@@ -10,7 +10,7 @@ sudo -u postgres psql -a -f db/migrations/0.sql
 psql -U postgres -a -f db/migrations/0.sql
 ```
 
-Затем нужно добавить содержимое конфига из conf/pg_hba.conf в /etc/postgresql/<version>/main/pg_hba.conf и перезапустить Postgres:
+Затем нужно добавить содержимое конфига из conf/pg_hba.conf в /etc/postgresql/(version)/main/pg_hba.conf и перезапустить Postgres:
 ```bash
 sudo cat misc/conf/pg_hba.conf >> /etc/postgresql/10/main/pg_hba.conf
 # или для Postgresql 9.*
