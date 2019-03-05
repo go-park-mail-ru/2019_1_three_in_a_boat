@@ -1,35 +1,51 @@
-CREATE ROLE hexagon WITH LOGIN 
-                         PASSWORD 'ChangeBeforeDeploying' -- imma forget to change it 100% of the time lmfao
-                         CONNECTION LIMIT -1;
+-- Creates database, creates role hexagon, grants permissions, creates tables
+--
+\set pwd 'ChangeBeforeDeploying';
+DO
+  $$
+    BEGIN
+      IF :pwd == 'ChangeBeforeDeploying' THEN -- dont change this line lmao
+        RAISE WARNING 'You are using the debugging password!';
+      END IF;
+    END
+  $$;
+
+CREATE ROLE hexagon WITH LOGIN
+  PASSWORD :pwd
+  CONNECTION LIMIT -1;
 
 CREATE DATABASE hexagon WITH OWNER = postgres;
 
 \c hexagon;
 
-CREATE TYPE gender_t AS ENUM ('male', 'female', 'other');
+CREATE TYPE GENDER_T AS ENUM ('male', 'female', 'other');
 
-CREATE TABLE IF NOT EXISTS account (
-  uid         SERIAL                      PRIMARY KEY,
-  username    VARCHAR(32)                 NOT NULL CHECK (username <> ''),
-  email       VARCHAR(254)                NOT NULL CHECK (email <> '')
+CREATE TABLE IF NOT EXISTS account
+(
+  uid      SERIAL       PRIMARY KEY,
+  username VARCHAR(32)  UNIQUE NOT NULL CHECK (username <> ''),
+  password BYTEA        NOT NULL CHECK (octet_length(password) <> 0),
+  email    VARCHAR(254) UNIQUE NOT NULL CHECK (email <> '')
 );
 
-CREATE TABLE IF NOT EXISTS profile (
-  uid         integer                     PRIMARY KEY REFERENCES account,
+CREATE TABLE IF NOT EXISTS profile
+(
+  uid         INTEGER                     PRIMARY KEY REFERENCES account
+                                          DEFERRABLE INITIALLY DEFERRED,
   first_name  VARCHAR(32),
   last_name   VARCHAR(32),
-  high_score  int                         CHECK (high_score >= 0),
-  gender      gender_t,
-  userpic     VARCHAR(64),
-  birth_data  date,
-  signup_date timestamp(0) with time zone NOT NULL DEFAULT current_timestamp
+  high_score  INT                         CHECK (high_score >= 0),
+  gender      GENDER_T,
+  img         VARCHAR(64),
+  birth_date  DATE,
+  signup_date TIMESTAMP(0) WITH TIME ZONE NOT NULL DEFAULT current_timestamp
 );
 
-CREATE TABLE IF NOT EXISTS author (
-  uid         integer                     PRIMARY KEY REFERENCES account,
-  devInfo     varchar(128),
-  img         varchar(128),
-  description text
+CREATE TABLE IF NOT EXISTS author
+(
+  uid         INTEGER      PRIMARY KEY REFERENCES account DEFERRABLE INITIALLY IMMEDIATE,
+  dev_info    VARCHAR(128),
+  description TEXT
 );
 
 GRANT ALL PRIVILEGES ON DATABASE hexagon TO hexagon;
