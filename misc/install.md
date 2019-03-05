@@ -2,12 +2,12 @@
 
 Запускаем постгрес, копипастим в терминал:
 ```bash
-sudo -u postgres psql -a -f db/migrations/bundle.sql
+sudo -u postgres psql -a -f db/migrations/0.sql
 ```
 
 Или, если авторизация через ОС выключена (тогда надо ввести пароль):
 ```bash
-psql -U postgres -a -f db/migrations/bundle.sql
+psql -U postgres -a -f db/migrations/0.sql
 ```
 
 Затем нужно добавить содержимое конфига из conf/pg_hba.conf в /etc/postgresql/<version>/main/pg_hba.conf и перезапустить Postgres:
