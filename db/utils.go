@@ -1,13 +1,6 @@
-// Package implements interface to Postgresql using db.sql and pq PostgreSQL driver
-// There's one class per DB entity, containing all the fields
-// Every class contains a Save method, which always takes Queryable or sql.DB
-// sql.DB is only taken when the body of amethod
-// All classes have Pk attributes, which are set to 0 if the object
-// is not represented in the database.
 package db
 
-// The file provides utility functions, structs and interfaces.
-// All of the structs and interfaces are exported. None of the functions are.
+// The file provides utility functions, none of which are exported
 
 import (
 	"database/sql"
@@ -15,34 +8,6 @@ import (
 	"fmt"
 	"strings"
 )
-
-// represents the common interface of sql.Tx and sql.DB
-type Queryable interface {
-	Exec(query string, args ...interface{}) (sql.Result, error)
-	Prepare(query string) (*sql.Stmt, error)
-	Query(query string, args ...interface{}) (*sql.Rows, error)
-	QueryRow(query string, args ...interface{}) *sql.Row
-}
-
-// represents the common interface of Sql.Row and Sql.Rows
-type Scanner interface {
-	Scan(...interface{}) error
-}
-
-// represents an ordering to the
-type SelectOrder struct {
-	Field string
-	Desc  bool
-}
-
-// returns "order.Field ASC/DESC", provided for convenience
-func (order *SelectOrder) String() string {
-	if order.Desc {
-		return order.Field + " DESC"
-	} else {
-		return order.Field + " ASC"
-	}
-}
 
 // Makes a valid SQL ORDER BY statement out of a slice of SelectOrder
 // adds a space at the end, so chaining statements with + is safe
