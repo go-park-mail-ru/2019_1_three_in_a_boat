@@ -11,7 +11,7 @@ import (
 
 type NullString sql.NullString
 
-func (ns NullString) MarshallJSON() ([]byte, error) {
+func (ns NullString) MarshalJSON() ([]byte, error) {
 	if val, err := ns.Value(); err != nil {
 		return nil, err
 	} else {
@@ -29,7 +29,7 @@ func (ns *NullString) Scan(value interface{}) error {
 
 type NullInt64 sql.NullInt64
 
-func (ni NullInt64) MarshallJSON() ([]byte, error) {
+func (ni NullInt64) MarshalJSON() ([]byte, error) {
 	if val, err := ni.Value(); err != nil {
 		return nil, err
 	} else {
@@ -47,7 +47,7 @@ func (ni NullInt64) Value() (driver.Value, error) {
 
 type NullFloat64 sql.NullFloat64
 
-func (nf NullFloat64) MarshallJSON() ([]byte, error) {
+func (nf NullFloat64) MarshalJSON() ([]byte, error) {
 	if val, err := nf.Value(); err != nil {
 		return nil, err
 	} else {
@@ -65,7 +65,7 @@ func (nf NullFloat64) Value() (driver.Value, error) {
 
 type NullBool sql.NullBool
 
-func (nb NullBool) MarshallJSON() ([]byte, error) {
+func (nb NullBool) MarshalJSON() ([]byte, error) {
 	if val, err := nb.Value(); err != nil {
 		return nil, err
 	} else {
@@ -83,7 +83,7 @@ func (nb NullBool) Value() (driver.Value, error) {
 
 type NullTime pq.NullTime
 
-func (nt NullTime) MarshallJSON() ([]byte, error) {
+func (nt NullTime) MarshalJSON() ([]byte, error) {
 	if val, err := nt.Value(); err != nil {
 		return nil, err
 	} else {

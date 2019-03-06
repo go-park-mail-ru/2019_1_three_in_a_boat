@@ -12,14 +12,11 @@ type Author struct {
 // Data required by the get_authors API resource, provided for convenience
 // Incorporates Author Class and Username + Img fields of Account and Profile
 type AuthorData struct {
-	Author   *Author    `json:",inline"`
-	Username string     `json:"username"`
-	Img      NullString `json:"img"`
-}
-
-// returns ad.Author.Pk, provided for convenience
-func (ad * AuthorData) GetPk() int64 {
-  return ad.Author.Pk
+	Pk          int64      `json:"uid"`
+	DevInfo     NullString `json:"devInfo"`
+	Description NullString `json:"description"`
+	Username    string     `json:"username"`
+	Img         NullString `json:"img"`
 }
 
 // Constructor - takes all the fields, does NOT immediately check if uid is valid
@@ -52,9 +49,9 @@ func (a *Author) Save(_db Queryable) error {
 
 // Created an AuthorData object from a Scanner returned by GetAllAuthors
 func AuthorDataFromRow(row Scanner) (*AuthorData, error) {
-	a := &AuthorData{Author: &Author{}}
-	err := row.Scan(&a.Author.Pk, &a.Username,
-		&a.Img, &a.Author.DevInfo, &a.Author.Description)
+	a := &AuthorData{}
+	err := row.Scan(&a.Pk, &a.Username,
+		&a.Img, &a.DevInfo, &a.Description)
 	if err != nil {
 		return nil, err
 	}
