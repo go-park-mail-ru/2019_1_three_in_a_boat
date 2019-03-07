@@ -25,7 +25,7 @@ func handle2XXDepth(depth int, status int, w http.ResponseWriter,
 func handle4XXDepth(depth int, status int, w http.ResponseWriter,
 	r *http.Request, msg string) {
 	w.WriteHeader(status)
-	writeErrorResponse(1+depth, w, r, msg)
+	writeErrorResponse(1+depth, w, r, msg, msg)
 }
 
 // Handles server errors: formats msg, returnedBy, err and forwards it to the
@@ -33,16 +33,16 @@ func handle4XXDepth(depth int, status int, w http.ResponseWriter,
 func handle5XXDepth(depth int, status int, w http.ResponseWriter, r *http.Request,
 	msg string, returnedBy string, err error) {
 	w.WriteHeader(status)
-	writeErrorResponse(1+depth, w, r,
+	writeErrorResponse(1+depth, w, r, msg,
 		fmt.Sprintf("%s (returned by %s as %s)", msg, returnedBy, err))
 }
 
 // used to write an error message to logs and return it to the client
 // if sending the error to the client fails, logs that too
 func writeErrorResponse(depth int, w http.ResponseWriter, r *http.Request,
-	msg string) {
+	clientMsg string, msg string) {
 	var responseError error = nil
-	_, responseError = w.Write(formats.MakeErrorResponse(msg))
+	_, responseError = w.Write(formats.MakeErrorResponse(clientMsg))
 
 	if responseError != nil {
 		logError(1+depth, fmt.Sprintf("%s while processing %s: %s",

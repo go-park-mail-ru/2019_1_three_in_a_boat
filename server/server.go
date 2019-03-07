@@ -18,11 +18,12 @@ import (
 // Maps true/false into a string returned to the client in the status field
 var RoutesMap = map[string]routes.Route{
 	"/authors": {
-		Handler:      &routes.AuthorsHandler{},
-		Methods:      map[string]struct{}{"GET": {}},
-		AuthRequired: false,
-		CorsAllowed:  true,
-		Name:         "authors",
+		Handler: &routes.AuthorsHandler{},
+		Name:    "authors",
+	},
+	"/users": {
+		Handler: &routes.UsersHandler{},
+		Name:    "authors",
 	},
 }
 

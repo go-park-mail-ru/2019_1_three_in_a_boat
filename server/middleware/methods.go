@@ -11,9 +11,9 @@ import (
 // CORS-preflight-friendly Methods middleware
 func Methods(next http.Handler, _route routes.Route) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if _, found := _route.Methods[r.Method]; found {
+		if _, found := _route.Handler.Methods()[r.Method]; found {
 			next.ServeHTTP(w, r)
-		} else if _route.CorsAllowed && r.Method == "OPTIONS" {
+		} else if _route.Handler.CorsAllowed(r.Method) && r.Method == "OPTIONS" {
 			CORS(http.HandlerFunc(
 				func(w http.ResponseWriter, r *http.Request) {
 					_, allowed := settings.AllowedOrigins[r.Header.Get("Origin")]

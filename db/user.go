@@ -2,16 +2,40 @@ package db
 
 import (
 	"database/sql"
+	"encoding/json"
 	"errors"
 	"fmt"
+	"time"
 )
 
 // Class representing a user - a JOIN on Account and Profile
 // Must not be created or modified directly but im still unsure whether unexported
 // fields work with JSON, and how hard my life will be if not.
 type User struct {
-	Account *Account `json:",inline"`
-	Profile *Profile `json:",inline"`
+	Account *Account
+	Profile *Profile
+}
+
+type UserData struct {
+	Pk         int64      `json:"uid"`
+	Username   string     `json:"username"`
+	Email      string     `json:"email"`
+	FirstName  NullString `json:"firstName"`
+	LastName   NullString `json:"lastName"`
+	HighScore  NullInt64  `json:"highScore"`
+	Gender     NullString `json:"gender"`
+	Img        NullString `json:"img"`
+	BirthDate  NullTime   `json:"birthDate"`
+	SignupDate time.Time  `json:"signupDate"`
+}
+
+func (u User) MarshalJSON() ([]byte, error) {
+	return json.Marshal(UserData{
+		u.Account.Pk, u.Account.Username, u.Account.Email,
+		u.Profile.FirstName, u.Profile.LastName,
+		u.Profile.HighScore, u.Profile.Gender, u.Profile.Img,
+		u.Profile.BirthDate, u.Profile.SignupDate,
+	})
 }
 
 // returns u.Account.Pk, provided for convenience
@@ -67,10 +91,10 @@ func (u *User) Save(_db *sql.DB) (err, transactionError error) {
 
 // Retrieves ALL values from multiple rows of the account/profile join
 // does not support projection, supports ordering on all fields specified in
-// userOrderMap
+// UserOrderMap
 func GetUserMany(_db Queryable, order []SelectOrder,
 	limit int, offset int) (*sql.Rows, error) {
-	orderStr, err := makeOrderString(userOrderMap, order)
+	orderStr, err := makeOrderString(UserOrderMap, order)
 	if err != nil {
 		return nil, err
 	}
@@ -79,8 +103,9 @@ func GetUserMany(_db Queryable, order []SelectOrder,
 	offsetStr := makeOffsetString(offset)
 
 	return _db.Query(`SELECT a."uid", a."username", a."email", a."password", 
-                           p."first_name", p."last_name", p."high_score", p."gender", 
-                           p."img", p."birth_date", p."signup_date"
+                           p."first_name", p."last_name", p."high_score",
+                    p."gender", p."img", p."birth_date", p."signup_date",
+                    count(*) OVER() AS n_users
                     FROM account a JOIN profile p ON a.uid = p.uid ` +
 		orderStr + limitStr + offsetStr)
 
@@ -89,23 +114,25 @@ func GetUserMany(_db Queryable, order []SelectOrder,
 // Convenience function provided for getting a user out of sql.Rows.Scan()
 // I probably should've implemented an sql.Scanner interface...
 // TODO: implement a Scanner interface for User
-func UserFromRow(row Scanner) (*User, error) {
+func UserFromRow(row Scanner) (*User, int, error) {
 	u := &User{&Account{}, &Profile{}}
+	var nUsers int
 	err := row.Scan(&u.Account.Pk, &u.Account.Username, &u.Account.Email,
-		&u.Account.Password, &u.Profile.FirstName, &u.Profile.LastName, &u.Profile.HighScore,
-		&u.Profile.Gender, &u.Profile.Img, &u.Profile.BirthDate, &u.Profile.SignupDate)
+		&u.Account.Password, &u.Profile.FirstName, &u.Profile.LastName,
+		&u.Profile.HighScore, &u.Profile.Gender, &u.Profile.Img,
+		&u.Profile.BirthDate, &u.Profile.SignupDate, &nUsers)
 
 	if err == nil {
-		return u, nil
+		return u, nUsers, nil
 	} else {
 		u.Profile.Pk = u.Account.Pk
-		return nil, err
+		return nil, 0, err
 	}
 }
 
 // Lists all fields that GetUserMany supports ordering by
 // adding an entry to the map is sufficient for everything to work
-var userOrderMap = map[string]string{
+var UserOrderMap = map[string]string{
 	"HighScore":  "p.high_score",
 	"FirstName":  "p.first_name",
 	"LastName":   "p.last_name",
