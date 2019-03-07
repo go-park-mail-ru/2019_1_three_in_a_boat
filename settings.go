@@ -43,7 +43,7 @@ func makeServer(handler http.Handler) *http.Server {
 		ReadTimeout:       time.Second * 30,
 		ReadHeaderTimeout: time.Second * 10,
 		WriteTimeout:      time.Second * 30,
-		IdleTimeout:       time.Second * 30,
+		IdleTimeout:       time.Second * 60,
 		MaxHeaderBytes:    0,
 		TLSNextProto:      nil,
 		ConnState:         nil,

@@ -1,7 +1,6 @@
 package routes
 
 import (
-	"database/sql"
 	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/db"
 	"net/http"
 )
@@ -10,28 +9,15 @@ import (
 type authorsResponse = []*db.AuthorData
 
 type AuthorsHandler struct {
-	db    *sql.DB
-	route string
 }
 
-func (h *AuthorsHandler) SetDB(_db *sql.DB) {
-	h.db = _db
-}
+func (h *AuthorsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	r.Header.Set("Content-Type", "application/json")
 
-func (h *AuthorsHandler) SetRoute(route string) {
-	h.route = route
-}
-
-func (h *AuthorsHandler) GetRoute() string {
-	return h.route
-}
-
-func (h *AuthorsHandler) ServeHTTP(res http.ResponseWriter, req *http.Request) {
-	setDefaultHeaders(res)
-
-	authorRows, err := db.GetAllAuthors(h.db)
+	authorRows, err := db.GetAllAuthors(_db)
 	if err != nil {
-		handle500(h, "E_DB_FAILURE", "db.GetAllAuthors", err, res)
+		Handle500(w, r, ErrSqlFailure, "db.GetAllAuthors", err)
+		return
 	}
 
 	var authors authorsResponse
@@ -39,10 +25,11 @@ func (h *AuthorsHandler) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 	for authorRows.Next() {
 		a, err := db.AuthorDataFromRow(authorRows)
 		if err != nil {
-			handle500(h, "E_DB_SCAN_FAILURE", "db.AuthorDataFromRow", err, res)
+			Handle500(w, r, ErrDbScanFailure, "db.AuthorDataFromRow", err)
+			return
 		}
 		authors = append(authors, a)
 	}
 
-	handle200(h, authors, "db.AuthorDataFromRow", res)
+	Handle200(w, r, authors, "db.AuthorDataFromRow")
 }

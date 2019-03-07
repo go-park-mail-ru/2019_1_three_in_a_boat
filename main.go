@@ -32,8 +32,8 @@ func main() {
 		log.Fatal(err)
 	}
 
-	mux := routes.GETRoutesMux(_db)
-	s := makeServer(mux)
+	router := routes.GetRouter(_db)
+	s := makeServer(router)
 
 	logger.Fatal(s.ListenAndServe())
 }

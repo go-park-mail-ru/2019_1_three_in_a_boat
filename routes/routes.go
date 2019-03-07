@@ -7,6 +7,7 @@ package routes
 import (
 	"database/sql"
 	"github.com/google/logger"
+	"github.com/gorilla/mux"
 	"net/http"
 	"sync"
 )
@@ -19,52 +20,58 @@ var StatusMap = map[bool]string{
 
 const Version = "0.1"
 
+var allowedOrigins = map[string]struct{}{
+	"http://localhost": {}, "https://three-in-a-boat.now.sh": {}}
+
+var routesMap = map[string]route{
+	"/authors": {
+		handler:      &AuthorsHandler{},
+		methods:      map[string]struct{}{"GET": {}},
+		middlewares:  []mux.MiddlewareFunc{},
+		authRequired: false,
+		corsAllowed:  true,
+		name:         "authors",
+	},
+}
+
+var globalRouter = mux.NewRouter()
+var _db *sql.DB = nil
+
 // Defines an HTTP handler on top of the http.Handler interface: adds the SetDB method
 type Handler interface {
 	http.Handler
-	SetDB(*sql.DB)
-	SetRoute(string)
-	GetRoute() string
 }
 
-// The routes map. Values will be set up with db and route in a call to
-// GETRoutesMap. Must not be used directly.
-var getRoutesMap = map[string]Handler{
-	"/authors": &AuthorsHandler{},
+type route struct {
+	handler      Handler
+	methods      map[string]struct{}
+	middlewares  []mux.MiddlewareFunc
+	authRequired bool
+	corsAllowed  bool
+	name         string
 }
 
-var getRoutesMapOnce = sync.Once{}
+var routesMapOnce = sync.Once{}
 
-// Returns routes map in the form of {route: handler}. Only the first call is
-// required to supply an actual sql.DB - subsequent calls can just pass nil.The
-// function is goroutine-safe, however, the first succeeded call must provide a
-// real sql.DB. Providing a nil in the first call will result in a fatal panic.
-func GETRoutesMap(db *sql.DB) map[string]Handler {
-	getRoutesMapOnce.Do(func() {
-		if db == nil {
-			logger.Fatal("GETRoutesMap called with nil the first time it was called")
+func GetRouter(database *sql.DB) http.Handler {
+	routesMapOnce.Do(func() {
+		if database == nil {
+			logger.Fatal("_db is nil in the first GetRouter call")
+		}
+		_db = database
+		logger.Info("Setting up router")
+
+		for routeStr, routeObj := range routesMap {
+			globalRouter.Handle(routeStr,
+				MethodMiddleware(
+					CORSMiddleware(
+						AuthMiddleware(
+							routeObj.handler, routeObj), routeObj), routeObj)).
+				Name(routeObj.name)
 		}
 
-		for route, handler := range getRoutesMap {
-			handler.SetDB(db)
-			handler.SetRoute(route)
-		}
+		globalRouter.NotFoundHandler = http.HandlerFunc(Handle404)
 	})
 
-	return getRoutesMap
-}
-
-// same as the routesMap, but this one is a ServeMux based on the map.
-var getRoutesMux = http.NewServeMux()
-var getRoutesMuxOnce = sync.Once{}
-
-// Returns an http.ServeMux based on GETRoutesMap's map. It calls GETRoutesMap,
-// so the same concurrency rules apply.
-func GETRoutesMux(db *sql.DB) *http.ServeMux {
-	getRoutesMuxOnce.Do(func() {
-		for route, handler := range GETRoutesMap(db) {
-			getRoutesMux.Handle(route, handler)
-		}
-	})
-	return getRoutesMux
+	return globalRouter
 }
