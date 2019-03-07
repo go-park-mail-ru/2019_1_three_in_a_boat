@@ -6,8 +6,8 @@ import (
 	"net/http"
 )
 
-// sets default content-type
-func CORSMiddleware(next http.Handler, _route routes.Route) http.Handler {
+// CORS Middleware: adds Access-Control headers if request's Origin is allowed
+func CORS(next http.Handler, _route routes.Route) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		origin := r.Header.Get("Origin")
 		_, allowed := settings.AllowedOrigins[origin]

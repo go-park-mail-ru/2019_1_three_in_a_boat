@@ -1,3 +1,5 @@
+// Package defines formats returned by the server and some utility functions
+// to work with them
 package formats
 
 import (

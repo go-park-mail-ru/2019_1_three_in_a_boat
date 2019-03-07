@@ -15,7 +15,6 @@ var logPath = flag.String("l", settings.DefaultLogPath, "path to the log file")
 var sysLog = flag.Bool("sl", false, "log to syslog")
 
 func main() {
-
 	logFile, err := os.OpenFile(
 		*logPath, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0660)
 	if err != nil {
