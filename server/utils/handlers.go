@@ -1,7 +1,8 @@
-package routes
+package utils
 
 import (
 	"fmt"
+	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/formats"
 	"net/http"
 )
 
@@ -26,23 +27,23 @@ func Handle500(w http.ResponseWriter, r *http.Request,
 
 // Logs 404 and sends back an error message, if possible
 func Handle405(w http.ResponseWriter, r *http.Request) {
-	handle4XXDepth(1, http.StatusMethodNotAllowed, w, r, Err405)
+	handle4XXDepth(1, http.StatusMethodNotAllowed, w, r, formats.Err405)
 }
 
 // Logs 404 and sends back an error message, if possible
 func Handle404(w http.ResponseWriter, r *http.Request) {
-	handle4XXDepth(1, http.StatusNotFound, w, r, Err404)
+	handle4XXDepth(1, http.StatusNotFound, w, r, formats.Err404)
 }
 
 // Handles a successful response: tries to marshal data, writes it to res.
 // If an error occurs, calls handle5XXDepth with the diagnostic message
 func handle2XXDepth(depth int, status int, w http.ResponseWriter,
 	r *http.Request, data interface{}, returnedBy string) {
-	jsonResponse, err := MakeSuccessResponse(data)
+	jsonResponse, err := formats.MakeSuccessResponse(data)
 
 	if err != nil {
 		handle5XXDepth(http.StatusInternalServerError, 1+depth, w, r,
-			ErrJSONMarshalFailure, returnedBy+"/MakeSuccessResponse", err)
+			formats.ErrJSONMarshalFailure, returnedBy+"/MakeSuccessResponse", err)
 	} else {
 		w.WriteHeader(status)
 		writeSuccessResponse(1+depth, w, r, jsonResponse, "200 OK")
@@ -70,11 +71,11 @@ func handle5XXDepth(depth int, status int, w http.ResponseWriter, r *http.Reques
 func writeErrorResponse(depth int, w http.ResponseWriter, r *http.Request,
 	msg string) {
 	var responseError error = nil
-	_, responseError = w.Write(MakeErrorResponse(msg))
+	_, responseError = w.Write(formats.MakeErrorResponse(msg))
 
 	if responseError != nil {
 		logError(1+depth, fmt.Sprintf("%s while processing %s: %s",
-			ErrResponseWriterFailure, msg, responseError), r)
+			formats.ErrResponseWriterFailure, msg, responseError), r)
 	} else {
 		logError(1+depth, msg, r)
 	}
@@ -87,7 +88,7 @@ func writeSuccessResponse(depth int, w http.ResponseWriter, r *http.Request,
 	_, err := w.Write(response)
 	if err != nil {
 		handle5XXDepth(1+depth, http.StatusInternalServerError, w, r,
-			ErrResponseWriterFailure, "res.Write", err)
+			formats.ErrResponseWriterFailure, "res.Write", err)
 	} else {
 		logInfo(1, msg, r)
 	}

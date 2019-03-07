@@ -1,4 +1,4 @@
-package routes
+package formats
 
 const (
 	ErrSqlFailure            = "E_DB_QUERY_FAILURE"
