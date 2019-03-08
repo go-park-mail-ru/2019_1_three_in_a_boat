@@ -1,7 +1,6 @@
 package routes
 
 import (
-	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/handlers"
 	"net/http"
 )
 
@@ -9,8 +8,8 @@ type UsersHandler struct{}
 
 func (h *UsersHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if r.Method == "POST" {
-		handlers.Handle405(w, r)
-	} else {
+		PostUsers(w, r)
+	} else if r.Method == "GET" {
 		GetUsers(w, r)
 	}
 }
