@@ -19,6 +19,22 @@ func (ns NullString) MarshalJSON() ([]byte, error) {
 	}
 }
 
+func (ns *NullString) UnmarshalJSON(data []byte) error {
+	var i *string
+	if err := json.Unmarshal(data, &i); err != nil {
+		return err
+	}
+
+	if i != nil {
+		ns.Valid = true
+		ns.String = *i
+	} else {
+		ns.Valid = false
+	}
+
+	return nil
+}
+
 func (ns NullString) Value() (driver.Value, error) {
 	return sql.NullString(ns).Value()
 }
@@ -35,6 +51,22 @@ func (ni NullInt64) MarshalJSON() ([]byte, error) {
 	} else {
 		return json.Marshal(val)
 	}
+}
+
+func (ni *NullInt64) UnmarshalJSON(data []byte) error {
+	var i *int64
+	if err := json.Unmarshal(data, &i); err != nil {
+		return err
+	}
+
+	if i != nil {
+		ni.Valid = true
+		ni.Int64 = *i
+	} else {
+		ni.Valid = false
+	}
+
+	return nil
 }
 
 func (ni *NullInt64) Scan(value interface{}) error {
@@ -55,6 +87,22 @@ func (nf NullFloat64) MarshalJSON() ([]byte, error) {
 	}
 }
 
+func (nf *NullFloat64) UnmarshalJSON(data []byte) error {
+	var f *float64
+	if err := json.Unmarshal(data, &f); err != nil {
+		return err
+	}
+
+	if f != nil {
+		nf.Valid = true
+		nf.Float64 = *f
+	} else {
+		nf.Valid = false
+	}
+
+	return nil
+}
+
 func (nf *NullFloat64) Scan(value interface{}) error {
 	return (*sql.NullFloat64)(nf).Scan(value)
 }
@@ -73,6 +121,22 @@ func (nb NullBool) MarshalJSON() ([]byte, error) {
 	}
 }
 
+func (nb *NullBool) UnmarshalJSON(data []byte) error {
+	var b *bool
+	if err := json.Unmarshal(data, &b); err != nil {
+		return err
+	}
+
+	if b != nil {
+		nb.Valid = true
+		nb.Bool = *b
+	} else {
+		nb.Valid = false
+	}
+
+	return nil
+}
+
 func (nb *NullBool) Scan(value interface{}) error {
 	return (*sql.NullBool)(nb).Scan(value)
 }
@@ -89,6 +153,22 @@ func (nt NullTime) MarshalJSON() ([]byte, error) {
 	} else {
 		return json.Marshal(val)
 	}
+}
+
+func (nt *NullTime) UnmarshalJSON(data []byte) error {
+	var i *time.Time
+	if err := json.Unmarshal(data, &i); err != nil {
+		return err
+	}
+
+	if i != nil {
+		nt.Valid = true
+		nt.Time = *i
+	} else {
+		nt.Valid = false
+	}
+
+	return nil
 }
 
 func (nt *NullTime) Scan(value interface{}) error {
