@@ -26,5 +26,9 @@ func main() {
 	l := logger.Init("Hexagon Server", *verbose, *sysLog, logFile)
 	defer l.Close()
 
+	// triggering the do.Once so fatal happens here if it does
+	settings.GetSigner()
+	settings.DB()
+
 	logger.Fatal(server.Server().ListenAndServe())
 }

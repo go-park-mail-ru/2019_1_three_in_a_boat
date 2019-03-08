@@ -39,7 +39,7 @@ func PostUsers(w http.ResponseWriter, r *http.Request) {
 
 	err, txErr := u.Save(settings.DB())
 	if txErr != nil {
-		handlers.Handle500(w, r, formats.ErrDbTranscationFailure,
+		handlers.Handle500(w, r, formats.ErrDbTransactionFailure,
 			"db.User.Save", txErr)
 		return
 	}
@@ -48,13 +48,19 @@ func PostUsers(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		if report != nil {
 			handlers.HandleInvalidData(w, r, report,
-				formats.ErrValidation, "forms.MakeReport")
+				formats.ErrValidation, "forms.NewReport")
 		} else {
 			handlers.Handle500(w, r, formats.ErrSqlFailure, "db.User.Save", err)
 		}
 		return
 	}
 
-	// TODO: set Auth data here
+	err = handlers.Authorize(w, r, u)
+	if err != nil {
+		handlers.Handle500(w, r, formats.ErrSignupAuthFailure,
+			"handlers.Authorize", err)
+		return
+	}
+
 	handlers.Handle201(w, r, u, "forms.SignupForm.MakeUser")
 }

@@ -11,7 +11,7 @@ import (
 // If an error occurs, calls handle5XXDepth with the diagnostic message
 func handle2XXDepth(depth int, status int, w http.ResponseWriter,
 	r *http.Request, data interface{}, returnedBy string) {
-	jsonResponse, err := formats.MakeSuccessResponse(data)
+	jsonResponse, err := formats.MakeSuccessResponse(r, data)
 
 	if err != nil {
 		handle5XXDepth(http.StatusInternalServerError, 1+depth, w, r,
@@ -26,7 +26,7 @@ func handle2XXDepth(depth int, status int, w http.ResponseWriter,
 // If an error occurs, calls handle5XXDepth with the diagnostic message
 func handleInvalidDataDepth(depth int, status int, w http.ResponseWriter,
 	r *http.Request, data interface{}, msg string, returnedBy string) {
-	jsonResponse, err := formats.MakeClientErrorResponse(data, msg)
+	jsonResponse, err := formats.MakeClientErrorResponse(r, data, msg)
 
 	if err != nil {
 		handle5XXDepth(http.StatusInternalServerError, 1+depth, w, r,
@@ -58,13 +58,13 @@ func handle5XXDepth(depth int, status int, w http.ResponseWriter, r *http.Reques
 func writeErrorResponse(depth int, w http.ResponseWriter, r *http.Request,
 	clientMsg string, msg string) {
 	var responseError error = nil
-	_, responseError = w.Write(formats.MakeErrorResponse(clientMsg))
+	_, responseError = w.Write(formats.MakeErrorResponse(r, clientMsg))
 
 	if responseError != nil {
-		logError(1+depth, fmt.Sprintf("%s while processing %s: %s",
+		LogError(1+depth, fmt.Sprintf("%s while processing %s: %s",
 			formats.ErrResponseWriterFailure, msg, responseError), r)
 	} else {
-		logError(1+depth, msg, r)
+		LogError(1+depth, msg, r)
 	}
 }
 
@@ -74,9 +74,9 @@ func writeSuccessResponse(depth int, w http.ResponseWriter, r *http.Request,
 	response []byte, msg string) {
 	_, err := w.Write(response)
 	if err != nil {
-		logError(1+depth, fmt.Sprintf("%s while processing %s: %s",
+		LogError(1+depth, fmt.Sprintf("%s while processing %s: %s",
 			formats.ErrResponseWriterFailure, msg, err), r)
 	} else {
-		logInfo(1, msg, r)
+		LogInfo(1, msg, r)
 	}
 }

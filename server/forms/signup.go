@@ -23,8 +23,8 @@ type SignupForm struct {
 	ok           bool          `json:"-"`
 }
 
-func (f *SignupForm) Validate() *FormReport {
-	report := MakeReport()
+func (f *SignupForm) Validate() *Report {
+	report := NewReport()
 
 	report.Fields["username"] = f.ValidateUsername()
 	report.Fields["password"] = f.ValidatePassword()
@@ -147,9 +147,10 @@ func (f *SignupForm) ValidateLastName() (r FieldReport) {
 	return checkLengthOptional(&f.LastName, 1, 32)
 }
 
-func CheckUserDbConstraints(err error) (*FormReport, error) {
+func CheckUserDbConstraints(err error) (*Report, error) {
 	if err != nil {
-		report := MakeReport()
+		report := NewReport("username", "password", "email",
+			"name", "lastname", "date")
 		if pqErr, ok := err.(*pq.Error); ok && pqErr.Constraint != "" {
 			fieldReport :=
 				FieldReport{false, []string{formats.ErrUniqueViolation}}

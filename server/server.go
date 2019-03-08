@@ -23,7 +23,11 @@ var RoutesMap = map[string]routes.Route{
 	},
 	"/users": {
 		Handler: &routes.UsersHandler{},
-		Name:    "authors",
+		Name:    "users",
+	},
+	"/signin": {
+		Handler: &routes.SigninHandler{},
+		Name:    "signin",
 	},
 }
 

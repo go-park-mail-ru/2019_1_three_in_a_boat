@@ -56,18 +56,41 @@ func NewUser(account *Account, profile *Profile) (*User, error) {
 
 // Retrieves a single user from the database, forwards the SQL error, if any
 func GetUser(_db Queryable, uid int64) (*User, error) {
-	// TODO: write a join, jeez what is this shittery
-	a, err := GetAccount(_db, uid)
+	u := &User{&Account{}, &Profile{}}
+	err := _db.QueryRow(`
+    SELECT a."uid", a."username", a."email", a."password", 
+           p."first_name", p."last_name", p."high_score",
+           p."gender", p."img", p."birth_date", p."signup_date"
+    FROM account a JOIN profile p ON a.uid = p.uid
+    WHERE a."uid"=$1`, uid).Scan(&u.Account.Pk, &u.Account.Username, &u.Account.Email,
+		&u.Account.Password, &u.Profile.FirstName, &u.Profile.LastName,
+		&u.Profile.HighScore, &u.Profile.Gender, &u.Profile.Img,
+		&u.Profile.BirthDate, &u.Profile.SignupDate)
+
 	if err != nil {
 		return nil, err
 	}
+	return u, nil
+}
 
-	p, err := GetProfile(_db, uid)
+func GetUserByUsernameOrEmail(_db Queryable, username string,
+	email string) (*User, error) {
+	u := &User{&Account{}, &Profile{}}
+	err := _db.QueryRow(`
+    SELECT a."uid", a."username", a."email", a."password", 
+           p."first_name", p."last_name", p."high_score",
+           p."gender", p."img", p."birth_date", p."signup_date"
+    FROM account a JOIN profile p ON a.uid = p.uid
+    WHERE a."email"=$1 OR a."username" = $2`, // both are constrained to be unique
+		email, username).Scan(&u.Account.Pk, &u.Account.Username, &u.Account.Email,
+		&u.Account.Password, &u.Profile.FirstName, &u.Profile.LastName,
+		&u.Profile.HighScore, &u.Profile.Gender, &u.Profile.Img,
+		&u.Profile.BirthDate, &u.Profile.SignupDate)
+
 	if err != nil {
 		return nil, err
 	}
-
-	return &User{a, p}, nil
+	return u, nil
 }
 
 // Saves User object to the database -
