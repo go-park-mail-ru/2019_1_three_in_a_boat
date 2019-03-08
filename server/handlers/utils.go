@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/formats"
 	"net/http"
+	"strconv"
 )
 
 // Handles a successful response: tries to marshal data, writes it to res.
@@ -17,15 +18,30 @@ func handle2XXDepth(depth int, status int, w http.ResponseWriter,
 			formats.ErrJSONMarshalFailure, returnedBy+"/MakeSuccessResponse", err)
 	} else {
 		w.WriteHeader(status)
-		writeSuccessResponse(1+depth, w, r, jsonResponse, "200 OK")
+		writeSuccessResponse(1+depth, w, r, jsonResponse, strconv.Itoa(status)+" OK")
+	}
+}
+
+// Handles a successful response: tries to marshal data, writes it to res.
+// If an error occurs, calls handle5XXDepth with the diagnostic message
+func handleInvalidDataDepth(depth int, status int, w http.ResponseWriter,
+	r *http.Request, data interface{}, msg string, returnedBy string) {
+	jsonResponse, err := formats.MakeClientErrorResponse(data, msg)
+
+	if err != nil {
+		handle5XXDepth(http.StatusInternalServerError, 1+depth, w, r,
+			formats.ErrJSONMarshalFailure, returnedBy+"/MakeClientErrorResponse", err)
+	} else {
+		w.WriteHeader(status)
+		writeSuccessResponse(1+depth, w, r, jsonResponse, msg)
 	}
 }
 
 // Handles client errors: logs msg and forwards it to writeErrorResponse
 func handle4XXDepth(depth int, status int, w http.ResponseWriter,
-	r *http.Request, msg string) {
+	r *http.Request, clientMsg, msg string) {
 	w.WriteHeader(status)
-	writeErrorResponse(1+depth, w, r, msg, msg)
+	writeErrorResponse(1+depth, w, r, clientMsg, msg)
 }
 
 // Handles server errors: formats msg, returnedBy, err and forwards it to the

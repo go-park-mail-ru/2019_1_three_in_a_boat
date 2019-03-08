@@ -25,12 +25,28 @@ func Handle500(w http.ResponseWriter, r *http.Request,
 	handle5XXDepth(1, http.StatusInternalServerError, w, r, msg, returnedBy, err)
 }
 
-// Logs 404 and sends back an error message, if possible
+// Logs 405 and sends back an error message, if possible
 func Handle405(w http.ResponseWriter, r *http.Request) {
-	handle4XXDepth(1, http.StatusMethodNotAllowed, w, r, formats.Err405)
+	handle4XXDepth(1, http.StatusMethodNotAllowed, w, r,
+		formats.Err405, formats.Err405)
 }
 
 // Logs 404 and sends back an error message, if possible
 func Handle404(w http.ResponseWriter, r *http.Request) {
-	handle4XXDepth(1, http.StatusNotFound, w, r, formats.Err404)
+	handle4XXDepth(1, http.StatusNotFound, w, r,
+		formats.Err405, formats.Err404)
+}
+
+// Handles request provided in an invalid format, e.g. invalid JSON. Should
+// never happen if the app is working as intended and the user isn't trying to
+// do something fishy
+func Handle400(w http.ResponseWriter, r *http.Request, clientMsg, msg string) {
+	handle4XXDepth(1, http.StatusBadRequest, w, r,
+		clientMsg, msg)
+}
+
+// Handles user error - generally a form validation error
+func HandleInvalidData(w http.ResponseWriter, r *http.Request,
+	clientMsg interface{}, msg string, returnedBy string) {
+	handleInvalidDataDepth(1, http.StatusBadRequest, w, r, clientMsg, msg, returnedBy)
 }
