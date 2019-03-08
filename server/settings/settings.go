@@ -33,5 +33,10 @@ var StatusMap = map[bool]string{
 // returned to the client. Otherwise Access-Control remains unset.
 var AllowedOrigins = map[string]struct{}{
 	"http://localhost":               {},
+	"http://localhost:8080":          {},
+	"http://localhost:3000":          {},
+	"http://127.0.0.1":               {},
+	"http://127.0.0.1:8080":          {},
+	"http://127.0.0.1:3000":          {},
 	"https://three-in-a-boat.now.sh": {},
 }
