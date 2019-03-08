@@ -15,7 +15,7 @@ type AuthorsHandler struct{}
 
 // Handler for the Authors resource
 func (h *AuthorsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	r.Header.Set("Content-Type", "application/formats")
+	r.Header.Set("Content-Type", "application/json")
 
 	rows, err := db.GetAllAuthors(settings.DB())
 	if err != nil {

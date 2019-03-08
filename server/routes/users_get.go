@@ -22,7 +22,7 @@ const UsersMaxPageSize = 10
 
 // Handler for the Users resource
 func GetUsers(w http.ResponseWriter, r *http.Request) {
-	r.Header.Set("Content-Type", "application/formats")
+	r.Header.Set("Content-Type", "application/json")
 
 	page, pageSize, order := validateUsersParams(r.URL)
 

@@ -11,11 +11,11 @@ import (
 // The struct outlines full JSON response structure. It should not be used directly,
 // use JSONResponse instead.
 type _JSONResponseData struct {
-	Status  string      `formats:"status"`
-	Version string      `formats:"version"`
-	Date    string      `formats:"responseTime"`
-	Data    interface{} `formats:"data"`
-	Message string      `formats:"message,omitempty"`
+	Status  string      `json:"status"`
+	Version string      `json:"version"`
+	Date    string      `json:"responseTime"`
+	Data    interface{} `json:"data"`
+	Message string      `json:"message,omitempty"`
 }
 
 // The struct outlines basic JSON response structure. Additional metadata fields
@@ -39,11 +39,11 @@ func (jr JSONResponse) MarshalJSON() ([]byte, error) {
 
 // Represents a single field in a validation result
 type JSONFieldValidation struct {
-	Errors    []string `formats:"errors"`
-	FieldName string   `formats:"fieldName"`
+	Errors    []string `json:"errors"`
+	FieldName string   `json:"fieldName"`
 }
 
 // Represents a form in a validation result
 type JSONFormValidation struct {
-	Fields []JSONFieldValidation `formats:"fields"`
+	Fields []JSONFieldValidation `json:"fields"`
 }
