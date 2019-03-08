@@ -59,6 +59,7 @@ func Auth(next http.Handler, _route routes.Route) http.Handler {
 		}
 
 		if _route.Handler.AuthRequired(r.Method) && err != nil {
+			handlers.LogError(0, errMsg, r)
 			handlers.Handle403(w, r)
 			return // .. unless the resource requires authorization
 		}
