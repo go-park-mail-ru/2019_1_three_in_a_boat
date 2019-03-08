@@ -45,7 +45,6 @@ func Auth(next http.Handler, _route routes.Route) http.Handler {
 					errMsg = formats.ErrJWTOutdated
 				} else {
 					ctx = formats.NewAuthContext(context.Background(), &claims)
-
 				}
 			}
 		}
@@ -58,7 +57,8 @@ func Auth(next http.Handler, _route routes.Route) http.Handler {
 			handlers.LogError(0, errMsg, r)
 			// log the error and forward the response as unauthorized - do not return
 		}
-		if _route.Handler.AuthRequired(r.Method) {
+
+		if _route.Handler.AuthRequired(r.Method) && err != nil {
 			handlers.Handle403(w, r)
 			return // .. unless the resource requires authorization
 		}
