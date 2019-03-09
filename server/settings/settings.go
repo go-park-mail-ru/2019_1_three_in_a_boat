@@ -1,12 +1,18 @@
 package settings
 
-import "gopkg.in/square/go-jose.v2"
+import (
+	"github.com/google/logger"
+	"gopkg.in/square/go-jose.v2"
+	"os"
+	"strings"
+	"sync"
+)
 
-const (
-	dbUsername        = "hexagon"
-	dbName            = "hexagon"
-	dbHost            = "localhost"
-	dbDefaultPassword = "ChangeBeforeDeploying"
+var (
+	dbUsername = "hexagon"
+	dbName     = "hexagon"
+	dbHost     = "localhost"
+	dbPassword = "ChangeBeforeDeploying"
 )
 
 // If -l is not specified, logs will be stored here
@@ -33,7 +39,7 @@ var SignerOpts = jose.SignerOptions{
 }
 
 // Simply the version returned to the client
-const Version = "0.3"
+const Version = "0.9"
 
 // JSON values returned to the client, indicating whether the response was
 // completed successfully. Is redundant, considering http status code, so
@@ -45,7 +51,7 @@ var StatusMap = map[bool]string{
 
 // Set-like map of allowed origins. If Origin belongs to this set, it will be
 // returned to the client. Otherwise Access-Control remains unset.
-var AllowedOrigins = map[string]struct{}{
+var allowedOrigins = map[string]struct{}{
 	"http://localhost":               {},
 	"http://localhost:8080":          {},
 	"http://localhost:3000":          {},
@@ -53,4 +59,24 @@ var AllowedOrigins = map[string]struct{}{
 	"http://127.0.0.1:8080":          {},
 	"http://127.0.0.1:3000":          {},
 	"https://three-in-a-boat.now.sh": {},
+}
+
+var allowedOriginsOnce sync.Once
+
+func GetAllowedOrigins() map[string]struct{} {
+	allowedOriginsOnce.Do(func() {
+		origins := strings.Split(os.Getenv("ALLOWED_ORIGINS"), ";")
+		for _, origin := range origins {
+			if origin != "" {
+				allowedOrigins[strings.TrimSpace(origin)] = struct{}{}
+			}
+		}
+
+		logger.Info("Listing allowed origins:")
+		for origin := range allowedOrigins {
+			logger.Info("\t", origin)
+		}
+	})
+
+	return allowedOrigins
 }

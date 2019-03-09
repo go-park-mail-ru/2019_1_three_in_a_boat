@@ -9,6 +9,7 @@ import (
 	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/routes"
 	"github.com/google/logger"
 	"net/http"
+	"strconv"
 	"sync"
 	"time"
 )
@@ -67,9 +68,9 @@ func GetRouter() http.Handler {
 }
 
 // Creates a new server with default settings and GetRouter() handler
-func Server() *http.Server {
+func Server(port int) *http.Server {
 	return &http.Server{
-		Addr:              ":3000",
+		Addr:              ":" + strconv.Itoa(port),
 		Handler:           GetRouter(),
 		TLSConfig:         nil,
 		ReadTimeout:       time.Second * 30,

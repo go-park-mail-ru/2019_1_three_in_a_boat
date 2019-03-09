@@ -13,8 +13,10 @@ import (
 var verbose = flag.Bool("v", true, "print info level logs to stdout")
 var logPath = flag.String("l", settings.DefaultLogPath, "path to the log file")
 var sysLog = flag.Bool("sl", false, "log to syslog")
+var port = flag.Int("p", 3000, "port to listen at")
 
 func main() {
+	flag.Parse()
 	logFile, err := os.OpenFile(
 		*logPath, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0660)
 	if err != nil {
@@ -26,11 +28,12 @@ func main() {
 	l := logger.Init("Hexagon Server", *verbose, *sysLog, logFile)
 	defer l.Close()
 
-	// triggering the do.Once so fatal happens here if it does
+	// triggering the do.Once for logging and triggering fatal errors
 	settings.GetSigner()
 	settings.DB()
+	settings.GetAllowedOrigins()
 
-	s := server.Server()
+	s := server.Server(*port)
 	logger.Info("Listening at ", s.Addr)
 	logger.Fatal(s.ListenAndServe())
 }

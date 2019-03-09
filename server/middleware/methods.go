@@ -16,7 +16,7 @@ func Methods(next http.Handler, _route routes.Route) http.Handler {
 		} else if _route.Handler.CorsAllowed(r.Method) && r.Method == "OPTIONS" {
 			CORS(http.HandlerFunc(
 				func(w http.ResponseWriter, r *http.Request) {
-					_, allowed := settings.AllowedOrigins[r.Header.Get("Origin")]
+					_, allowed := settings.GetAllowedOrigins()[r.Header.Get("Origin")]
 					if !allowed {
 						handlers.Handle405(w, r)
 					} else {
