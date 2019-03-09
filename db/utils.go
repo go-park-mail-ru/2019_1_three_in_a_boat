@@ -24,6 +24,7 @@ func makeOrderString(orderMap map[string]string, order []SelectOrder) (string, e
 			if orderElt.Desc {
 				orderBuilder.WriteString(" DESC")
 			}
+			orderBuilder.WriteString(" NULLS LAST")
 			if i != len(order)-1 {
 				orderBuilder.WriteString(", ")
 			} else {
