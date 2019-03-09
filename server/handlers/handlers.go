@@ -34,7 +34,13 @@ func Handle405(w http.ResponseWriter, r *http.Request) {
 // Logs 404 and sends back an error message, if possible
 func Handle404(w http.ResponseWriter, r *http.Request) {
 	handle4XXDepth(1, http.StatusNotFound, w, r,
-		formats.Err405, formats.Err404)
+		formats.Err404, formats.Err404)
+}
+
+// Logs 404 and sends back an error message, if possible
+func Handle403(w http.ResponseWriter, r *http.Request) {
+	handle4XXDepth(1, http.StatusForbidden, w, r,
+		formats.Err403, formats.Err403)
 }
 
 // Handles request provided in an invalid format, e.g. invalid JSON. Should

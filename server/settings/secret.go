@@ -5,13 +5,16 @@ import (
 	"crypto/rsa"
 	"crypto/x509"
 	"github.com/google/logger"
+	"gopkg.in/square/go-jose.v2"
 	"io/ioutil"
 	"os"
 	"sync"
 )
 
 var jwtTokenOnce = sync.Once{}
+var getSignerOnce = sync.Once{}
 var secretKey *rsa.PrivateKey
+var rsaSigner jose.Signer
 
 func generateKey() {
 	logger.Infoln("Generating a new secret key")
@@ -51,4 +54,18 @@ func GetSecretKey() *rsa.PrivateKey {
 		}
 	})
 	return secretKey
+}
+
+func GetSigner() jose.Signer {
+	getSignerOnce.Do(func() {
+		var err error
+		key := jose.SigningKey{Algorithm: SigningAlgorithm, Key: GetSecretKey()}
+		var signerOpts = jose.SignerOptions{}
+		signerOpts.WithType("JWT")
+		rsaSigner, err = jose.NewSigner(key, &signerOpts)
+		if err != nil {
+			logger.Fatal("failed to create signer")
+		}
+	})
+	return rsaSigner
 }

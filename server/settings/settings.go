@@ -1,5 +1,7 @@
 package settings
 
+import "gopkg.in/square/go-jose.v2"
+
 const (
 	dbUsername        = "hexagon"
 	dbName            = "hexagon"
@@ -17,6 +19,15 @@ const SecretPath = "secret.rsa" // relative to the binary
 // will be created and a newly generated key will be written to it.
 // If false, generates a new key on startup every time.
 const StoreKey = true
+
+// Signing parameters, just don't change them and you'll be fine. Probably
+const SigningAlgorithm = jose.RS256
+
+var SignerOpts = jose.SignerOptions{
+	ExtraHeaders: map[jose.HeaderKey]interface{}{
+		"typ": "JWT",
+	},
+}
 
 // Simply the version returned to the client
 const Version = "0.2"
