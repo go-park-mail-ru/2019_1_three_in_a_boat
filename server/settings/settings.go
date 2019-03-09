@@ -11,6 +11,9 @@ const (
 
 // If -l is not specified, logs will be stored here
 const DefaultLogPath = "logs/server.log"
+const UploadsPath = "media/images"
+
+var ImageSize = [...]int{400, 400}
 
 // Path to file containing secret key. Meaningless when StoreKey is false
 const SecretPath = "secret.rsa" // relative to the binary
@@ -30,7 +33,7 @@ var SignerOpts = jose.SignerOptions{
 }
 
 // Simply the version returned to the client
-const Version = "0.2"
+const Version = "0.3"
 
 // JSON values returned to the client, indicating whether the response was
 // completed successfully. Is redundant, considering http status code, so

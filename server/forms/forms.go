@@ -1,8 +1,12 @@
 package forms
 
+import "errors"
+
 const minPasswordStrnegth = 0 // 0..4
 const dateFormat = "2-1-2006"
 const emailExistsCheck = false
+
+var ErrFormInvalid = errors.New("can not create/edit DB objects from an invalid form")
 
 type Report struct {
 	Ok     bool                   `json:"ok"`

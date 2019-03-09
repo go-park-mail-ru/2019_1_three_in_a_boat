@@ -30,5 +30,7 @@ func main() {
 	settings.GetSigner()
 	settings.DB()
 
-	logger.Fatal(server.Server().ListenAndServe())
+	s := server.Server()
+	logger.Info("Listening at ", s.Addr)
+	logger.Fatal(s.ListenAndServe())
 }
