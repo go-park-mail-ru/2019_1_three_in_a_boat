@@ -10,12 +10,12 @@ import (
 // Handles a successful response: tries to marshal data, writes it to res.
 // If an error occurs, calls handle5XXDepth with the diagnostic message
 func handle2XXDepth(depth int, status int, w http.ResponseWriter,
-	r *http.Request, data interface{}, returnedBy string) {
+	r *http.Request, data interface{}) {
 	jsonResponse, err := formats.MakeSuccessResponse(r, data)
 
 	if err != nil {
 		handle5XXDepth(http.StatusInternalServerError, 1+depth, w, r,
-			formats.ErrJSONMarshalFailure, returnedBy+"/MakeSuccessResponse", err)
+			formats.ErrJSONMarshalFailure, err)
 	} else {
 		w.WriteHeader(status)
 		writeSuccessResponse(1+depth, w, r, jsonResponse, strconv.Itoa(status)+" OK")
@@ -25,12 +25,12 @@ func handle2XXDepth(depth int, status int, w http.ResponseWriter,
 // Handles a successful response: tries to marshal data, writes it to res.
 // If an error occurs, calls handle5XXDepth with the diagnostic message
 func handleInvalidDataDepth(depth int, status int, w http.ResponseWriter,
-	r *http.Request, data interface{}, msg string, returnedBy string) {
+	r *http.Request, data interface{}, msg string) {
 	jsonResponse, err := formats.MakeClientErrorResponse(r, data, msg)
 
 	if err != nil {
 		handle5XXDepth(http.StatusInternalServerError, 1+depth, w, r,
-			formats.ErrJSONMarshalFailure, returnedBy+"/MakeClientErrorResponse", err)
+			formats.ErrJSONMarshalFailure, err)
 	} else {
 		w.WriteHeader(status)
 		writeSuccessResponse(1+depth, w, r, jsonResponse, msg)
@@ -47,10 +47,10 @@ func handle4XXDepth(depth int, status int, w http.ResponseWriter,
 // Handles server errors: formats msg, returnedBy, err and forwards it to the
 // writeErrorResponse
 func handle5XXDepth(depth int, status int, w http.ResponseWriter, r *http.Request,
-	msg string, returnedBy string, err error) {
+	msg string, err error) {
 	w.WriteHeader(status)
 	writeErrorResponse(1+depth, w, r, msg,
-		fmt.Sprintf("%s (returned by %s as %s)", msg, returnedBy, err))
+		fmt.Sprintf("%s (err: %s)", msg, err))
 }
 
 // used to write an error message to logs and return it to the client

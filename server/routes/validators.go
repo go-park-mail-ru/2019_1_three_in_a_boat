@@ -1,7 +1,9 @@
 package routes
 
 import (
+	"errors"
 	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/db"
+	"net/url"
 	"strconv"
 	"strings"
 )
@@ -66,4 +68,18 @@ func makeNPage(nPageParams []string) int {
 	}
 
 	return page
+}
+
+func getOnlyIntParam(u *url.URL) (int64, error) {
+	urlParamsSplit := strings.Split(u.Path[1:], "/")
+	if len(urlParamsSplit) != 2 {
+		return 0, errors.New("# of params != 1 when expecting just one")
+	}
+
+	param, err := strconv.ParseInt(urlParamsSplit[1], 10, 64)
+	if err != nil || param == 0 {
+		return 0, errors.New("# of params != 1 when expecting just one")
+	}
+
+	return param, nil
 }

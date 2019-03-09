@@ -5,8 +5,8 @@ import "net/http"
 type UserHandler struct{}
 
 func (h *UserHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	if r.Method == "POST" {
-		// PutUser(w, r)
+	if r.Method == "PUT" {
+		PutUser(w, r)
 	} else if r.Method == "GET" {
 		GetUser(w, r)
 	}
