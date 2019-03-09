@@ -21,9 +21,19 @@ func Authorize(w http.ResponseWriter, r *http.Request, user *db.User) error {
 		Value:    token,
 		Expires:  time.Now().Add(time.Hour * 24 * 30),
 		HttpOnly: true,
+		Path:     "/", // guarantees uniqueness.. I think
 	})
 
 	return nil
+}
+
+func Unauthorize(w http.ResponseWriter, r *http.Request) {
+	http.SetCookie(w, &http.Cookie{
+		Name:     "auth",
+		Expires:  time.Time{},
+		HttpOnly: true,
+		Path:     "/", // guarantees uniqueness.. I think
+	})
 }
 
 func makeJWEToken(user *db.User) (string, error) {

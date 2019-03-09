@@ -5,7 +5,6 @@ package server
 // routes package
 
 import (
-	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/handlers"
 	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/middleware"
 	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/routes"
 	"github.com/google/logger"
@@ -32,6 +31,14 @@ var RoutesMap = map[string]routes.Route{
 		Handler: &routes.SigninHandler{},
 		Name:    "signin",
 	},
+	"/": {
+		Handler: &routes.CheckAuthHandler{},
+		Name:    "check-auth",
+	},
+	"/signout": {
+		Handler: &routes.SignOutHandler{},
+		Name:    "signout",
+	},
 }
 
 var globalRouter = http.ServeMux{}
@@ -54,7 +61,6 @@ func GetRouter() http.Handler {
 						middleware.Auth(
 							routeObj.Handler, routeObj), routeObj), routeObj))
 		}
-		globalRouter.Handle("/", http.HandlerFunc(handlers.Handle404))
 	})
 
 	return &globalRouter
