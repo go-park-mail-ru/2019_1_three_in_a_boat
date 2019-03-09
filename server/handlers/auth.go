@@ -59,7 +59,7 @@ func makeJWEToken(user *db.User) (string, error) {
 			HighScore:  user.Profile.HighScore,
 			Gender:     user.Profile.Gender,
 			Img:        user.Profile.Img,
-			BirthDate:  user.Profile.BirthDate,
+			BirthDate:  db.NullDateTime{user.Profile.BirthDate},
 			SignupDate: user.Profile.SignupDate,
 		},
 	}

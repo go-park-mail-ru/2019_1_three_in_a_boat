@@ -9,6 +9,8 @@ import (
 	"time"
 )
 
+const DateFormat = "02.01.2006"
+
 type NullString sql.NullString
 
 func (ns NullString) MarshalJSON() ([]byte, error) {
@@ -188,4 +190,31 @@ func (nt *NullTime) Scan(value interface{}) error {
 
 func (nt NullTime) Value() (driver.Value, error) {
 	return pq.NullTime(nt).Value()
+}
+
+type NullDateTime struct {
+	NullTime
+}
+
+func (ndt NullDateTime) MarshalJSON() ([]byte, error) {
+	if !ndt.Valid {
+		return ndt.NullTime.MarshalJSON()
+	} else {
+		return NullString{
+			String: ndt.NullTime.Time.Format(DateFormat),
+			Valid:  true,
+		}.MarshalJSON()
+	}
+}
+
+func (ndt *NullDateTime) UnmarshalJSON(data []byte) error {
+	return ndt.NullTime.UnmarshalJSON(data)
+}
+
+func (ndt *NullDateTime) Scan(value interface{}) error {
+	return ndt.NullTime.Scan(value)
+}
+
+func (ndt NullDateTime) Value() (driver.Value, error) {
+	return pq.NullTime(ndt.NullTime).Value()
 }

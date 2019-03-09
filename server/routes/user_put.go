@@ -2,7 +2,6 @@ package routes
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/disintegration/imaging"
 	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/db"
 	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/formats"

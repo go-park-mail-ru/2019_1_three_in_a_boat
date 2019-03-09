@@ -17,16 +17,16 @@ type User struct {
 }
 
 type UserData struct {
-	Pk         int64      `json:"uid"`
-	Username   string     `json:"username"`
-	Email      string     `json:"email"`
-	FirstName  NullString `json:"firstName"`
-	LastName   NullString `json:"lastName"`
-	HighScore  NullInt64  `json:"highScore"`
-	Gender     NullString `json:"gender"`
-	Img        NullString `json:"img"`
-	BirthDate  NullTime   `json:"birthDate"`
-	SignupDate time.Time  `json:"signupDate"`
+	Pk         int64        `json:"uid"`
+	Username   string       `json:"username"`
+	Email      string       `json:"email"`
+	FirstName  NullString   `json:"firstName"`
+	LastName   NullString   `json:"lastName"`
+	HighScore  NullInt64    `json:"highScore"`
+	Gender     NullString   `json:"gender"`
+	Img        NullString   `json:"img"`
+	BirthDate  NullDateTime `json:"birthDate"`
+	SignupDate time.Time    `json:"signupDate"`
 }
 
 func (u User) MarshalJSON() ([]byte, error) {
@@ -34,7 +34,7 @@ func (u User) MarshalJSON() ([]byte, error) {
 		u.Account.Pk, u.Account.Username, u.Account.Email,
 		u.Profile.FirstName, u.Profile.LastName,
 		u.Profile.HighScore, u.Profile.Gender, u.Profile.Img,
-		u.Profile.BirthDate, u.Profile.SignupDate,
+		NullDateTime{u.Profile.BirthDate}, u.Profile.SignupDate,
 	})
 }
 

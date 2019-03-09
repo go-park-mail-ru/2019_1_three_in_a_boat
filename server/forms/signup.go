@@ -2,7 +2,6 @@ package forms
 
 import (
 	"errors"
-	"fmt"
 	"github.com/badoux/checkmail"
 	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/db"
 	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/formats"
