@@ -33,7 +33,7 @@ func (f *UserEditForm) Validate() *Report {
 	report.Fields["email"] = f.ValidateEmail()
 	report.Fields["name"] = f.ValidateFirstName()
 	report.Fields["lastname"] = f.ValidateLastName()
-	report.Fields["date"] = f.ValidateLastName()
+	report.Fields["date"] = f.ValidateBirthDate()
 	report.Fields["img"] = f.ValidateImg()
 
 	report.Ok = report.Fields["username"].Ok && report.Fields["password"].Ok &&
