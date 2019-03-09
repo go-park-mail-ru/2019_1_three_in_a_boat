@@ -208,7 +208,23 @@ func (ndt NullDateTime) MarshalJSON() ([]byte, error) {
 }
 
 func (ndt *NullDateTime) UnmarshalJSON(data []byte) error {
-	return ndt.NullTime.UnmarshalJSON(data)
+	var nullStr NullString
+	var err error
+	if err = json.Unmarshal(data, &nullStr); err != nil {
+		return err
+	}
+	if nullStr.Valid {
+		if ndt.Time, err = time.Parse(DateFormat, nullStr.String); err != nil {
+			return err
+		} else {
+			ndt.Valid = true
+		}
+	} else {
+		ndt.Time = time.Time{}
+		ndt.Valid = false
+	}
+
+	return nil
 }
 
 func (ndt *NullDateTime) Scan(value interface{}) error {
