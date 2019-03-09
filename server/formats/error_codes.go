@@ -12,15 +12,17 @@ const (
 	ErrJWTDecryptionEmpty    = "E_JWT_EMPTY_FAILURE"
 	ErrJWTDecryptionFailure  = "E_JWT_DECRYPTION_FAILURE"
 	ErrJWTEncryptionFailure  = "E_JWT_ENCRYPTION_FAILURE"
-	ErrSignupAuthFailure     = "E_SIGNUP_OK_AUTH_FAILED"
 	ErrJWTOutdated           = "E_JWT_OUTDATED"
 	ErrPasswordHashing       = "E_BCRYPT_FAILURE"
 	ErrResponseWriterFailure = "E_RESPONSE_WRITER_FAILURE"
+	ErrSavingImg             = "E_IMG_SAVE_FAILURE"
+	ErrSignupAuthFailure     = "E_SIGNUP_OK_AUTH_FAILED"
 	ErrSqlFailure            = "E_DB_QUERY_FAILURE"
 )
 
 const (
 	ErrDateOutOfRange          = "E_DATE_OUT_OF_RANGE"
+	ErrBase64Decoding          = "E_INVALID_BASE64"
 	ErrEmailDoesNotExist       = "E_EMAIL_DOES_NOT_EXIST"
 	ErrEmailDomainDoesNotExist = "E_EMAIL_DOMAIN_DOES_NOT_EXIST"
 	ErrFieldTooLong            = "E_TOO_LONG"
