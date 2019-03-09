@@ -21,12 +21,12 @@ func (f *SigninForm) Validate() *Report {
 
 	if len(f.Name) == 0 {
 		report.Ok = false
-		report.Fields["password"] = fReport
+		report.Fields["name"] = fReport
 	}
 
 	if len(f.Password) == 0 {
 		report.Ok = false
-		report.Fields["email"] = fReport
+		report.Fields["password"] = fReport
 	}
 
 	if !report.Ok {
