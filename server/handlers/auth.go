@@ -30,7 +30,7 @@ func Authorize(w http.ResponseWriter, r *http.Request, user *db.User) error {
 func Unauthorize(w http.ResponseWriter, r *http.Request) {
 	http.SetCookie(w, &http.Cookie{
 		Name:     "auth",
-		Expires:  time.Time{},
+		Expires:  time.Now().Add(-24 * time.Hour),
 		HttpOnly: true,
 		Path:     "/", // guarantees uniqueness.. I think
 	})
