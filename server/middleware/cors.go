@@ -7,6 +7,7 @@ import (
 )
 
 // CORS Middleware: adds Access-Control headers if request's Origin is allowed
+// See settings for the allowed origins.
 func CORS(next http.Handler, _route routes.Route) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		origin := r.Header.Get("Origin")

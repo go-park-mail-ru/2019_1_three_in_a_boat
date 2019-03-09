@@ -16,7 +16,14 @@ import (
 // stores pointers, assumes they aren't modified anywhere else
 type PutUserResponse = db.User
 
-// Handler for the Users resource
+// A handler that handles a ~single~ user resource. Requires authorization,
+// returns 403 if the user is not authorized or is trying to change somebody
+// else's data. Uses UserEditForm to validate the data. Handles saving and
+// deleting images, however, the resizing and ID generation is handled in the
+// form. Expects PUT method only. In case of a successful request, returns
+// UserData with the updated data. The request.user is going to be updated
+// on the following request. In case of a failure, returns form.Report
+// indicating errors in the user data.
 func PutUser(w http.ResponseWriter, r *http.Request) {
 	r.Header.Set("Content-Type", "application/json")
 
@@ -34,7 +41,7 @@ func PutUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	form := forms.NewUserEditForm()
+	form := forms.UserEditForm{}
 	err = json.NewDecoder(r.Body).Decode(&form)
 	if HandleErrForward(w, r, formats.ErrInvalidJSON, err) != nil {
 		return
@@ -72,12 +79,20 @@ func PutUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if form.Img != nil {
+		// here's a little bug that can't be easily fixed: we want to create a file
+		// and write to the database transactionally, which isn't really possible.
+		// since writing to a file is extremely unlikely to fail (no disk space or
+		// something of the sort), we do it second. If this fails, we just return an
+		// error, and the user will be left with a broken link instead of a pic.
+		// This, however, can be easily fixed by uploading the same pic again,
+		// assuming the error will go away. So we just let it be.
 		err = imaging.Save(form.Img, path.Join(settings.UploadsPath, u.Profile.Img.String))
 		if HandleErrForward(w, r, formats.ErrSavingImg, err) != nil {
 			return
 		}
 	}
 	if (form.ImgBase64.String == "" || form.Img != nil) && oldImg.Valid {
+		// we don't care if this fails and this is very unlikely to fail
 		_ = os.Remove(path.Join(settings.UploadsPath, oldImg.String))
 	}
 

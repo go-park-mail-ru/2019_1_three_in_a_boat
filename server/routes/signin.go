@@ -11,8 +11,13 @@ import (
 	"net/http"
 )
 
+// Handles Signin resource. Only accepts POST requests. Implements
+// routes.Handler interface, which extends http.Handler. Uses SigninForm to
+// validate the data. In case of a successful response, returns User which gets
+// encoded into JSON as db.UserData
 type SigninHandler struct{}
 
+// Handles POST requests.
 func (h *SigninHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	r.Header.Set("Content-Type", "application/json")
 

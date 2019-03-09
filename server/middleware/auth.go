@@ -66,11 +66,5 @@ func Auth(next http.Handler, _route routes.Route) http.Handler {
 
 		r = r.WithContext(ctx)
 		next.ServeHTTP(w, r)
-		//if !_route.Handler.AuthRequired(r.Method) {
-		//	r.WithContext(ctx)
-		//
-		//} else {
-		//
-		//}
 	})
 }

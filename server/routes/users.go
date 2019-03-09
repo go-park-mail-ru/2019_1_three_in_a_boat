@@ -4,6 +4,11 @@ import (
 	"net/http"
 )
 
+// A handler that handles a ~multiple~ users resource. The handler itself is
+// simply a struct that forwards the requests, depending on the method to one of
+// GetUsers or PostUsers. Accepts PUT and POST requests. Implements
+// route.Handler. For details on what do both resources do, see
+// users_(method).go.
 type UsersHandler struct{}
 
 func (h *UsersHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {

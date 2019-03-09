@@ -10,6 +10,9 @@ import (
 
 var setDbParamsOnce sync.Once
 
+// singleton-like function that sets the DB parameters from the environment
+// or uses the default ones. Uses PGPASSWORD, PGUSERNAME, PGHOST, PGDBNAME
+// environment variables.
 func setDbParams() {
 	setDbParamsOnce.Do(func() {
 		if os.Getenv("PGPASSWORD") != "" {
@@ -32,8 +35,7 @@ func setDbParams() {
 	})
 }
 
-// makes a postgres connection string based on db* constants and PGPASSWORD
-// environment variable
+// makes a postgres connection string based on setDbParams
 func makeConnStr() string {
 	setDbParams()
 	return fmt.Sprintf("postgres://%s:%s@%s/%s",
@@ -43,7 +45,7 @@ func makeConnStr() string {
 var dbOnce = sync.Once{}
 var db *sql.DB
 
-// gets DB in a singleton-like manner
+// Gets/creates DB in a singleton-like manner
 func DB() *sql.DB {
 	dbOnce.Do(func() {
 		var err error

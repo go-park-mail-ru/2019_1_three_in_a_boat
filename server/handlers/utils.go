@@ -22,8 +22,10 @@ func handle2XXDepth(depth int, status int, w http.ResponseWriter,
 	}
 }
 
-// Handles a successful response: tries to marshal data, writes it to res.
-// If an error occurs, calls handle5XXDepth with the diagnostic message
+// Handles a user error: tries to marshal data, writes it to res. If an error
+// occurs, calls handle5XXDepth with the diagnostic message The only difference
+// from the handle2XX depth is this function also logs the message and returns
+// it to the client.
 func handleInvalidDataDepth(depth int, status int, w http.ResponseWriter,
 	r *http.Request, data interface{}, msg string) {
 	jsonResponse, err := formats.MakeClientErrorResponse(r, data, msg)
@@ -38,14 +40,15 @@ func handleInvalidDataDepth(depth int, status int, w http.ResponseWriter,
 }
 
 // Handles client errors: logs msg and forwards it to writeErrorResponse
+// Unlike HandleInvalidData, does not serialize an interface into JSON, just
+// sends the error message with empty data
 func handle4XXDepth(depth int, status int, w http.ResponseWriter,
 	r *http.Request, clientMsg, msg string) {
 	w.WriteHeader(status)
 	writeErrorResponse(1+depth, w, r, clientMsg, msg)
 }
 
-// Handles server errors: formats msg, returnedBy, err and forwards it to the
-// writeErrorResponse
+// Handles server errors: formats msg, err and forwards it to the writeErrorResponse
 func handle5XXDepth(depth int, status int, w http.ResponseWriter, r *http.Request,
 	msg string, err error) {
 	w.WriteHeader(status)
@@ -53,8 +56,9 @@ func handle5XXDepth(depth int, status int, w http.ResponseWriter, r *http.Reques
 		fmt.Sprintf("%s (err: %s)", msg, err))
 }
 
-// used to write an error message to logs and return it to the client
-// if sending the error to the client fails, logs that too
+// Used to write an error message. Logs and returns it to the client. If sending
+// the error to the client fails, logs that too. Assumes headers have already
+// been written.
 func writeErrorResponse(depth int, w http.ResponseWriter, r *http.Request,
 	clientMsg string, msg string) {
 	var responseError error = nil
@@ -68,7 +72,7 @@ func writeErrorResponse(depth int, w http.ResponseWriter, r *http.Request,
 	}
 }
 
-// used to write an success message to logs and return response to the client
+// Used to write a success message. Logs and return response to the client
 // if sending the response to the client fails, logs that too
 func writeSuccessResponse(depth int, w http.ResponseWriter, r *http.Request,
 	response []byte, msg string) {

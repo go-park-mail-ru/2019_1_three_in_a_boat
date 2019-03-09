@@ -8,12 +8,14 @@ import (
 	"net/http"
 )
 
-// stores pointers, assumes they aren't modified anywhere else
-type authorsResponse = []*db.AuthorData
-
+// Handles Authors resource. Only accepts GET requests because creating authors
+// is currently not implemented and not needed. Implements routes.Handler
+// interface, which extends http.Handler.
 type AuthorsHandler struct{}
 
-// Handler for the Authors resource
+// Handles GET requests for the authors resource. Assumes method is already
+// filtered by the Methods middleware. In case Of a successful request, returns
+// []*db.AuthorData
 func (h *AuthorsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	r.Header.Set("Content-Type", "application/json")
 
@@ -24,7 +26,7 @@ func (h *AuthorsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		defer rows.Close()
 	}
 
-	authors := authorsResponse{}
+	authors := make([]*db.AuthorData, 0)
 
 	for rows.Next() {
 		a, err := db.AuthorDataFromRow(rows)

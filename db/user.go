@@ -16,6 +16,8 @@ type User struct {
 	Profile *Profile
 }
 
+// Helper class, representing the User in a way it is serailized. User JSON
+// interface converts User to UserData and forwards the marshal/unmarshal call.
 type UserData struct {
 	Pk         int64        `json:"uid"`
 	Username   string       `json:"username"`
@@ -30,10 +32,15 @@ type UserData struct {
 }
 
 func (u User) MarshalJSON() ([]byte, error) {
+	img := u.Profile.Img
+	if img.String == "" {
+		img.String = "default.jpg"
+		img.Valid = true
+	}
 	return json.Marshal(UserData{
 		u.Account.Pk, u.Account.Username, u.Account.Email,
 		u.Profile.FirstName, u.Profile.LastName,
-		u.Profile.HighScore, u.Profile.Gender, u.Profile.Img,
+		u.Profile.HighScore, u.Profile.Gender, img,
 		NullDateTime{u.Profile.BirthDate}, u.Profile.SignupDate,
 	})
 }
@@ -73,6 +80,9 @@ func GetUser(_db Queryable, uid int64) (*User, error) {
 	return u, nil
 }
 
+// Retrieves a single user from the database, if either username or email
+// are found in the DB. To make the response deterministic, one string should
+// be empty, unless you're absolutely sure both belong to the same User.
 func GetUserByUsernameOrEmail(_db Queryable, username string,
 	email string) (*User, error) {
 	u := &User{&Account{}, &Profile{}}
@@ -93,9 +103,10 @@ func GetUserByUsernameOrEmail(_db Queryable, username string,
 	return u, nil
 }
 
-// Saves User object to the database -
-// no matter if it's a newly created or an existing object
-// only accepts sql.DB, since it needs to use its own transaction
+// Saves a User in the database, forwards the SQL error, if any. Can be used for
+// both updating and inserting. The operation is determined based on Pk: 0 ->
+// INSERT, non-0 -> update. Return error can be examined via type assertion to
+// the underlying driver's error type
 func (u *User) Save(_db *sql.DB) (err, transactionError error) {
 	tx, transactionError := _db.Begin()
 	if transactionError != nil {
@@ -135,9 +146,9 @@ func GetUserMany(_db Queryable, order []SelectOrder,
 }
 
 // Convenience function provided for getting a user out of sql.Rows.Scan()
-// I probably should've implemented an sql.Scanner interface...
-// the туду was removed because there isn't a universal scanner - sometimes
-// we need count(*), sometimes we don't
+// returned by GetUserMany. For single users, use GetUser or
+// GetUserByNameOrEmail User does not implement Scanner interface because there
+// isn't a universal scanner - sometimes we need count(*), sometimes we don't.
 func UserFromRow(row Scanner) (*User, int, error) {
 	u := &User{&Account{}, &Profile{}}
 	var nUsers int
@@ -154,8 +165,8 @@ func UserFromRow(row Scanner) (*User, int, error) {
 	}
 }
 
-// Lists all fields that GetUserMany supports ordering by
-// adding an entry to the map is sufficient for everything to work
+// Lists all fields that GetUserMany supports ordering by. Adding an entry to
+// this map is sufficient for ordering with the field to work
 var UserOrderMap = map[string]string{
 	"HighScore":  "p.high_score",
 	"FirstName":  "p.first_name",
