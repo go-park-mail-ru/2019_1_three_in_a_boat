@@ -37,8 +37,7 @@ func (h *SigninHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		if err == sql.ErrNoRows {
 			handlers.HandleInvalidData(w, r, forms.UnsuccessfulSigninReport,
-				formats.ErrInvalidCredentials,
-				"forms.UnsuccessfulSigninReport")
+				formats.ErrInvalidCredentials, "forms.UnsuccessfulSigninReport")
 		} else {
 			handlers.Handle500(w, r, formats.ErrSqlFailure,
 				"db.GetUserByUsernameOrEmail", err)
@@ -55,8 +54,7 @@ func (h *SigninHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	if !ok {
 		handlers.HandleInvalidData(w, r, forms.UnsuccessfulSigninReport,
-			formats.ErrInvalidCredentials,
-			"forms.UnsuccessfulSigninReport")
+			formats.ErrInvalidCredentials, "forms.UnsuccessfulSigninReport")
 		return
 	}
 

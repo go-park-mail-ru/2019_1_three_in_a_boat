@@ -19,11 +19,7 @@ func (h *UsersHandler) Methods() map[string]struct{} {
 }
 
 func (h *UsersHandler) AuthRequired(method string) bool {
-	if method == "PUT" {
-		return true
-	} else {
-		return false
-	}
+	return false
 }
 
 func (h *UsersHandler) CorsAllowed(method string) bool {

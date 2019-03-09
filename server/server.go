@@ -9,7 +9,6 @@ import (
 	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/middleware"
 	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/routes"
 	"github.com/google/logger"
-	"github.com/gorilla/mux"
 	"net/http"
 	"sync"
 	"time"
@@ -25,13 +24,17 @@ var RoutesMap = map[string]routes.Route{
 		Handler: &routes.UsersHandler{},
 		Name:    "users",
 	},
+	"/users/": {
+		Handler: &routes.UserHandler{},
+		Name:    "user",
+	},
 	"/signin": {
 		Handler: &routes.SigninHandler{},
 		Name:    "signin",
 	},
 }
 
-var globalRouter = mux.NewRouter()
+var globalRouter = http.ServeMux{}
 var routesMapOnce = sync.Once{}
 
 // Singleton-like function, since router can be reused.
@@ -49,13 +52,12 @@ func GetRouter() http.Handler {
 				middleware.Methods(
 					middleware.CORS(
 						middleware.Auth(
-							routeObj.Handler, routeObj), routeObj), routeObj)).
-				Name(routeObj.Name)
+							routeObj.Handler, routeObj), routeObj), routeObj))
 		}
-		globalRouter.NotFoundHandler = http.HandlerFunc(handlers.Handle404)
+		globalRouter.Handle("/", http.HandlerFunc(handlers.Handle404))
 	})
 
-	return globalRouter
+	return &globalRouter
 }
 
 // Creates a new server with default settings and GetRouter() handler
