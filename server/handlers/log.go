@@ -7,7 +7,7 @@ import (
 )
 
 func fmtHttpLog(msg string, r *http.Request) string {
-	return fmt.Sprintf("%s %s\t: %s %s\n",
+	return fmt.Sprintf("%s %s: %s %s\n",
 		r.RemoteAddr, r.Method, r.RequestURI, msg)
 }
 
