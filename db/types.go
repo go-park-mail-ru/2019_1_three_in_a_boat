@@ -11,6 +11,8 @@ import (
 
 const DateFormat = "02.01.2006"
 
+// Represents a NULLable string from the DB. Implements JSON and DB IO
+// interfaces.
 type NullString sql.NullString
 
 func (ns NullString) MarshalJSON() ([]byte, error) {
@@ -45,6 +47,8 @@ func (ns *NullString) Scan(value interface{}) error {
 	return (*sql.NullString)(ns).Scan(value)
 }
 
+// Represents a NULLable Int64 from the DB. Implements JSON and DB IO
+// interfaces.
 type NullInt64 sql.NullInt64
 
 func (ni NullInt64) MarshalJSON() ([]byte, error) {
@@ -79,6 +83,8 @@ func (ni NullInt64) Value() (driver.Value, error) {
 	return sql.NullInt64(ni).Value()
 }
 
+// Represents a NULLable Float64 from the DB. Implements JSON and DB IO
+// interfaces.
 type NullFloat64 sql.NullFloat64
 
 func (nf NullFloat64) MarshalJSON() ([]byte, error) {
@@ -113,6 +119,8 @@ func (nf NullFloat64) Value() (driver.Value, error) {
 	return sql.NullFloat64(nf).Value()
 }
 
+// Represents a NULLable Bool from the DB. Implements JSON and DB IO
+// interfaces.
 type NullBool sql.NullBool
 
 func (nb NullBool) MarshalJSON() ([]byte, error) {
@@ -147,6 +155,8 @@ func (nb NullBool) Value() (driver.Value, error) {
 	return sql.NullBool(nb).Value()
 }
 
+// Represents a NULLable Time from the DB. Implements JSON and DB IO
+// interfaces.
 type NullTime pq.NullTime
 
 func (nt NullTime) MarshalJSON() ([]byte, error) {
@@ -192,6 +202,9 @@ func (nt NullTime) Value() (driver.Value, error) {
 	return pq.NullTime(nt).Value()
 }
 
+// Represents a NULLable Date from the DB. Implements JSON and DB IO
+// interfaces. The difference between this and NullTime is that NullDateTime
+// serializes into a DD.MM.YYYY format, as defined in the DateFormat variable
 type NullDateTime struct {
 	NullTime
 }

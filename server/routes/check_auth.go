@@ -5,12 +5,17 @@ import (
 	"net/http"
 )
 
+// Provides a convenient way for the frontend to check whether the user is
+// authorized. The handler itself does nothing, but the auth middleware will
+// return the user data in the response. It also handles 404 requests and is
+// expected to be bound to the "/" path. Returns nothing in the JSOn response
+// data.
 type CheckAuthHandler struct{}
 
-// Dummy empty resource, to provide the user with the UserData.
-// All the checking is handled in the Auth middleware, so we just need a cheap
-// entrypoint.
+// Handles the GET request.
 func (h *CheckAuthHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	r.Header.Set("Content-Type", "application/json")
+
 	if r.URL.Path != "" && r.URL.Path != "/" {
 		Handle404(w, r)
 	} else {

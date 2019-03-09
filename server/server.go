@@ -14,7 +14,7 @@ import (
 	"time"
 )
 
-// Maps true/false into a string returned to the client in the status field
+// Maps URL paths into corresponding routes.Routes
 var RoutesMap = map[string]routes.Route{
 	"/authors": {
 		Handler: &routes.AuthorsHandler{},

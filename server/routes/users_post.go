@@ -9,9 +9,10 @@ import (
 	"net/http"
 )
 
-type PostUsersResponse = forms.SignupForm
-
-// Handler for the Users resource
+// A handler that handles a ~multiple~ users resource. Only accepts POST
+// requests. Is used for creating users, takes a JSON-encoded SignupForm,
+// validates it, saves the resulting user. If everything went OK, the created
+// user will be returned, otherwise returns forms.Report.
 func PostUsers(w http.ResponseWriter, r *http.Request) {
 	r.Header.Set("Content-Type", "application/json")
 

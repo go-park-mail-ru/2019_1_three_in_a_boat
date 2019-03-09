@@ -9,7 +9,11 @@ import (
 	"net/http"
 )
 
-// stores pointers, assumes they aren't modified anywhere else
+// A handler that handles a ~single~ user resource. Simply returns the user
+// data for the requested user. If the authorized user is checking his own
+// profile, does not make a DB request, uses the JWE data isntead. Expects GET
+// method only. In case of a successful request, returns User object which is
+// encoded as UserData in JSON.
 type GetUserResponse = db.User
 
 // Handler for the Users resource

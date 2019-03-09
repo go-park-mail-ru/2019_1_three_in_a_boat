@@ -2,15 +2,16 @@ package db
 
 import "database/sql"
 
-// Class representing an entity author
+// Struct representing an author - data, additional to Profile, supplied only
+// for the authors of the project.
 type Author struct {
 	Pk          int64      `json:"uid"`
 	DevInfo     NullString `json:"devInfo"`
 	Description NullString `json:"description"`
 }
 
-// Data required by the get_authors API resource, provided for convenience
-// Incorporates Author Class and Username + Img fields of Account and Profile
+// Data required by the /authors API resource, provided for convenience.
+// Incorporates Author Class and Username + Img fields of Account and Profile.
 type AuthorData struct {
 	Pk          int64      `json:"uid"`
 	DevInfo     NullString `json:"devInfo"`
@@ -19,8 +20,8 @@ type AuthorData struct {
 	Img         NullString `json:"img"`
 }
 
-// Constructor - takes all the fields, does NOT immediately check if uid is valid
-// The Pk check is deferred until Save is called
+// Constructor - takes all the fields, does not immediately check if the uid is
+// valid. The Pk check is deferred until Save is called.
 func NewAuthor(uid int64, devInfo, description NullString) *Author {
 	// integrity is handled when saving by the database
 	return &Author{
@@ -34,7 +35,8 @@ func NewAuthor(uid int64, devInfo, description NullString) *Author {
 
 // Saves Author object to the database - the user with a.Pk must already exist
 // or be created in the same transaction (FK constraint is initially deferred).
-// Should be used to mark certain users as authors and add some information
+// Should be used to mark certain users as authors and add extra info from
+// Author struct
 func (a *Author) Save(_db Queryable) error {
 	_, err := _db.Exec(`
       INSERT INTO author ("uid", "dev_info", "description")
@@ -47,7 +49,7 @@ func (a *Author) Save(_db Queryable) error {
 	return err
 }
 
-// Created an AuthorData object from a Scanner returned by GetAllAuthors
+// Creates an AuthorData object from a Scanner returned by GetAllAuthors
 func AuthorDataFromRow(row Scanner) (*AuthorData, error) {
 	a := &AuthorData{}
 	err := row.Scan(&a.Pk, &a.Username,

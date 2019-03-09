@@ -1,5 +1,8 @@
 package formats
 
+// These constants represent error messages - not error objects. They represent
+// strings that are sent to client when a certain error occurs, since sending
+// the whole error.Error() is probably unwise.
 const (
 	Err404                   = "E_NOT_FOUND"
 	Err405                   = "E_METHOD_NOT_ALLOWED"

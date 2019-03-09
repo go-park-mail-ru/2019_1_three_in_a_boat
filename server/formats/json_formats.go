@@ -1,5 +1,5 @@
-// Package defines formats returned by the server and some utility functions
-// to work with them
+// Package defines formats returned by the server or used internally, and some
+// utility functions to simplify the work with these formats.
 package formats
 
 import (
@@ -43,13 +43,6 @@ func (jr JSONResponse) MarshalJSON() ([]byte, error) {
 	})
 }
 
-// Represents a single field in a validation result
-type JSONFieldValidation struct {
-	Errors    []string `json:"errors"`
-	FieldName string   `json:"fieldName"`
-}
-
-// Represents a form in a validation result
-type JSONFormValidation struct {
-	Fields []JSONFieldValidation `json:"fields"`
-}
+// different from the db.DateFormat! DB one is fore pretty printing, this one
+// is for accepting values from the API.
+const DateFormat = "2-1-2006"

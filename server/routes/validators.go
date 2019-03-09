@@ -8,6 +8,8 @@ import (
 	"strings"
 )
 
+// file provides utility functions user for validating get parameters
+
 // Takes string slice out (e.g., from URL.Query()) and makes a valid
 // []db.SelectOrder, ignores fields that aren't keys in allowed
 func makeOrderList(orderParams []string, allowed map[string]string) []db.SelectOrder {
@@ -70,6 +72,9 @@ func makeNPage(nPageParams []string) int {
 	return page
 }
 
+// Parses the url in the form of [/]something/int64 (no slash at the end).
+// Returns an error if parsing failed, returns the integer and nil if everything
+// is ok.
 func getOnlyIntParam(u *url.URL) (int64, error) {
 	urlParamsSplit := strings.Split(u.Path[1:], "/")
 	if len(urlParamsSplit) != 2 {
@@ -78,7 +83,7 @@ func getOnlyIntParam(u *url.URL) (int64, error) {
 
 	param, err := strconv.ParseInt(urlParamsSplit[1], 10, 64)
 	if err != nil || param == 0 {
-		return 0, errors.New("# of params != 1 when expecting just one")
+		return 0, errors.New("the param isn't can not be converted to integer")
 	}
 
 	return param, nil

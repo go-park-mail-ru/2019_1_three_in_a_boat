@@ -8,7 +8,11 @@ import (
 	"net/http"
 )
 
-// CORS-preflight-friendly Methods middleware
+// CORS-preflight-friendly Methods middleware based on routes.Route and
+// routes.Handler. Uses _route.Handler.Methods() to determine what methods are
+// allowed. If _route.Handler.CorsAllowed, also allows OPTIONS request to handle
+// a potential preflight. Simply returns the headers and does not call the
+// handler in that case.
 func Methods(next http.Handler, _route routes.Route) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if _, found := _route.Handler.Methods()[r.Method]; found {

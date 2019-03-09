@@ -1,4 +1,4 @@
-// Package defines helper handlers for some common http statuses
+// Package defines helper handlers for some common http usages
 package handlers
 
 import (
@@ -26,6 +26,8 @@ func Handle500(w http.ResponseWriter, r *http.Request,
 	handle5XXDepth(1, http.StatusInternalServerError, w, r, msg, err)
 }
 
+// If err != nil, calls handle 500. Returns the original err eitherway, so it
+// can be used in the context if HandleErrForward(...) != nil { return }
 func HandleErrForward(w http.ResponseWriter, r *http.Request,
 	msg string, err error) error {
 	if err == nil {
@@ -48,7 +50,7 @@ func Handle404(w http.ResponseWriter, r *http.Request) {
 		formats.Err404, formats.Err404)
 }
 
-// Logs 404 and sends back an error message, if possible
+// Logs 403 and sends back an error message, if possible
 func Handle403(w http.ResponseWriter, r *http.Request) {
 	handle4XXDepth(1, http.StatusForbidden, w, r,
 		formats.Err403, formats.Err403)
@@ -68,6 +70,8 @@ func HandleInvalidData(w http.ResponseWriter, r *http.Request,
 	handleInvalidDataDepth(1, http.StatusBadRequest, w, r, clientMsg, msg)
 }
 
+// If !report.Ok, callse HandleInvalidData. Returns report eitherway, so it can
+// be used in the context if !HandleReportForward(...).Ok { return }
 func HandleReportForward(w http.ResponseWriter, r *http.Request,
 	report *forms.Report) *forms.Report {
 	if !report.Ok {

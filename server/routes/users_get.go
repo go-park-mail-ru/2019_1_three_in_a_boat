@@ -9,18 +9,18 @@ import (
 	"net/url"
 )
 
-// stores pointers, assumes they aren't modified anywhere else
+// Represents the result returned by GetUsers
 type GetUsersResponse struct {
-	Users  []*db.User `json:"users"`
+	Users  []*db.User `json:"users"`  // will be transformed to UserData
 	Page   int        `json:"page"`   // 0-indexed
 	NPages int        `json:"nPages"` // largest valid Page value is NPages - 1
 }
 
-// TODO: split this in a separate routes/settings file if more constants arise
-const UsersDefaultPageSize = 10
-const UsersMaxPageSize = 10
-
-// Handler for the Users resource
+// A handler that handles a ~multiple~ users resource. Only accepts GET
+// requests. Accepts sort=[]string, page=int, pageSize=int GET params validates
+// those and sends them to DB. Unlike forms, incorrect parameters are ignored
+// rather than triggering an error. In case of a successful request, returns
+// GetUsersResponse struct, described above.
 func GetUsers(w http.ResponseWriter, r *http.Request) {
 	r.Header.Set("Content-Type", "application/json")
 
@@ -62,6 +62,7 @@ func GetUsers(w http.ResponseWriter, r *http.Request) {
 func validateUsersParams(url *url.URL) (
 	page int, pageSize int, order []db.SelectOrder) {
 	return makeNPage(url.Query()["page"]),
-		makePageSize(url.Query()["pageSize"], UsersMaxPageSize, UsersDefaultPageSize),
+		makePageSize(url.Query()["pageSize"],
+			settings.UsersMaxPageSize, settings.UsersDefaultPageSize),
 		makeOrderList(url.Query()["sort"], db.UserOrderMap)
 }

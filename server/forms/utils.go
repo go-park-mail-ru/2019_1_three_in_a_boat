@@ -5,6 +5,8 @@ import (
 	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/formats"
 )
 
+// returns a fieldReport indicating min < len(str) < max. Length counted in
+// runes, not in bytes
 func checkLength(str string, min, max int) FieldReport {
 	length := len([]rune(str))
 	if length < min {
@@ -17,6 +19,8 @@ func checkLength(str string, min, max int) FieldReport {
 	return FieldReport{true, nil}
 }
 
+// returns a fieldReport indicating min < len(str) < max. Length counted in
+// runes, not in bytes. Also allows empty strings, even if min is > 0.
 func checkLengthOptional(str *db.NullString, min, max int) FieldReport {
 	length := len([]rune(str.String))
 	if length < min {

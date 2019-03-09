@@ -32,12 +32,6 @@ const StoreKey = true
 // Signing parameters, just don't change them and you'll be fine. Probably
 const SigningAlgorithm = jose.RS256
 
-var SignerOpts = jose.SignerOptions{
-	ExtraHeaders: map[jose.HeaderKey]interface{}{
-		"typ": "JWT",
-	},
-}
-
 // Simply the version returned to the client
 const Version = "0.9"
 
@@ -63,6 +57,8 @@ var allowedOrigins = map[string]struct{}{
 
 var allowedOriginsOnce sync.Once
 
+// concats allowedOrigins with everything found in ALLOWED_ORIGINS environment
+// variable (extracts urls split by ;)
 func GetAllowedOrigins() map[string]struct{} {
 	allowedOriginsOnce.Do(func() {
 		origins := strings.Split(os.Getenv("ALLOWED_ORIGINS"), ";")
