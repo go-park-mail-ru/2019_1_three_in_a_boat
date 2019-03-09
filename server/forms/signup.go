@@ -31,7 +31,7 @@ func (f *SignupForm) Validate() *Report {
 	report.Fields["email"] = f.ValidateEmail()
 	report.Fields["name"] = f.ValidateFirstName()
 	report.Fields["lastname"] = f.ValidateLastName()
-	report.Fields["date"] = f.ValidateLastName()
+	report.Fields["date"] = f.ValidateBirthDate()
 
 	// optional fields return OK if they're empty - error only if the data is
 	// there, but it's invalid
@@ -127,7 +127,7 @@ func (f *SignupForm) ValidateBirthDate() (r FieldReport) {
 	f.BirthDate.Time, err = time.Parse(dateFormat, f.BirthDateStr.String)
 	if err != nil {
 		r.Errors = append(r.Errors, formats.ErrInvalidDate)
-	} else if f.BirthDate.Time.Year() < 1900 || time.Now().After(f.BirthDate.Time) {
+	} else if f.BirthDate.Time.Year() < 1900 || time.Now().Before(f.BirthDate.Time) {
 		r.Errors = append(r.Errors, formats.ErrDateOutOfRange)
 	} else {
 		r.Ok = true
@@ -154,7 +154,6 @@ func CheckUserDbConstraints(err error) (*Report, error) {
 		if pqErr, ok := err.(*pq.Error); ok && pqErr.Constraint != "" {
 			fieldReport :=
 				FieldReport{false, []string{formats.ErrUniqueViolation}}
-			fmt.Println(pqErr)
 
 			if pqErr.Constraint == "account_username_key" {
 				report.Fields["username"] = fieldReport

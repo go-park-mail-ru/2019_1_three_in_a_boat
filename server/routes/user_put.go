@@ -72,7 +72,6 @@ func PutUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fmt.Println("")
 	if form.Img != nil {
 		err = imaging.Save(form.Img, path.Join(settings.UploadsPath, u.Profile.Img.String))
 		if HandleErrForward(w, r, formats.ErrSavingImg, err) != nil {
