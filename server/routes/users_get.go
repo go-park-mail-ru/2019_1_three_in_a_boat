@@ -3,7 +3,7 @@ package routes
 import (
 	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/db"
 	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/formats"
-	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/handlers"
+	. "github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/handlers"
 	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/settings"
 	"net/http"
 	"net/url"
@@ -27,8 +27,7 @@ func GetUsers(w http.ResponseWriter, r *http.Request) {
 	page, pageSize, order := validateUsersParams(r.URL)
 
 	rows, err := db.GetUserMany(settings.DB(), order, -1, pageSize*page)
-	if err != nil {
-		handlers.Handle500(w, r, formats.ErrSqlFailure, "db.GetUserMany", err)
+	if HandleErrForward(w, r, formats.ErrSqlFailure, err) != nil {
 		return
 	} else {
 		defer rows.Close()
@@ -39,28 +38,25 @@ func GetUsers(w http.ResponseWriter, r *http.Request) {
 	var u *db.User
 	for i := 0; rows.Next() && i < pageSize; i++ {
 		u, nUsers, err = db.UserFromRow(rows)
-		if err != nil {
-			handlers.Handle500(w, r, formats.ErrDbScanFailure,
-				"db.UserFromRow", err)
+		if HandleErrForward(w, r, formats.ErrDbScanFailure, err) != nil {
 			return
 		}
 		users.Users = append(users.Users, u)
 	}
 
-	if err := rows.Err(); err != nil {
-		handlers.Handle500(w, r, formats.ErrDbRowsFailure, "db.GetUserMany", err)
+	if err := rows.Err(); HandleErrForward(w, r, formats.ErrDbRowsFailure, err) != nil {
 		return
 	}
 
 	if nUsers == 0 {
-		handlers.Handle404(w, r)
+		Handle404(w, r)
 		return
 	}
 
 	users.Page = page
 	users.NPages = (nUsers - 1) / pageSize
 
-	handlers.Handle200(w, r, users, "db.AuthorDataFromRow")
+	Handle200(w, r, users)
 }
 
 func validateUsersParams(url *url.URL) (

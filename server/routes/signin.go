@@ -6,7 +6,7 @@ import (
 	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/db"
 	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/formats"
 	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/forms"
-	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/handlers"
+	. "github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/handlers"
 	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/settings"
 	"net/http"
 )
@@ -20,14 +20,12 @@ func (h *SigninHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	var form forms.SigninForm
 	err := decoder.Decode(&form)
 	if err != nil {
-		handlers.Handle400(w, r, formats.ErrInvalidJSON, err.Error())
+		Handle400(w, r, formats.ErrInvalidJSON, err.Error())
 		return
 	}
 
 	report := form.Validate()
-	if !report.Ok {
-		handlers.HandleInvalidData(w, r, report, formats.ErrValidation,
-			"forms.SigninForm.Validate")
+	if !HandleReportForward(w, r, report).Ok {
 		return
 	}
 
@@ -36,38 +34,30 @@ func (h *SigninHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		form.Email.String)
 	if err != nil {
 		if err == sql.ErrNoRows {
-			handlers.HandleInvalidData(w, r, forms.UnsuccessfulSigninReport,
-				formats.ErrInvalidCredentials,
-				"forms.UnsuccessfulSigninReport")
+			HandleInvalidData(w, r, forms.UnsuccessfulSigninReport,
+				formats.ErrInvalidCredentials)
 		} else {
-			handlers.Handle500(w, r, formats.ErrSqlFailure,
-				"db.GetUserByUsernameOrEmail", err)
+			Handle500(w, r, formats.ErrSqlFailure, err)
 		}
 		return
 	}
 
 	ok, err := db.AccountComparePasswordToHash(form.Password, u.Account.Password)
-	if err != nil {
-		handlers.Handle500(w, r, formats.ErrPasswordHashing,
-			"db.AccountComparePasswordToHash", err)
+	if HandleErrForward(w, r, formats.ErrPasswordHashing, err) != nil {
 		return
 	}
 
 	if !ok {
-		handlers.HandleInvalidData(w, r, forms.UnsuccessfulSigninReport,
-			formats.ErrInvalidCredentials,
-			"forms.UnsuccessfulSigninReport")
+		HandleInvalidData(w, r, forms.UnsuccessfulSigninReport, formats.ErrInvalidCredentials)
 		return
 	}
 
-	err = handlers.Authorize(w, r, u)
-	if err != nil {
-		handlers.Handle500(w, r, formats.ErrJWTEncryptionFailure,
-			"handlers.Authorize", err)
+	err = Authorize(w, r, u)
+	if HandleErrForward(w, r, formats.ErrJWTEncryptionFailure, err) != nil {
 		return
 	}
 
-	handlers.Handle200(w, r, u, "db.GetUserByUsernameOrEmail")
+	Handle200(w, r, u)
 }
 
 func (h *SigninHandler) Methods() map[string]struct{} {

@@ -3,7 +3,7 @@ package routes
 import (
 	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/db"
 	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/formats"
-	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/handlers"
+	. "github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/handlers"
 	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/settings"
 	"net/http"
 )
@@ -18,8 +18,7 @@ func (h *AuthorsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	r.Header.Set("Content-Type", "application/json")
 
 	rows, err := db.GetAllAuthors(settings.DB())
-	if err != nil {
-		handlers.Handle500(w, r, formats.ErrSqlFailure, "db.GetAllAuthors", err)
+	if HandleErrForward(w, r, formats.ErrSqlFailure, err) != nil {
 		return
 	} else {
 		defer rows.Close()
@@ -29,20 +28,17 @@ func (h *AuthorsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	for rows.Next() {
 		a, err := db.AuthorDataFromRow(rows)
-		if err != nil {
-			handlers.Handle500(w, r, formats.ErrDbScanFailure,
-				"db.AuthorDataFromRow", err)
+		if HandleErrForward(w, r, formats.ErrDbScanFailure, err) != nil {
 			return
 		}
 		authors = append(authors, a)
 	}
 
-	if err := rows.Err(); err != nil {
-		handlers.Handle500(w, r, formats.ErrDbRowsFailure, "db.GetAllAuthors", err)
+	if err := rows.Err(); HandleErrForward(w, r, formats.ErrDbRowsFailure, err) != nil {
 		return
 	}
 
-	handlers.Handle200(w, r, authors, "db.AuthorDataFromRow")
+	Handle200(w, r, authors)
 }
 
 func (h *AuthorsHandler) Methods() map[string]struct{} {

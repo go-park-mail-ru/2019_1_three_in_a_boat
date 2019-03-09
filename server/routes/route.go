@@ -7,9 +7,9 @@ import (
 // Handler, as in http.Handler, but could be extended in the future
 type Handler interface {
 	http.Handler
-	Methods() map[string]struct{}
-	AuthRequired(string) bool
-	CorsAllowed(string) bool
+	Methods() (methods map[string]struct{})
+	AuthRequired(method string) bool
+	CorsAllowed(method string) bool
 }
 
 // Represents all the data there's to know about a root. Every middleware checks

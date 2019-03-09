@@ -31,10 +31,8 @@ type JSONResponse struct {
 
 // Converts JSONResponse into _JSONResponseData, adding the missing fields automatically
 func (jr JSONResponse) MarshalJSON() ([]byte, error) {
-	u, ok := AuthFromContext(jr.Request.Context())
-	if !ok {
-		u = nil
-	}
+	u, _ := AuthFromContext(jr.Request.Context()) // if !ok just leave nil
+
 	return json.Marshal(&_JSONResponseData{
 		settings.StatusMap[jr.Status],
 		settings.Version,

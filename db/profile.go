@@ -30,7 +30,7 @@ func NewProfile(uid int64, firstName, lastName NullString,
 		gender,
 		img,
 		birthDate,
-		time.Time{},
+		time.Now(),
 	}, nil
 }
 
