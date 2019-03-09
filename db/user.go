@@ -136,7 +136,8 @@ func GetUserMany(_db Queryable, order []SelectOrder,
 
 // Convenience function provided for getting a user out of sql.Rows.Scan()
 // I probably should've implemented an sql.Scanner interface...
-// TODO: implement a Scanner interface for User
+// the туду was removed because there isn't a universal scanner - sometimes
+// we need count(*), sometimes we don't
 func UserFromRow(row Scanner) (*User, int, error) {
 	u := &User{&Account{}, &Profile{}}
 	var nUsers int

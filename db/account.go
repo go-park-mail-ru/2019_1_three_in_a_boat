@@ -47,8 +47,8 @@ func (a *Account) Save(_db Queryable) (err error) {
 	} else {
 		_, err = _db.Exec(`UPDATE Account 
                        SET "username" = $1, "password"= $2, "email" = $3
-                       WHERE "uid" = $1`,
-			a.Username, a.Password, a.Email)
+                       WHERE "uid" = $4`,
+			a.Username, a.Password, a.Email, a.Pk)
 	}
 	return
 }
