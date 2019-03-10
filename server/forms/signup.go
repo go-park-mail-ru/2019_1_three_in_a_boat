@@ -184,7 +184,7 @@ func CheckUserDbConstraints(err error) (*Report, error) {
 			if pqErr.Constraint == "account_username_key" {
 				report.Fields["username"] = fieldReport
 			} else if pqErr.Constraint == "account_email_key" {
-				report.Fields["password"] = fieldReport
+				report.Fields["email"] = fieldReport
 			} // else shouldn't ever be possible
 			return report, errors.New(formats.ErrUniqueViolation)
 		}
