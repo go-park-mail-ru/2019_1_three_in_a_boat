@@ -47,6 +47,12 @@ func makeJWEToken(user *db.User) (string, error) {
 		return "", err
 	}
 
+	img := user.Profile.Img
+	if !img.Valid || img.String == "" {
+		img.String = "default.png"
+		img.Valid = true
+	}
+
 	customClaims := formats.UserClaims{
 		Claims: &jwt.Claims{
 			Issuer:   "hexagon",
@@ -63,7 +69,7 @@ func makeJWEToken(user *db.User) (string, error) {
 			LastName:   user.Profile.LastName,
 			HighScore:  user.Profile.HighScore,
 			Gender:     user.Profile.Gender,
-			Img:        user.Profile.Img,
+			Img:        img,
 			BirthDate:  db.NullDateTime{user.Profile.BirthDate},
 			SignupDate: user.Profile.SignupDate,
 		},

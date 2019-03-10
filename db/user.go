@@ -33,7 +33,7 @@ type UserData struct {
 
 func (u User) MarshalJSON() ([]byte, error) {
 	img := u.Profile.Img
-	if img.String == "" || img.Valid == false{
+	if img.String == "" || img.Valid == false {
 		img.String = "default.png"
 		img.Valid = true
 	}
