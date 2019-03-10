@@ -35,14 +35,6 @@ const SigningAlgorithm = jose.RS256
 // Simply the version returned to the client
 const Version = "0.9"
 
-// JSON values returned to the client, indicating whether the response was
-// completed successfully. Is redundant, considering http status code, so
-// provided just for convenience
-var StatusMap = map[bool]string{
-	true:  "ok",
-	false: "error",
-}
-
 // Set-like map of allowed origins. If Origin belongs to this set, it will be
 // returned to the client. Otherwise Access-Control remains unset.
 var allowedOrigins = map[string]struct{}{

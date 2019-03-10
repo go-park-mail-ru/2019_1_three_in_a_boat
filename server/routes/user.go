@@ -3,7 +3,7 @@ package routes
 import "net/http"
 
 // A handler that handles a ~single~ user resource. The handler itself is simply
-// a struct that forwards the requests, depending on the method to one of
+// a struct that forwards the requests, depending on the method to one giof
 // PutUser or GetUser. Accepts PUT and GET requests. Implements route.Handler.
 // For details on what do both resources do, see user_(method).go.
 type UserHandler struct{}

@@ -9,9 +9,9 @@ import (
 	"time"
 )
 
-// The struct outlines full JSON response structure. It should not be used directly,
-// use JSONResponse instead.
-type _JSONResponseData struct {
+// The struct outlines full JSON response structure. It should not be used
+// directly, use JSONResponse instead.
+type JSONResponseData struct {
 	Status  string      `json:"status"`
 	Version string      `json:"version"`
 	Date    string      `json:"responseTime"`
@@ -29,12 +29,12 @@ type JSONResponse struct {
 	Data    interface{}
 }
 
-// Converts JSONResponse into _JSONResponseData, adding the missing fields automatically
+// Converts JSONResponse into JSONResponseData, adding the missing fields automatically
 func (jr JSONResponse) MarshalJSON() ([]byte, error) {
 	u, _ := AuthFromContext(jr.Request.Context()) // if !ok just leave nil
 
-	return json.Marshal(&_JSONResponseData{
-		settings.StatusMap[jr.Status],
+	return json.Marshal(&JSONResponseData{
+		StatusMap[jr.Status],
 		settings.Version,
 		time.Now().Format(time.RFC3339),
 		jr.Data,
@@ -46,3 +46,11 @@ func (jr JSONResponse) MarshalJSON() ([]byte, error) {
 // different from the db.DateFormat! DB one is fore pretty printing, this one
 // is for accepting values from the API.
 const DateFormat = "2-1-2006"
+
+// JSON values returned to the client, indicating whether the response was
+// completed successfully. Is redundant, considering http status code, so
+// provided just for convenience
+var StatusMap = map[bool]string{
+	true:  "ok",
+	false: "error",
+}
