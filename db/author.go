@@ -59,7 +59,10 @@ func AuthorDataFromRow(row Scanner) (*AuthorData, error) {
 	if err != nil {
 		return nil, err
 	}
-	if a.Img.String == "" || !a.Img.Valid { a.Img.String = "default.png" }
+	if a.Img.String == "" || !a.Img.Valid {
+		a.Img.String = "default.png"
+		a.Img.Valid = true
+	}
 	return a, nil
 }
 
