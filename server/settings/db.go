@@ -47,7 +47,7 @@ func SetDbParams(pwd, username, host, name string) {
 // makes a postgres connection string based on SetDbParams
 func makeConnStr() string {
 	SetDbParams("", "", "", "")
-	return fmt.Sprintf("postgres://%s:%s@%s/%s",
+	return fmt.Sprintf("user=%s password=%s host=%s dbname=%s sslmode=prefer",
 		dbUsername, dbPassword, dbHost, dbName)
 }
 
