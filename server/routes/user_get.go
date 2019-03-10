@@ -11,12 +11,9 @@ import (
 
 // A handler that handles a ~single~ user resource. Simply returns the user
 // data for the requested user. If the authorized user is checking his own
-// profile, does not make a DB request, uses the JWE data isntead. Expects GET
+// profile, does not make a DB request, uses the JWE data instead. Expects GET
 // method only. In case of a successful request, returns User object which is
 // encoded as UserData in JSON.
-type GetUserResponse = db.User
-
-// Handler for the Users resource
 func GetUser(w http.ResponseWriter, r *http.Request) {
 	r.Header.Set("Content-Type", "application/json")
 
