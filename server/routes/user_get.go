@@ -23,12 +23,12 @@ func GetUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	authedAs, ok := formats.AuthFromContext(r.Context())
-	if authedAs != nil && ok && authedAs.Pk == uid {
-		// if the user looking at their own profile this can save as 1 DB request
-		Handle200(w, r, authedAs.UserData)
-		return
-	}
+	//authedAs, ok := formats.AuthFromContext(r.Context())
+	//if authedAs != nil && ok && authedAs.Pk == uid {
+	//	// if the user looking at their own profile this can save as 1 DB request
+	//	Handle200(w, r, authedAs.UserData)
+	//	return
+	//}
 
 	u, err := db.GetUser(settings.DB(), uid)
 	if err != nil {
