@@ -17,6 +17,8 @@ type AuthorData struct {
 	DevInfo     NullString `json:"devInfo"`
 	Description NullString `json:"description"`
 	Username    string     `json:"username"`
+	FirstName   NullString `json:"name"`
+	LastName    NullString `json:"lastName"`
 	Img         NullString `json:"img"`
 }
 
@@ -52,7 +54,7 @@ func (a *Author) Save(_db Queryable) error {
 // Creates an AuthorData object from a Scanner returned by GetAllAuthors
 func AuthorDataFromRow(row Scanner) (*AuthorData, error) {
 	a := &AuthorData{}
-	err := row.Scan(&a.Pk, &a.Username,
+	err := row.Scan(&a.Pk, &a.Username, &a.FirstName, &a.LastName,
 		&a.Img, &a.DevInfo, &a.Description)
 	if err != nil {
 		return nil, err
@@ -63,8 +65,8 @@ func AuthorDataFromRow(row Scanner) (*AuthorData, error) {
 // Returns all authors from the database. Use AuthorDataFromRow on the returned
 // object to retrieve the object from a row. And don't forget to Close the Rows!
 func GetAllAuthors(_db Queryable) (*sql.Rows, error) {
-	return _db.Query(`SELECT a."uid", a."username", p."img",
-                           au."dev_info", au."description"
+	return _db.Query(`SELECT a."uid", a."username", p."first_name", p."last_name",
+                           p."img", au."dev_info", au."description"
                     FROM author au
                     JOIN Account a ON au.uid = a.uid
                     JOIN profile p ON a.uid = p.uid`)
