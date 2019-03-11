@@ -74,11 +74,13 @@ func (f *UserEditForm) EditUser(u *db.User) (*db.User, error) {
 	}
 
 	if f.ImgBase64.Valid {
-		u.Profile.Img.Valid = true
-		u.Profile.Img.String = f.ImgName
-	} else if f.ImgBase64.String == "" {
-		u.Profile.Img.Valid = false
-		u.Profile.Img.String = ""
+		if f.ImgBase64.String != "" {
+			u.Profile.Img.Valid = false
+			u.Profile.Img.String = ""
+		} else {
+			u.Profile.Img.Valid = true
+			u.Profile.Img.String = f.ImgName
+		}
 	} // else (null) do nothing
 
 	u.Profile.FirstName = f.FirstName
