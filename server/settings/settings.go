@@ -29,8 +29,17 @@ const SecretPath = "secret.rsa" // relative to the binary
 // If false, generates a new key on startup every time.
 const StoreKey = true
 
-// Signing parameters, just don't change them and you'll be fine. Probably
+// Signing algorithm. The documentation recommends RS256 as the default one.
 const SigningAlgorithm = jose.RS256
+
+// Lifespan of a JWE Auth token - in days
+const JWETokenLifespan = 30
+
+// Regulates the length of a CSRF Token (in bytes). 20 is probably ok.
+const CSRFTokenLength = 20
+
+// Lifespan of a CSRFToken - in days
+const CSRFTokenLifespan = 7
 
 // Simply the version returned to the client
 const Version = "0.9"
