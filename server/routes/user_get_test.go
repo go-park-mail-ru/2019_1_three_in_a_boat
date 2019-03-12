@@ -18,8 +18,6 @@ type GetUserFullResponse struct {
 }
 
 func TestGetUser(t *testing.T) {
-	SetUpDB()
-	defer TearDownDB()
 	cases := []struct {
 		req  func(m *Mock) *http.Request
 		res  func(m *Mock) db.UserData

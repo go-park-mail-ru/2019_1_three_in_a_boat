@@ -21,8 +21,6 @@ type AuthorsFullResponse struct {
 }
 
 func TestAuthorsHandler_ServeHTTPs(t *testing.T) {
-	SetUpDB()
-	defer TearDownDB()
 	cases := []struct {
 		req *http.Request
 		ok  func(*httptest.ResponseRecorder)

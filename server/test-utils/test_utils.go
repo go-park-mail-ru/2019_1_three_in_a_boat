@@ -6,21 +6,19 @@ import (
 	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/settings"
 	"github.com/google/logger"
 	"io/ioutil"
-	"sync"
 )
 
-var setUpOnce sync.Once
-
-func SetUpDB() {
-	setUpOnce.Do(func() {
+func SetUp() {
 		logger.Init("", false, false, ioutil.Discard)
 		settings.SetDbParams("", "", "", "hexagon_test")
-	})
-	TearDownDB()
-	StoreMockData(settings.DB())
+		// teardown is needed if the test stops halfway through: e.g., if stopped
+		// by a debugger. Otherwise, main calls TearDown and there's no need to call
+		// it here. Anyway, it's idempotent so it doesn't hurt
+		TearDown()
+		StoreMockData(settings.DB())
 }
 
-func TearDownDB() {
+func TearDown() {
 	// foreign keys first, or the constraint will complain
 	_, err := settings.DB().Exec("DELETE FROM author;")
 	if err != nil {

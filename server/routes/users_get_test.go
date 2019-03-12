@@ -25,8 +25,6 @@ type GetUsersResponseUnmarhsaled struct {
 }
 
 func TestGetUsers(t *testing.T) {
-	SetUpDB()
-	defer TearDownDB()
 	cases := []struct {
 		req  *http.Request
 		res  func() GetUsersResponse
