@@ -13,16 +13,8 @@ import (
 // resource.
 type Handler interface {
 	http.Handler
-	// Returns set-like map of all allowed methods
-	Methods() (methods map[string]struct{})
-	// Given a method, returns bool indicating whether unauthorized users are not
-	// allowed to work with the resource. The authorization process is handled
-	// in the Auth middleware
-	AuthRequired(method string) bool
-	// Given a method returns bool indicating whether cross-origin requests should
-	// be allowed. False indicates that the resource is not supposed to be used by
-	// the API.
-	CorsAllowed(method string) bool
+	// Returns map of all allowed methods, mapping them to the RouteSettings
+	Settings() (methods map[string]RouteSettings)
 }
 
 // Represents all the data there's to know about a root. Every middleware checks
@@ -31,4 +23,15 @@ type Handler interface {
 type Route struct {
 	Handler Handler
 	Name    string
+}
+type RouteSettings struct {
+	// Indicates whether unauthorized users are not allowed to work with the
+	// resource. The authorization process is handled in the Auth middleware
+	AuthRequired bool
+	// Indicates whether cross-origin requests should/ be allowed. False indicates
+	// that the resource is not supposed to be used by the client JS API.
+	CorsAllowed bool
+	// Indicates whether CSRF protection is required by the resource. The
+	// protection is handled in the CSRF middleware
+	CsrfProtectionRequired bool
 }

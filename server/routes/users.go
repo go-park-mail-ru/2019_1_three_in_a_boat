@@ -19,14 +19,17 @@ func (h *UsersHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (h *UsersHandler) Methods() map[string]struct{} {
-	return map[string]struct{}{"POST": {}, "GET": {}}
-}
-
-func (h *UsersHandler) AuthRequired(method string) bool {
-	return false
-}
-
-func (h *UsersHandler) CorsAllowed(method string) bool {
-	return true
+func (h *UsersHandler) Settings() map[string]RouteSettings {
+	return map[string]RouteSettings{
+		"POST": {
+			AuthRequired:           false,
+			CorsAllowed:            true,
+			CsrfProtectionRequired: true,
+		},
+		"GET": {
+			AuthRequired:           false,
+			CorsAllowed:            true,
+			CsrfProtectionRequired: false,
+		},
+	}
 }

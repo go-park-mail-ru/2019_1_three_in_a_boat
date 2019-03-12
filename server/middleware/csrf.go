@@ -8,16 +8,11 @@ import (
 
 // CORS Middleware: adds Access-Control headers if request's Origin is allowed
 // See settings for the allowed origins.
-func CORS(next http.Handler, _route routes.Route) http.Handler {
+func CSRF(next http.Handler, _route routes.Route) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		origin := r.Header.Get("Origin")
 		_, allowed := settings.GetAllowedOrigins()[origin]
-		method := r.Method
-		if method == "OPTIONS" {
-			method = r.Header.Get("Access-Control-Request-Method")
-		}
-
-		if allowed && _route.Handler.Settings()[method].CorsAllowed {
+		if allowed && _route.Handler.Settings()[r.Method].CorsAllowed {
 			w.Header().Set("Access-Control-Allow-Origin", origin)
 			w.Header().Set("Access-Control-Allow-Credentials", "true")
 			w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
