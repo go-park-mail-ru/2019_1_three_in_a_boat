@@ -57,7 +57,7 @@ func (h *SigninHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = Authorize(w, r, u)
+	err = Authorize(w, u)
 	if HandleErrForward(w, r, formats.ErrJWTEncryptionFailure, err) != nil {
 		return
 	}

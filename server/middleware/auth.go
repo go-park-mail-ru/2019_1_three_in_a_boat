@@ -13,11 +13,11 @@ import (
 
 // Authentication middleware: if the resource requires authentication,
 // checks JWT token and calls the method, returning 403 if it's invalid.
-// Otherwise simply forwards the call.
-// MUST be used after Methods middleware, or it might silently forward
-// unauthorized requests.
-// ALWAYS adds formats.UserClaims to the context - default constructed if no
-// user. Checks the claims
+// Otherwise simply forwards the call. MUST be used after every other middleware,
+// since it unconditionally adds data to the request. That data is public,
+// however, you still wouldn't want to give it away in a CSRF attack.  ALWAYS
+// adds formats.UserClaims to the context - default constructed if no user.
+// Verifies that the claims are signed.
 func Auth(next http.Handler, _route routes.Route) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx := context.Background()

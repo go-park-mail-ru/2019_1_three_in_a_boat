@@ -48,7 +48,7 @@ func PostUsers(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if HandleErrForward(w, r, formats.ErrSignupAuthFailure, Authorize(w, r, u)) != nil {
+	if HandleErrForward(w, r, formats.ErrSignupAuthFailure, Authorize(w, u)) != nil {
 		return
 	}
 
