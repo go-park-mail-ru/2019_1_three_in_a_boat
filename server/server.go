@@ -59,8 +59,9 @@ func GetRouter() http.Handler {
 			globalRouter.Handle(routeStr,
 				middleware.Methods(
 					middleware.CORS(
-						middleware.Auth(
-							routeObj.Handler, routeObj), routeObj), routeObj))
+						middleware.CSRF(
+							middleware.Auth(
+								routeObj.Handler, routeObj), routeObj), routeObj), routeObj))
 		}
 	})
 
