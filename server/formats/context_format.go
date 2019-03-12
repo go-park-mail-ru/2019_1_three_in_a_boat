@@ -2,7 +2,7 @@ package formats
 
 import (
 	"context"
-	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/db"
+	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/db"
 	"gopkg.in/square/go-jose.v2/jwt"
 )
 

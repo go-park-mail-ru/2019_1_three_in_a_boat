@@ -1,6 +1,9 @@
 package db
 
-import "database/sql"
+import (
+	"database/sql"
+	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/settings"
+)
 
 // Struct representing an author - data, additional to Profile, supplied only
 // for the authors of the project.
@@ -60,7 +63,7 @@ func AuthorDataFromRow(row Scanner) (*AuthorData, error) {
 		return nil, err
 	}
 	if a.Img.String == "" || !a.Img.Valid {
-		a.Img.String = "default.png"
+		a.Img.String = settings.DefaultImgName
 		a.Img.Valid = true
 	}
 	return a, nil

@@ -2,7 +2,7 @@ package test_utils
 
 import (
 	"encoding/json"
-	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/db"
+	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/db"
 	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/settings"
 	"github.com/google/logger"
 	"io/ioutil"

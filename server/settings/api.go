@@ -4,6 +4,12 @@ package settings
 // the behavior of the API in a non-critical way (e.g. validation settings,
 // entries per page etc.)
 
+// Specifies the directory images are saved to
+const UploadsPath = "media/images"
+
+// Specifies the string returned to the client when the entry in the DB is NULL or empty
+const DefaultImgName = "default.png"
+
 // Defines how many users are returned per page by default.
 const UsersDefaultPageSize = 10
 
@@ -18,3 +24,12 @@ const MinPasswordStrength = 0
 // If true, also checks that the email is real when signing up. This can be
 // rather long (up to 1 second) since it requires an answer from the SMTP server.
 const EmailExistsCheck = false
+
+// Lifespan of a JWE Auth token - in days
+const JWETokenLifespan = 30
+
+// Regulates the length of a CSRF Token (in bytes). 20 is probably ok.
+const CSRFTokenLength = 20
+
+// Lifespan of a CSRFToken - in days
+const CSRFTokenLifespan = 7

@@ -1,7 +1,7 @@
 package handlers
 
 import (
-	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/db"
+	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/db"
 	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/formats"
 	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/settings"
 	"github.com/google/uuid"
@@ -49,7 +49,7 @@ func makeJWEToken(user *db.User) (string, error) {
 
 	img := user.Profile.Img
 	if !img.Valid || img.String == "" {
-		img.String = "default.png"
+		img.String = settings.DefaultImgName
 		img.Valid = true
 	}
 

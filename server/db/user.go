@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/settings"
 	"time"
 )
 
@@ -34,7 +35,7 @@ type UserData struct {
 func (u User) MarshalJSON() ([]byte, error) {
 	img := u.Profile.Img
 	if img.String == "" || img.Valid == false {
-		img.String = "default.png"
+		img.String = settings.DefaultImgName
 		img.Valid = true
 	}
 	return json.Marshal(UserData{

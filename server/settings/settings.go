@@ -1,3 +1,7 @@
+// Package defines constants and singletons used across the entire server
+// package. All the constants that affect the behavior of the server itself are
+// listed in settings.go, constants that define client-related interaction
+// specifics are listed in api.go
 package settings
 
 import (
@@ -17,7 +21,6 @@ var (
 
 // If -l is not specified, logs will be stored here
 const DefaultLogPath = "logs/server.log"
-const UploadsPath = "media/images"
 
 var ImageSize = [...]int{400, 400}
 
@@ -31,15 +34,6 @@ const StoreKey = true
 
 // Signing algorithm. The documentation recommends RS256 as the default one.
 const SigningAlgorithm = jose.RS256
-
-// Lifespan of a JWE Auth token - in days
-const JWETokenLifespan = 30
-
-// Regulates the length of a CSRF Token (in bytes). 20 is probably ok.
-const CSRFTokenLength = 20
-
-// Lifespan of a CSRFToken - in days
-const CSRFTokenLifespan = 7
 
 // Simply the version returned to the client
 const Version = "0.9"
