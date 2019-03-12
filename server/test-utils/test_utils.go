@@ -9,13 +9,13 @@ import (
 )
 
 func SetUp() {
-		logger.Init("", false, false, ioutil.Discard)
-		settings.SetDbParams("", "", "", "hexagon_test")
-		// teardown is needed if the test stops halfway through: e.g., if stopped
-		// by a debugger. Otherwise, main calls TearDown and there's no need to call
-		// it here. Anyway, it's idempotent so it doesn't hurt
-		TearDown()
-		StoreMockData(settings.DB())
+	logger.Init("", false, false, ioutil.Discard)
+	settings.SetDbParams("", "", "", "hexagon_test")
+	// teardown is needed if the test stops halfway through: e.g., if stopped
+	// by a debugger. Otherwise, main calls TearDown and there's no need to call
+	// it here. Anyway, it's idempotent so it doesn't hurt
+	TearDown()
+	StoreMockData(settings.DB())
 }
 
 func TearDown() {
