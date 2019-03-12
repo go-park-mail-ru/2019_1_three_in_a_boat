@@ -23,14 +23,12 @@ func (h *CheckAuthHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (h *CheckAuthHandler) Methods() map[string]struct{} {
-	return map[string]struct{}{"GET": {}}
-}
-
-func (h *CheckAuthHandler) AuthRequired(method string) bool {
-	return false
-}
-
-func (h *CheckAuthHandler) CorsAllowed(method string) bool {
-	return true
+func (h *CheckAuthHandler) Settings() map[string]RouteSettings {
+	return map[string]RouteSettings{
+		"GET": {
+			AuthRequired:           false,
+			CorsAllowed:            true,
+			CsrfProtectionRequired: false,
+		},
+	}
 }

@@ -96,7 +96,7 @@ func PutUser(w http.ResponseWriter, r *http.Request) {
 		_ = os.Remove(path.Join(settings.UploadsPath, oldImg.String))
 	}
 
-	if HandleErrForward(w, r, formats.ErrSignupAuthFailure, Authorize(w, r, u)) != nil {
+	if HandleErrForward(w, r, formats.ErrSignupAuthFailure, Authorize(w, u)) != nil {
 		return
 	}
 

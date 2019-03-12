@@ -56,6 +56,11 @@ func Handle403(w http.ResponseWriter, r *http.Request) {
 		formats.Err403, formats.Err403)
 }
 
+func Handle403Msg(w http.ResponseWriter, r *http.Request, msg string) {
+	handle4XXDepth(1, http.StatusForbidden, w, r,
+		msg, msg)
+}
+
 // Handles request provided in an invalid format, e.g. invalid JSON. Should
 // never happen if the app is working as intended and the user isn't trying to
 // do something fishy

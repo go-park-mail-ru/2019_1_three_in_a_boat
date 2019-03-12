@@ -57,7 +57,7 @@ func (h *SigninHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = Authorize(w, r, u)
+	err = Authorize(w, u)
 	if HandleErrForward(w, r, formats.ErrJWTEncryptionFailure, err) != nil {
 		return
 	}
@@ -65,14 +65,12 @@ func (h *SigninHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	Handle200(w, r, u)
 }
 
-func (h *SigninHandler) Methods() map[string]struct{} {
-	return map[string]struct{}{"POST": {}}
-}
-
-func (h *SigninHandler) AuthRequired(method string) bool {
-	return false
-}
-
-func (h *SigninHandler) CorsAllowed(method string) bool {
-	return true
+func (h *SigninHandler) Settings() map[string]RouteSettings {
+	return map[string]RouteSettings{
+		"POST": {
+			AuthRequired:           false,
+			CorsAllowed:            true,
+			CsrfProtectionRequired: true,
+		},
+	}
 }

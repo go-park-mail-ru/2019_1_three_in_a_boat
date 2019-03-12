@@ -13,7 +13,7 @@ import (
 // Generates a JWE authorization token for user. Sets the cookie. Returns error
 // if the token generation failed (shouldn't ever happen in a properly
 // configured app.
-func Authorize(w http.ResponseWriter, r *http.Request, user *db.User) error {
+func Authorize(w http.ResponseWriter, user *db.User) error {
 	token, err := makeJWEToken(user)
 	if err != nil {
 		return err
@@ -22,7 +22,7 @@ func Authorize(w http.ResponseWriter, r *http.Request, user *db.User) error {
 	http.SetCookie(w, &http.Cookie{
 		Name:     "auth",
 		Value:    token,
-		Expires:  time.Now().Add(time.Hour * 24 * 30),
+		Expires:  time.Now().Add(time.Hour * 24 * settings.JWETokenLifespan),
 		HttpOnly: true,
 		Path:     "/", // guarantees uniqueness.. I think
 	})
@@ -31,7 +31,7 @@ func Authorize(w http.ResponseWriter, r *http.Request, user *db.User) error {
 }
 
 // Deletes the authorization cookie. Guaranteed to succeed.
-func Unauthorize(w http.ResponseWriter, r *http.Request) {
+func Unauthorize(w http.ResponseWriter) {
 	http.SetCookie(w, &http.Cookie{
 		Name:     "auth",
 		Expires:  time.Now().Add(-24 * time.Hour), // sufficient for any time zone

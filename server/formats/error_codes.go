@@ -6,7 +6,8 @@ package formats
 const (
 	Err404                   = "E_NOT_FOUND"
 	Err405                   = "E_METHOD_NOT_ALLOWED"
-	Err403                   = "E_AUTH_REQUIRED"
+	Err403                   = "E_FORBIDDEN"
+	ErrCSRF                  = "E_CSRF_VALIDATION_FAILED"
 	ErrDbModuleFailure       = "E_DB_MODULE_FAILURE"
 	ErrDbRowsFailure         = "E_DB_READ_FAILURE"
 	ErrDbScanFailure         = "E_DB_SCAN_FAILURE"

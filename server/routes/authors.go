@@ -43,14 +43,12 @@ func (h *AuthorsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	Handle200(w, r, authors)
 }
 
-func (h *AuthorsHandler) Methods() map[string]struct{} {
-	return map[string]struct{}{"GET": {}}
-}
-
-func (h *AuthorsHandler) AuthRequired(method string) bool {
-	return false
-}
-
-func (h *AuthorsHandler) CorsAllowed(method string) bool {
-	return true
+func (h *AuthorsHandler) Settings() map[string]RouteSettings {
+	return map[string]RouteSettings{
+		"GET": {
+			AuthRequired:           false,
+			CorsAllowed:            true,
+			CsrfProtectionRequired: false,
+		},
+	}
 }

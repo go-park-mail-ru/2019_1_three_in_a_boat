@@ -14,18 +14,16 @@ type SignOutHandler struct{}
 func (h *SignOutHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	r.Header.Set("Content-Type", "application/json")
 
-	Unauthorize(w, r)
+	Unauthorize(w)
 	Handle200(w, r, nil)
 }
 
-func (h *SignOutHandler) Methods() map[string]struct{} {
-	return map[string]struct{}{"GET": {}}
-}
-
-func (h *SignOutHandler) AuthRequired(method string) bool {
-	return false
-}
-
-func (h *SignOutHandler) CorsAllowed(method string) bool {
-	return true
+func (h *SignOutHandler) Settings() map[string]RouteSettings {
+	return map[string]RouteSettings{
+		"POST": {
+			AuthRequired:           false,
+			CorsAllowed:            true,
+			CsrfProtectionRequired: false,
+		},
+	}
 }
