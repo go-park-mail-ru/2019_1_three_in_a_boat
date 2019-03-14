@@ -91,7 +91,7 @@ func PutUser(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-	if (form.ImgBase64.String == "" || form.Img != nil) && oldImg.Valid {
+	if u.Profile.Img.String == "" && oldImg.Valid {
 		// we don't care if this fails and this is very unlikely to fail
 		_ = os.Remove(path.Join(settings.UploadsPath, oldImg.String))
 	}
