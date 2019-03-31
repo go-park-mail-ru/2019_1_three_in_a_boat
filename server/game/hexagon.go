@@ -2,11 +2,6 @@ package game
 
 // we're thinking about ⬣ sort of hexagon, not the rotated one (width > height)
 
-type Coords struct {
-	X float64
-	Y float64
-}
-
 const (
 	SideTop = iota
 	SideTopRight
@@ -28,6 +23,7 @@ type Hexagon struct {
 func NewHexagon(skipSides []int, side float64) *Hexagon {
 	h := &Hexagon{Center: Coords{0, 0}, Side: side}
 
+	h.EmptySides = make(map[int]struct{})
 	for _, x := range skipSides {
 		h.EmptySides[x] = struct{}{}
 	}
