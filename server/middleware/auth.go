@@ -54,6 +54,7 @@ func Auth(next routes.Handler) routes.Handler {
 		// could not be read)
 		if errMsg != "" {
 			ctx = formats.NewAuthContext(context.Background(), nil)
+			//noinspection GoNilness
 			handlers.LogError(0, errMsg+": "+err.Error(), r)
 			// log the error and forward the response as unauthorized - do not return
 		}

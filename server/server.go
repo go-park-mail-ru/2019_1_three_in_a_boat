@@ -31,11 +31,6 @@ var routesMapOnce = sync.Once{}
 // Aggregates RoutesMap into a http.Handler, handling all acceptable requests
 func GetRouter() http.Handler {
 	routesMapOnce.Do(func() {
-		var err error
-		if err != nil {
-			logger.Fatal("Failed to connect to DB")
-		}
-
 		logger.Info("Setting up router")
 		for route, handler := range RoutesMap {
 			globalRouter.Handle(route,
