@@ -18,6 +18,7 @@ const (
 	ErrJWTEncryptionFailure  = "E_JWT_ENCRYPTION_FAILURE"
 	ErrJWTOutdated           = "E_JWT_OUTDATED"
 	ErrPasswordHashing       = "E_BCRYPT_FAILURE"
+	ErrPanic                 = "E_PANIC"
 	ErrResponseWriterFailure = "E_RESPONSE_WRITER_FAILURE"
 	ErrSavingImg             = "E_IMG_SAVE_FAILURE"
 	ErrSignupAuthFailure     = "E_SIGNUP_OK_AUTH_FAILED"

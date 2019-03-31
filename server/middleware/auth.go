@@ -18,8 +18,8 @@ import (
 // however, you still wouldn't want to give it away in a CSRF attack.  ALWAYS
 // adds formats.UserClaims to the context - default constructed if no user.
 // Verifies that the claims are signed.
-func Auth(next http.Handler, _route routes.Route) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+func Auth(next routes.Handler) routes.Handler {
+	return HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx := context.Background()
 		var rawJWT *http.Cookie
 		var parsedJWT *jwt.JSONWebToken
@@ -58,7 +58,7 @@ func Auth(next http.Handler, _route routes.Route) http.Handler {
 			// log the error and forward the response as unauthorized - do not return
 		}
 
-		if _route.Handler.Settings()[r.Method].AuthRequired && err != nil {
+		if next.Settings()[r.Method].AuthRequired && err != nil {
 			handlers.LogError(0, errMsg, r)
 			handlers.Handle403(w, r)
 			return // .. unless the resource requires authorization
@@ -66,5 +66,5 @@ func Auth(next http.Handler, _route routes.Route) http.Handler {
 
 		r = r.WithContext(ctx)
 		next.ServeHTTP(w, r)
-	})
+	}, next.Settings())
 }

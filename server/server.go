@@ -15,31 +15,13 @@ import (
 )
 
 // Maps URL paths into corresponding routes.Routes
-var RoutesMap = map[string]routes.Route{
-	"/authors": {
-		Handler: &routes.AuthorsHandler{},
-		Name:    "authors",
-	},
-	"/users": {
-		Handler: &routes.UsersHandler{},
-		Name:    "users",
-	},
-	"/users/": {
-		Handler: &routes.UserHandler{},
-		Name:    "user",
-	},
-	"/signin": {
-		Handler: &routes.SigninHandler{},
-		Name:    "signin",
-	},
-	"/": {
-		Handler: &routes.CheckAuthHandler{},
-		Name:    "check-auth",
-	},
-	"/signout": {
-		Handler: &routes.SignOutHandler{},
-		Name:    "signout",
-	},
+var RoutesMap = map[string]routes.Handler{
+	"/authors": &routes.AuthorsHandler{},
+	"/users":   &routes.UsersHandler{},
+	"/users/":  &routes.UserHandler{},
+	"/signin":  &routes.SigninHandler{},
+	"/":        &routes.CheckAuthHandler{},
+	"/signout": &routes.SignOutHandler{},
 }
 
 var globalRouter = http.ServeMux{}
@@ -55,13 +37,13 @@ func GetRouter() http.Handler {
 		}
 
 		logger.Info("Setting up router")
-		for routeStr, routeObj := range RoutesMap {
-			globalRouter.Handle(routeStr,
-				middleware.Methods(
-					middleware.CORS(
-						middleware.CSRF(
-							middleware.Auth(
-								routeObj.Handler, routeObj), routeObj), routeObj), routeObj))
+		for route, handler := range RoutesMap {
+			globalRouter.Handle(route,
+				middleware.Panic(
+					middleware.Methods(
+						middleware.CORS(
+							middleware.CSRF(
+								middleware.Auth(handler))))))
 		}
 	})
 

@@ -10,10 +10,10 @@ import (
 
 // CORS Middleware: adds Access-Control headers if request's Origin is allowed
 // See settings for the allowed origins.
-func CSRF(next http.Handler, _route routes.Route) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+func CSRF(next routes.Handler) routes.Handler {
+	return HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// if the protection is required - check for it right away
-		if _route.Handler.Settings()[r.Method].CsrfProtectionRequired {
+		if next.Settings()[r.Method].CsrfProtectionRequired {
 			cookieToken, err := r.Cookie("csrf") // err ErrNoCookie only
 			headerToken := r.Header.Get("X-CSRF-Token")
 			if err != nil || headerToken != cookieToken.Value {
@@ -34,5 +34,5 @@ func CSRF(next http.Handler, _route routes.Route) http.Handler {
 			}
 		}
 		next.ServeHTTP(w, r)
-	})
+	}, next.Settings())
 }
