@@ -21,8 +21,7 @@ func Handle201(w http.ResponseWriter, r *http.Request,
 }
 
 // Logs the error and sends back an error message, if possible
-func Handle500(w http.ResponseWriter, r *http.Request,
-	msg string, err error) {
+func Handle500(w http.ResponseWriter, r *http.Request, msg string, err error) {
 	handle5XXDepth(1, http.StatusInternalServerError, w, r, msg, err)
 }
 
