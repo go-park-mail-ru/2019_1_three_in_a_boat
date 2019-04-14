@@ -1,6 +1,19 @@
 package game
 
+import (
+	"encoding/json"
+)
+
 // we're thinking about ⬣ sort of hexagon, not the rotated one (width > height)
+
+const (
+	SkipTop = 1 << iota
+	SkipTopRight
+	SkipBottomRight
+	SkipBottom
+	SkipBottomLeft
+	SkipTopLeft
+)
 
 const (
 	SideTop = iota
@@ -14,21 +27,26 @@ const (
 const sqrt3 = 1.7320508075688772
 
 type Hexagon struct {
-	Center     Coords
-	Side       float64
-	EmptySides map[int]struct{}
-	Lines      [6]*Line
+	Side      float64
+	SidesMask int
+	angle     float64
+	Lines     [6]*Line
 }
 
-func NewHexagon(skipSides []int, side float64) *Hexagon {
-	h := &Hexagon{Center: Coords{0, 0}, Side: side}
+type hexagonData struct {
+	Side      float64 `json:"side"`
+	SidesMask int     `json:"sidesMask"`
+	Angle     float64 `json:"angle"`
+}
 
-	h.EmptySides = make(map[int]struct{})
-	for _, x := range skipSides {
-		h.EmptySides[x] = struct{}{}
-	}
+func (h Hexagon) MarshalJSON() ([]byte, error) {
+	return json.Marshal(hexagonData{h.Side, h.SidesMask, h.angle})
+}
 
-	if _, skip := h.EmptySides[SideTop]; !skip {
+func NewHexagon(sidesMask int, side float64) *Hexagon {
+	h := &Hexagon{Side: side}
+
+	if sidesMask&SkipTop == 0 {
 		h.Lines[SideTop] = &Line{
 			Start: Coords{-h.Side / 2, h.Height() / 2},
 			End:   Coords{h.Side / 2, h.Height() / 2},
@@ -37,7 +55,7 @@ func NewHexagon(skipSides []int, side float64) *Hexagon {
 		h.Lines[SideTop] = nil
 	}
 
-	if _, skip := h.EmptySides[SideTopRight]; !skip {
+	if sidesMask&SkipTopRight == 0 {
 		h.Lines[SideTopRight] = &Line{
 			Start: Coords{h.Side / 2, h.Height() / 2},
 			End:   Coords{h.Width() / 2, 0},
@@ -46,7 +64,7 @@ func NewHexagon(skipSides []int, side float64) *Hexagon {
 		h.Lines[SideTopRight] = nil
 	}
 
-	if _, skip := h.EmptySides[SideBottomRight]; !skip {
+	if sidesMask&SkipBottomRight == 0 {
 		h.Lines[SideBottomRight] = &Line{
 			Start: Coords{h.Width() / 2, 0},
 			End:   Coords{h.Side / 2, -h.Height() / 2},
@@ -55,7 +73,7 @@ func NewHexagon(skipSides []int, side float64) *Hexagon {
 		h.Lines[SideBottomRight] = nil
 	}
 
-	if _, skip := h.EmptySides[SideBottom]; !skip {
+	if sidesMask&SkipBottom == 0 {
 		h.Lines[SideBottom] = &Line{
 			Start: Coords{h.Side / 2, -h.Height() / 2},
 			End:   Coords{-h.Side / 2, -h.Height() / 2},
@@ -64,7 +82,7 @@ func NewHexagon(skipSides []int, side float64) *Hexagon {
 		h.Lines[SideBottom] = nil
 	}
 
-	if _, skip := h.EmptySides[SideBottomLeft]; !skip {
+	if sidesMask&SkipBottomLeft == 0 {
 		h.Lines[SideBottomLeft] = &Line{
 			Start: Coords{-h.Side / 2, -h.Height() / 2},
 			End:   Coords{-h.Width() / 2, 0},
@@ -73,7 +91,7 @@ func NewHexagon(skipSides []int, side float64) *Hexagon {
 		h.Lines[SideBottomLeft] = nil
 	}
 
-	if _, skip := h.EmptySides[SideTopLeft]; !skip {
+	if sidesMask&SkipTopLeft == 0 {
 		h.Lines[SideTopLeft] = &Line{
 			Start: Coords{-h.Width() / 2, 0},
 			End:   Coords{-h.Side / 2, h.Height() / 2},
@@ -100,4 +118,18 @@ func (h *Hexagon) Crosses(circle Circle) bool {
 		}
 	}
 	return false
+}
+
+func (h *Hexagon) Rotate(rad float64) {
+	h.angle += rad
+	for _, line := range h.Lines {
+		if line != nil {
+			line.Rotate(rad)
+		}
+	}
+}
+
+func (h *Hexagon) Shrink(diff float64) {
+	h.Side -= diff
+	h.Lines = NewHexagon(h.SidesMask, h.Side).Lines
 }

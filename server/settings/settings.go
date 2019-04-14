@@ -35,6 +35,9 @@ const StoreKey = true
 // Signing algorithm. The documentation recommends RS256 as the default one.
 const SigningAlgorithm = jose.RS256
 
+// CSRF when debugging is annoying af, hence this setting
+const EnableCSRF = false
+
 // Simply the version returned to the client
 const Version = "0.9"
 

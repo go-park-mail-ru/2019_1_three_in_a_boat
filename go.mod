@@ -7,8 +7,10 @@ require (
 	github.com/disintegration/imaging v1.6.0
 	github.com/google/logger v1.0.1
 	github.com/google/uuid v1.1.1
+	github.com/gorilla/websocket v1.4.0
 	github.com/lib/pq v1.0.0
 	github.com/nbutton23/zxcvbn-go v0.0.0-20180912185939-ae427f1e4c1d
+	github.com/stretchr/testify v1.3.0 // indirect
 	golang.org/x/crypto v0.0.0-20190228161510-8dd112bcdc25
 	gopkg.in/square/go-jose.v2 v2.3.0
 )

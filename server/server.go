@@ -5,13 +5,15 @@ package server
 // routes package
 
 import (
-	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/middleware"
-	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/routes"
-	"github.com/google/logger"
 	"net/http"
 	"strconv"
 	"sync"
 	"time"
+
+	"github.com/google/logger"
+
+	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/middleware"
+	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/routes"
 )
 
 // Maps URL paths into corresponding routes.Routes
@@ -22,6 +24,7 @@ var RoutesMap = map[string]routes.Handler{
 	"/signin":  &routes.SigninHandler{},
 	"/":        &routes.CheckAuthHandler{},
 	"/signout": &routes.SignOutHandler{},
+	"/play":    &routes.SinglePlayHandler{},
 }
 
 var globalRouter = http.ServeMux{}

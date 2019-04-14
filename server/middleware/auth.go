@@ -2,13 +2,15 @@ package middleware
 
 import (
 	"context"
+	"net/http"
+	"time"
+
+	"gopkg.in/square/go-jose.v2/jwt"
+
 	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/formats"
 	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/handlers"
 	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/routes"
 	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/settings"
-	"gopkg.in/square/go-jose.v2/jwt"
-	"net/http"
-	"time"
 )
 
 // Authentication middleware: if the resource requires authentication,
@@ -60,7 +62,7 @@ func Auth(next routes.Handler) routes.Handler {
 		}
 
 		if next.Settings()[r.Method].AuthRequired && err != nil {
-			handlers.LogError(0, errMsg, r)
+			handlers.LogError(0, err.Error(), r)
 			handlers.Handle403(w, r)
 			return // .. unless the resource requires authorization
 		}

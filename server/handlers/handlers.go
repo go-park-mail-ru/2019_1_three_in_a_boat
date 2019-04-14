@@ -2,9 +2,11 @@
 package handlers
 
 import (
+	"fmt"
+	"net/http"
+
 	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/formats"
 	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/forms"
-	"net/http"
 )
 
 // Processes response for sending: if it can't be marshaled, handles 500
@@ -83,4 +85,22 @@ func HandleReportForward(w http.ResponseWriter, r *http.Request,
 			w, r, report, formats.ErrValidation)
 	}
 	return report
+}
+
+func WSLogInfo(r *http.Request, msg, connId string) {
+	LogInfo(1, fmt.Sprintf("Connection %s: %s", connId, msg), r)
+}
+
+func WSLogError(r *http.Request, msg, connId string, err error) {
+	LogError(1, fmt.Sprintf(
+		"Connection %s: %s (%s)", connId, msg, err.Error()), r)
+}
+
+func WSHandleErrForward(r *http.Request, msg, connId string, err error) error {
+	if err == nil {
+		return nil
+	} else {
+		WSLogError(r, msg, connId, err)
+		return err
+	}
 }

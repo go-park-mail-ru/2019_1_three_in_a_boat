@@ -2,16 +2,24 @@ package middleware
 
 import (
 	"fmt"
+	"net/http"
+
 	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/formats"
 	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/handlers"
 	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/routes"
-	"net/http"
+	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/settings"
 )
 
 // CORS Middleware: adds Access-Control headers if request's Origin is allowed
 // See settings for the allowed origins.
 func CSRF(next routes.Handler) routes.Handler {
 	return HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// noinspection GoBoolExpressions
+		if !settings.EnableCSRF {
+			next.ServeHTTP(w, r)
+			return
+		}
+
 		// if the protection is required - check for it right away
 		if next.Settings()[r.Method].CsrfProtectionRequired {
 			cookieToken, err := r.Cookie("csrf") // err ErrNoCookie only

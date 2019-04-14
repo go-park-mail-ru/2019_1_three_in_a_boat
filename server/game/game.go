@@ -9,10 +9,10 @@ import (
 var Game game
 
 var Settings = settings{
-	PlayerCircleRadius:    10,
+	PlayerCircleRadius:    5,
 	ShrinkPerSec:          5,
 	RotatePerSec:          math.Pi / 4,
-	TickLength:            time.Millisecond * 35,
+	TickDuration:          time.Millisecond * 35,
 	IntensityToAngleRatio: 0.1,
 	CursorRadius:          0.5,
 }
@@ -30,14 +30,15 @@ type settings struct {
 	PlayerCircleRadius    float64
 	ShrinkPerSec          float64
 	RotatePerSec          float64
-	TickLength            time.Duration
+	TickDuration          time.Duration
 	IntensityToAngleRatio float64
 	CursorRadius          float64
 }
 
 func GetSinglePlayRoom(playerId int64) (Room, bool) {
 	if room, ok := Game.Rooms.Load(playerId); ok {
-		return room.(Room), true
+		r := room.(Room)
+		return r, true
 	} else {
 		return nil, false
 	}
@@ -45,6 +46,11 @@ func GetSinglePlayRoom(playerId int64) (Room, bool) {
 
 func LoadOrStoreSinglePlayRoom(playerId int64, room Room) (Room, bool) {
 	actual, ok := Game.Rooms.LoadOrStore(playerId, room)
-	return actual.(Room), ok
+	r := actual.(Room)
+	return r, ok
 
+}
+
+func init() {
+	ShrinkPerTick = Settings.ShrinkPerSec / float64(time.Second/Settings.TickDuration)
 }
