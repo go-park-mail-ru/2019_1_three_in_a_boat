@@ -100,7 +100,8 @@ func WSHandleErrForward(r *http.Request, msg, connId string, err error) error {
 	if err == nil {
 		return nil
 	} else {
-		WSLogError(r, msg, connId, err)
+		LogError(1, fmt.Sprintf(
+			"Connection %s: %s (%s)", connId, msg, err.Error()), r)
 		return err
 	}
 }

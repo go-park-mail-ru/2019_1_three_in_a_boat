@@ -44,7 +44,7 @@ func (h Hexagon) MarshalJSON() ([]byte, error) {
 }
 
 func NewHexagon(sidesMask int, side float64) *Hexagon {
-	h := &Hexagon{Side: side}
+	h := &Hexagon{Side: side, SidesMask: sidesMask}
 
 	if sidesMask&SkipTop == 0 {
 		h.Lines[SideTop] = &Line{
@@ -132,4 +132,5 @@ func (h *Hexagon) Rotate(rad float64) {
 func (h *Hexagon) Shrink(diff float64) {
 	h.Side -= diff
 	h.Lines = NewHexagon(h.SidesMask, h.Side).Lines
+	h.Rotate(0) // sync with the h.angle
 }

@@ -1,6 +1,8 @@
 package game
 
 import (
+	"encoding/json"
+	"go.uber.org/atomic"
 	"math"
 )
 
@@ -12,7 +14,25 @@ const (
 )
 
 type Input struct {
-	Angle float64 `json:"angle"`
+	angle *atomic.Float64
+}
+
+func (i *Input) UnmarshalJSON(data []byte) error {
+	var f float64
+	err := json.Unmarshal(data, &f)
+	if err != nil {
+		return err
+	}
+	i.angle.Store(f)
+	return nil
+}
+
+func (i *Input) Angle() float64 {
+	return i.angle.Load()
+}
+
+func NewInput(angle float64) *Input {
+	return &Input{atomic.NewFloat64(angle)}
 }
 
 var InitialSnapshot = Snapshot{
@@ -49,7 +69,7 @@ func NewSnapshot() Snapshot {
 	return snap
 }
 
-func (ss *Snapshot) Update(in Input) bool {
+func (ss *Snapshot) Update(in *Input) bool {
 
 	// check previous snapshot doesn't end the game
 	for _, h := range ss.Hexagons {
@@ -60,16 +80,16 @@ func (ss *Snapshot) Update(in Input) bool {
 	}
 
 	// update snapshot
-	for i, h := range ss.Hexagons {
-		if h.Side <= ShrinkPerTick {
+	for i := range ss.Hexagons {
+		if ss.Hexagons[i].Side <= ShrinkPerTick {
+			ss.Score += 10
 			ss.Hexagons[i] = *NewHexagon(InitialHexagons[0].SidesMask, InitialHexagons[0].Side)
 		} else {
-			h.Shrink(ShrinkPerTick)
-			h.Rotate(in.Angle - ss.Angle)
+			ss.Hexagons[i].Shrink(ShrinkPerTick)
+			ss.Hexagons[i].Rotate(RotatePerTick)
 		}
 	}
 
-	ss.Angle = in.Angle
 	return false
 }
 

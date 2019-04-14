@@ -11,6 +11,7 @@ require (
 	github.com/lib/pq v1.0.0
 	github.com/nbutton23/zxcvbn-go v0.0.0-20180912185939-ae427f1e4c1d
 	github.com/stretchr/testify v1.3.0 // indirect
+	go.uber.org/atomic v1.3.2
 	golang.org/x/crypto v0.0.0-20190228161510-8dd112bcdc25
 	gopkg.in/square/go-jose.v2 v2.3.0
 )

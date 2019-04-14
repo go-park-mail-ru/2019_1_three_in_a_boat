@@ -8,16 +8,17 @@ import (
 
 var Game game
 
-var Settings = settings{
-	PlayerCircleRadius:    5,
-	ShrinkPerSec:          5,
+var Settings = gameSettings{
+	PlayerCircleRadius:    10,
+	ShrinkPerSec:          0.1,
 	RotatePerSec:          math.Pi / 4,
-	TickDuration:          time.Millisecond * 35,
+	TickDuration:          time.Millisecond * 50,
 	IntensityToAngleRatio: 0.1,
-	CursorRadius:          0.5,
+	CursorRadius:          3,
 }
 
 var ShrinkPerTick float64
+var RotatePerTick float64
 
 type game struct {
 	// the map stores pointers to Rooms, and despite being thread-safe
@@ -26,7 +27,7 @@ type game struct {
 	Rooms sync.Map
 }
 
-type settings struct {
+type gameSettings struct {
 	PlayerCircleRadius    float64
 	ShrinkPerSec          float64
 	RotatePerSec          float64
@@ -53,4 +54,5 @@ func LoadOrStoreSinglePlayRoom(playerId int64, room Room) (Room, bool) {
 
 func init() {
 	ShrinkPerTick = Settings.ShrinkPerSec / float64(time.Second/Settings.TickDuration)
+	RotatePerTick = Settings.RotatePerSec / float64(time.Second/Settings.TickDuration)
 }

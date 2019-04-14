@@ -1,7 +1,6 @@
 package game
 
 import (
-	"errors"
 	"math"
 	"net/http"
 	"time"
@@ -9,8 +8,10 @@ import (
 	"github.com/google/uuid"
 	"github.com/gorilla/websocket"
 
+	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/db"
 	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/formats"
 	. "github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/handlers"
+	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/settings"
 )
 
 type Room interface {
@@ -33,14 +34,16 @@ type SinglePlayerRoom struct {
 	Uid       int64
 	RoomId    RoomId
 	Snapshot  Snapshot
-	LastInput Input
+	LastInput *Input
 	Request   *http.Request
 	Running   bool
 }
 
 func (spr *SinglePlayerRoom) Disconnect() {
 	spr.Conn = nil
-	spr.Snapshot.State = StateDisconnect
+	if spr.Snapshot.State == StateRunning {
+		spr.Snapshot.State = StateDisconnect
+	}
 }
 
 func (spr *SinglePlayerRoom) Connected() bool {
@@ -90,9 +93,7 @@ func (spr *SinglePlayerRoom) ReadJSON(v interface{}) bool {
 }
 
 func (spr *SinglePlayerRoom) ReadInput() bool {
-	input := Input{}
-	if spr.ReadJSON(&input) {
-		spr.LastInput = input
+	if spr.ReadJSON(&spr.LastInput) {
 		return true
 	}
 
@@ -106,7 +107,7 @@ func NewSinglePlayerRoom(
 		Uid:       p1uid,
 		RoomId:    uuid.New().String(),
 		Snapshot:  NewSnapshot(),
-		LastInput: Input{math.Pi / 2},
+		LastInput: NewInput(math.Pi / 2),
 		Request:   r,
 	}
 	Game.Rooms.Store(room.RoomId, room)
@@ -121,14 +122,9 @@ func NewSinglePlayerRoom(
 // Error() method, so that's why all errors are treated as disconnects.
 func (spr *SinglePlayerRoom) Tick() (
 	isOver bool) {
-	if !spr.ReadInput() {
-		WSLogError(spr.Request, "WS: unexpected disconnect",
-			spr.RoomId, errors.New(formats.ErrWebSocketFailure))
-	}
 	spr.Snapshot.State = StateRunning
 	if isOver {
-		spr.WriteJSON(
-			SinglePlayerSnapshotData{Over: true, Score: spr.Snapshot.Score})
+		spr.FinishGame()
 		return
 	} else {
 		spr.WriteJSON(
@@ -142,16 +138,36 @@ func (spr *SinglePlayerRoom) Tick() (
 	isOver = spr.Snapshot.Update(spr.LastInput)
 
 	if isOver {
-		spr.WriteJSON(
-			SinglePlayerSnapshotData{Over: true, Score: spr.Snapshot.Score})
-
+		spr.FinishGame()
 	}
 
 	return
 }
 
+func (spr *SinglePlayerRoom) FinishGame() {
+	spr.WriteJSON(
+		SinglePlayerSnapshotData{Over: true, Score: spr.Snapshot.Score})
+	if spr.Conn != nil {
+		_ = spr.Conn.Close()
+	}
+	spr.Disconnect()
+	WSLogInfo(spr.Request, "Closing socket", spr.RoomId)
+	err := db.UpdateScoreById(settings.DB(), spr.Uid, spr.Snapshot.Score)
+	if err != nil {
+		WSLogError(spr.Request, "Failed to write game result", spr.RoomId, err)
+	}
+	Game.Rooms.Delete(spr.RoomId)
+}
+
+func (spr *SinglePlayerRoom) ReadLoop(inputCh chan struct{}) {
+	for spr.ReadInput() {
+	}
+}
+
 func (spr *SinglePlayerRoom) Run(r *http.Request, reconnect bool) {
-	spr.LastInput = Input{Angle: math.Pi / 2}
+	spr.LastInput = NewInput(math.Pi / 2)
+	inputCh := make(chan struct{})
+	go spr.ReadLoop(inputCh)
 	err := spr.Conn.WriteMessage(websocket.TextMessage, []byte(spr.RoomId))
 	if err != nil {
 		LogError(0, "WS: unexpected disconnect", r)

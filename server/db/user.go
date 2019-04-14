@@ -166,6 +166,13 @@ func UserFromRow(row Scanner) (*User, int, error) {
 	}
 }
 
+func UpdateScoreById(_db Queryable, uid int64, score int64) error {
+	_, err := _db.Exec(
+		`UPDATE profile p SET high_score=$2 WHERE p."uid"=$1 AND p."high_score" < $2`,
+		uid, score)
+	return err
+}
+
 // Lists all fields that GetUserMany supports ordering by. Adding an entry to
 // this map is sufficient for ordering with the field to work
 var UserOrderMap = map[string]string{
