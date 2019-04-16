@@ -78,7 +78,7 @@ func (f *SignupForm) MakeUser() (*db.User, error) {
 // Validates username: trims it and checks 3 <= len(f.Username) <= 32
 func (f *SignupForm) ValidateUsername() (r FieldReport) {
 	f.Username = strings.TrimSpace(f.Username)
-	return checkLength(f.Username, 3, 32)
+	return CheckLength(f.Username, 3, 32)
 }
 
 // Validates username: checks 8 <= len(f.Password) <= 128. Also checks strength
@@ -160,13 +160,13 @@ func (f *SignupForm) ValidateBirthDate() (r FieldReport) {
 // is 0 in case of hieroglyphs or something.
 func (f *SignupForm) ValidateFirstName() (r FieldReport) {
 	f.FirstName.String = strings.TrimSpace(f.FirstName.String)
-	return checkLengthOptional(&f.LastName, 1, 32)
+	return CheckLengthOptional(&f.LastName, 1, 32)
 }
 
 // Validates last name the same way as ValidateFirstName validates first name
 func (f *SignupForm) ValidateLastName() (r FieldReport) {
 	f.LastName.String = strings.TrimSpace(f.LastName.String)
-	return checkLengthOptional(&f.LastName, 1, 32)
+	return CheckLengthOptional(&f.LastName, 1, 32)
 }
 
 // Takes an error returned by the database. If that error indicates a constraint

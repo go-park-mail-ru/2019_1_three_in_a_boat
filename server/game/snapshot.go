@@ -17,13 +17,17 @@ type Input struct {
 	angle *atomic.Float64
 }
 
+type inputData struct {
+	Angle float64 `json:"angle"`
+}
+
 func (i *Input) UnmarshalJSON(data []byte) error {
-	var f float64
+	f := inputData{}
 	err := json.Unmarshal(data, &f)
 	if err != nil {
 		return err
 	}
-	i.angle.Store(f)
+	i.angle.Store(f.Angle)
 	return nil
 }
 

@@ -36,15 +36,6 @@ type gameSettings struct {
 	CursorRadius          float64
 }
 
-func GetSinglePlayRoom(playerId int64) (Room, bool) {
-	if room, ok := Game.Rooms.Load(playerId); ok {
-		r := room.(Room)
-		return r, true
-	} else {
-		return nil, false
-	}
-}
-
 func LoadOrStoreSinglePlayRoom(playerId int64, room Room) (Room, bool) {
 	actual, ok := Game.Rooms.LoadOrStore(playerId, room)
 	r := actual.(Room)

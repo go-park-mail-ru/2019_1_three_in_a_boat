@@ -36,7 +36,7 @@ const StoreKey = true
 const SigningAlgorithm = jose.RS256
 
 // CSRF when debugging is annoying af, hence this setting
-const EnableCSRF = false
+const EnableCSRF = true
 
 // Simply the version returned to the client
 const Version = "0.9"
