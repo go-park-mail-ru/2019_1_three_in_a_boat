@@ -12,20 +12,19 @@ import (
 // allowed. OPTIONS request to handle a potential preflight is allowed if it
 // contains Access-Control-Request-Method and that method allows CORS. Simply
 // returns the headers and does not call the handler in that case.
-func Methods(next http.Handler, _route routes.Route) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if _, found := _route.Handler.Settings()[r.Method]; found {
+func Methods(next routes.Handler) routes.Handler {
+	return HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if _, found := next.Settings()[r.Method]; found {
 			next.ServeHTTP(w, r)
-		} else if r.Method == "OPTIONS" && _route.Handler.Settings()[r.Header.Get("Access-Control-Request-Method")].CorsAllowed {
-			CORS(http.HandlerFunc(
+		} else if r.Method == "OPTIONS" && next.Settings()[r.Header.Get(
+			"Access-Control-Request-Method")].CorsAllowed {
+			CORS(HandlerFunc(
 				func(w http.ResponseWriter, r *http.Request) {
-					// there's probably some merit in checking origin and returning 403 if
-					// it's not allowed, but the main thing is that CORS headers will not
-					// be returned, even if the status is OK. we could
 					w.WriteHeader(http.StatusOK)
-				}), _route).ServeHTTP(w, r)
+				},
+				next.Settings())).ServeHTTP(w, r)
 		} else {
 			handlers.Handle405(w, r)
 		}
-	})
+	}, next.Settings())
 }

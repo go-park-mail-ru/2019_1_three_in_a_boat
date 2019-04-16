@@ -7,7 +7,7 @@ import (
 
 // returns a fieldReport indicating min < len(str) < max. Length counted in
 // runes, not in bytes
-func checkLength(str string, min, max int) FieldReport {
+func CheckLength(str string, min, max int) FieldReport {
 	length := len([]rune(str))
 	if length < min {
 		return FieldReport{false, []string{formats.ErrFieldTooShort}}
@@ -21,7 +21,7 @@ func checkLength(str string, min, max int) FieldReport {
 
 // returns a fieldReport indicating min < len(str) < max. Length counted in
 // runes, not in bytes. Also allows empty strings, even if min is > 0.
-func checkLengthOptional(str *db.NullString, min, max int) FieldReport {
+func CheckLengthOptional(str *db.NullString, min, max int) FieldReport {
 	length := len([]rune(str.String))
 	if length < min {
 		if length != 0 {

@@ -2,13 +2,15 @@ package middleware
 
 import (
 	"context"
+	"net/http"
+	"time"
+
+	"gopkg.in/square/go-jose.v2/jwt"
+
 	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/formats"
 	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/handlers"
 	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/routes"
 	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/settings"
-	"gopkg.in/square/go-jose.v2/jwt"
-	"net/http"
-	"time"
 )
 
 // Authentication middleware: if the resource requires authentication,
@@ -18,8 +20,8 @@ import (
 // however, you still wouldn't want to give it away in a CSRF attack.  ALWAYS
 // adds formats.UserClaims to the context - default constructed if no user.
 // Verifies that the claims are signed.
-func Auth(next http.Handler, _route routes.Route) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+func Auth(next routes.Handler) routes.Handler {
+	return HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ctx := context.Background()
 		var rawJWT *http.Cookie
 		var parsedJWT *jwt.JSONWebToken
@@ -54,17 +56,18 @@ func Auth(next http.Handler, _route routes.Route) http.Handler {
 		// could not be read)
 		if errMsg != "" {
 			ctx = formats.NewAuthContext(context.Background(), nil)
+			//noinspection GoNilness
 			handlers.LogError(0, errMsg+": "+err.Error(), r)
 			// log the error and forward the response as unauthorized - do not return
 		}
 
-		if _route.Handler.Settings()[r.Method].AuthRequired && err != nil {
-			handlers.LogError(0, errMsg, r)
+		if next.Settings()[r.Method].AuthRequired && err != nil {
+			handlers.LogError(0, err.Error(), r)
 			handlers.Handle403(w, r)
 			return // .. unless the resource requires authorization
 		}
 
 		r = r.WithContext(ctx)
 		next.ServeHTTP(w, r)
-	})
+	}, next.Settings())
 }

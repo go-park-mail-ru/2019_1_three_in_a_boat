@@ -5,41 +5,26 @@ package server
 // routes package
 
 import (
-	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/middleware"
-	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/routes"
-	"github.com/google/logger"
 	"net/http"
 	"strconv"
 	"sync"
 	"time"
+
+	"github.com/google/logger"
+
+	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/middleware"
+	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/routes"
 )
 
 // Maps URL paths into corresponding routes.Routes
-var RoutesMap = map[string]routes.Route{
-	"/authors": {
-		Handler: &routes.AuthorsHandler{},
-		Name:    "authors",
-	},
-	"/users": {
-		Handler: &routes.UsersHandler{},
-		Name:    "users",
-	},
-	"/users/": {
-		Handler: &routes.UserHandler{},
-		Name:    "user",
-	},
-	"/signin": {
-		Handler: &routes.SigninHandler{},
-		Name:    "signin",
-	},
-	"/": {
-		Handler: &routes.CheckAuthHandler{},
-		Name:    "check-auth",
-	},
-	"/signout": {
-		Handler: &routes.SignOutHandler{},
-		Name:    "signout",
-	},
+var RoutesMap = map[string]routes.Handler{
+	"/authors": &routes.AuthorsHandler{},
+	"/users":   &routes.UsersHandler{},
+	"/users/":  &routes.UserHandler{},
+	"/signin":  &routes.SigninHandler{},
+	"/":        &routes.CheckAuthHandler{},
+	"/signout": &routes.SignOutHandler{},
+	"/play":    &routes.SinglePlayHandler{},
 }
 
 var globalRouter = http.ServeMux{}
@@ -49,19 +34,14 @@ var routesMapOnce = sync.Once{}
 // Aggregates RoutesMap into a http.Handler, handling all acceptable requests
 func GetRouter() http.Handler {
 	routesMapOnce.Do(func() {
-		var err error
-		if err != nil {
-			logger.Fatal("Failed to connect to DB")
-		}
-
 		logger.Info("Setting up router")
-		for routeStr, routeObj := range RoutesMap {
-			globalRouter.Handle(routeStr,
-				middleware.Methods(
-					middleware.CORS(
-						middleware.CSRF(
-							middleware.Auth(
-								routeObj.Handler, routeObj), routeObj), routeObj), routeObj))
+		for route, handler := range RoutesMap {
+			globalRouter.Handle(route,
+				middleware.Panic(
+					middleware.Methods(
+						middleware.CORS(
+							middleware.CSRF(
+								middleware.Auth(handler))))))
 		}
 	})
 

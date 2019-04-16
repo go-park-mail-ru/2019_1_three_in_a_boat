@@ -8,8 +8,8 @@ import (
 
 // CORS Middleware: adds Access-Control headers if request's Origin is allowed
 // See settings for the allowed origins. Handles OPTIONS requests.
-func CORS(next http.Handler, _route routes.Route) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+func CORS(next routes.Handler) routes.Handler {
+	return HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		origin := r.Header.Get("Origin")
 		_, allowed := settings.GetAllowedOrigins()[origin]
 		method := r.Method
@@ -17,7 +17,7 @@ func CORS(next http.Handler, _route routes.Route) http.Handler {
 			method = r.Header.Get("Access-Control-Request-Method")
 		}
 
-		if allowed && _route.Handler.Settings()[method].CorsAllowed {
+		if allowed && next.Settings()[method].CorsAllowed {
 			w.Header().Set("Access-Control-Allow-Origin", origin)
 			w.Header().Set("Access-Control-Allow-Credentials", "true")
 			w.Header().Set("Access-Control-Allow-Headers",
@@ -27,5 +27,5 @@ func CORS(next http.Handler, _route routes.Route) http.Handler {
 				"GET, POST, OPTIONS, HEAD, PUT")
 		}
 		next.ServeHTTP(w, r)
-	})
+	}, next.Settings())
 }
