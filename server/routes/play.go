@@ -37,7 +37,7 @@ func (h *SinglePlayHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// claims, _ := formats.AuthFromContext(r.Context())
 
 	room, reconnect := game.LoadOrStoreSinglePlayRoom(
-		0, game.NewSinglePlayerRoom(r, 0, conn))
+		game.NewSinglePlayerRoom(r, 0, conn))
 
 	LogInfo(0, "WS: connected", r)
 	go room.Run(r, reconnect)
@@ -48,7 +48,7 @@ func (h *SinglePlayHandler) Settings() map[string]RouteSettings {
 		"GET": {
 			AuthRequired:           false,
 			CorsAllowed:            true,
-			CsrfProtectionRequired: true,
+			CsrfProtectionRequired: false,
 		},
 	}
 }

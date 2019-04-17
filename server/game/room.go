@@ -16,6 +16,7 @@ import (
 
 type Room interface {
 	Run(*http.Request, bool)
+	Id() RoomId
 }
 
 type RoomId = string
@@ -37,6 +38,10 @@ type SinglePlayerRoom struct {
 	LastInput *Input
 	Request   *http.Request
 	Running   bool
+}
+
+func (spr *SinglePlayerRoom) Id() RoomId {
+	return spr.RoomId
 }
 
 func (spr *SinglePlayerRoom) Disconnect() {
@@ -110,7 +115,6 @@ func NewSinglePlayerRoom(
 		LastInput: NewInput(math.Pi / 2),
 		Request:   r,
 	}
-	Game.Rooms.Store(room.RoomId, room)
 	return room
 }
 
@@ -156,7 +160,7 @@ func (spr *SinglePlayerRoom) FinishGame() {
 	if err != nil {
 		WSLogError(spr.Request, "Failed to write game result", spr.RoomId, err)
 	}
-	Game.Rooms.Delete(spr.RoomId)
+	Game.Rooms.Delete(string(spr.RoomId))
 }
 
 func (spr *SinglePlayerRoom) ReadLoop(inputCh chan struct{}) {
@@ -168,9 +172,11 @@ func (spr *SinglePlayerRoom) Run(r *http.Request, reconnect bool) {
 	spr.LastInput = NewInput(math.Pi / 2)
 	inputCh := make(chan struct{})
 	go spr.ReadLoop(inputCh)
-	err := spr.Conn.WriteMessage(websocket.TextMessage, []byte(spr.RoomId))
-	if err != nil {
-		LogError(0, "WS: unexpected disconnect", r)
+	if spr.Connected() {
+		err := spr.Conn.WriteMessage(websocket.TextMessage, []byte(spr.RoomId))
+		if err != nil {
+			LogError(0, "WS: unexpected disconnect", r)
+		}
 	}
 
 	tick := time.Tick(Settings.TickDuration)
