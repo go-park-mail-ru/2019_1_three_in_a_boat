@@ -8,6 +8,7 @@ import (
 	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/formats"
 	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/game"
 	. "github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/handlers"
+	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/settings"
 )
 
 // A handler that handles a ~multiple~ users resource. The handler itself is
@@ -21,7 +22,9 @@ var upgrader = websocket.Upgrader{
 	ReadBufferSize:  1024,
 	WriteBufferSize: 1024,
 	CheckOrigin: func(r *http.Request) bool {
-		return true
+		origin := r.Header.Get("Origin")
+		_, allowed := settings.GetAllowedOrigins()[origin]
+		return allowed
 	},
 }
 
