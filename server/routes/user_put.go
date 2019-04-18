@@ -2,7 +2,6 @@ package routes
 
 import (
 	"encoding/json"
-	"github.com/disintegration/imaging"
 	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/db"
 	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/formats"
 	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/forms"
@@ -86,7 +85,7 @@ func PutUser(w http.ResponseWriter, r *http.Request) {
 		// error, and the user will be left with a broken link instead of a pic.
 		// This, however, can be easily fixed by uploading the same pic again,
 		// assuming the error will go away. So we just let it be.
-		err = imaging.Save(form.Img, path.Join(settings.UploadsPath, u.Profile.Img.String))
+		err = SaveImage(form.Img, u.Profile.Img.String)
 		if HandleErrForward(w, r, formats.ErrSavingImg, err) != nil {
 			return
 		}
