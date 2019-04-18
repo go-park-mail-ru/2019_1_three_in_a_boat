@@ -121,10 +121,10 @@ func (h *Hexagon) Crosses(circle Circle) bool {
 }
 
 func (h *Hexagon) Rotate(rad float64) {
-	h.angle += rad
+	h.angle = rad
 	for _, line := range h.Lines {
 		if line != nil {
-			line.Rotate(rad)
+			line.Rotate(h.angle)
 		}
 	}
 }

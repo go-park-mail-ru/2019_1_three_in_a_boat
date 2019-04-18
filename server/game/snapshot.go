@@ -27,7 +27,8 @@ func (i *Input) UnmarshalJSON(data []byte) error {
 	if err != nil {
 		return err
 	}
-	i.angle.Store(f.Angle)
+	// invert the angle because of some stupid canvas shitто
+	i.angle.Store(-f.Angle)
 	return nil
 }
 
@@ -50,10 +51,10 @@ var InitialHexagons = []struct {
 	SidesMask int
 	Side      float64
 }{
-	{SkipTop | SkipBottom, 25},
-	{SkipTopRight | SkipBottomLeft, 20},
-	{SkipTopLeft | SkipBottomRight, 15},
-	{SkipTop | SkipBottom, 10},
+	{SkipTop | SkipBottom, 850},
+	{SkipTopRight | SkipBottomLeft, 600},
+	{SkipTopLeft | SkipBottomRight, 450},
+	{SkipTop | SkipBottom, 300},
 }
 
 type Snapshot struct {
@@ -74,10 +75,11 @@ func NewSnapshot() Snapshot {
 }
 
 func (ss *Snapshot) Update(in *Input) bool {
-
+	ss.Angle = in.Angle()
 	// check previous snapshot doesn't end the game
+	cur := ss.GetCursor()
 	for _, h := range ss.Hexagons {
-		if h.Crosses(ss.GetCursor()) {
+		if h.Crosses(cur) {
 			ss.State = StateOver
 			return true
 		}
@@ -89,8 +91,9 @@ func (ss *Snapshot) Update(in *Input) bool {
 			ss.Score += 10
 			ss.Hexagons[i] = *NewHexagon(InitialHexagons[0].SidesMask, InitialHexagons[0].Side)
 		} else {
+			angle := ss.Hexagons[i].angle + RotatePerTick
 			ss.Hexagons[i].Shrink(ShrinkPerTick)
-			ss.Hexagons[i].Rotate(RotatePerTick)
+			ss.Hexagons[i].Rotate(angle)
 		}
 	}
 

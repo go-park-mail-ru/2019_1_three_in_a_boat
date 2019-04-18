@@ -124,20 +124,15 @@ func NewSinglePlayerRoom(
 // logged but otherwise treated like a disconnect. Gorilla WS implementation
 // doesn't really provide a way to differ between the two other than the
 // Error() method, so that's why all errors are treated as disconnects.
-func (spr *SinglePlayerRoom) Tick() (
-	isOver bool) {
+func (spr *SinglePlayerRoom) Tick() (isOver bool) {
 	spr.Snapshot.State = StateRunning
-	if isOver {
-		spr.FinishGame()
-		return
-	} else {
-		spr.WriteJSON(
-			SinglePlayerSnapshotData{
-				Over:     false,
-				Score:    spr.Snapshot.Score,
-				Hexagons: spr.Snapshot.Hexagons,
-			})
-	}
+
+	spr.WriteJSON(
+		SinglePlayerSnapshotData{
+			Over:     false,
+			Score:    spr.Snapshot.Score,
+			Hexagons: spr.Snapshot.Hexagons,
+		})
 
 	isOver = spr.Snapshot.Update(spr.LastInput)
 

@@ -8,8 +8,9 @@ type Coords struct {
 }
 
 func (c *Coords) ApplyTransform(T [2][2]float64) {
+	tmpX := c.X
 	c.X = T[0][0]*c.X + T[0][1]*c.Y
-	c.Y = T[1][0]*c.X + T[1][1]*c.Y
+	c.Y = T[1][0]*tmpX + T[1][1]*c.Y
 }
 
 func (c Coords) Sub(c2 Coords) Coords {

@@ -9,12 +9,12 @@ import (
 var Game game
 
 var Settings = gameSettings{
-	PlayerCircleRadius:    10,
-	ShrinkPerSec:          0.1,
+	PlayerCircleRadius:    70,
+	ShrinkPerSec:          60,
 	RotatePerSec:          math.Pi / 4,
 	TickDuration:          time.Millisecond * 50,
 	IntensityToAngleRatio: 0.1,
-	CursorRadius:          3,
+	CursorRadius:          10,
 }
 
 var ShrinkPerTick float64
