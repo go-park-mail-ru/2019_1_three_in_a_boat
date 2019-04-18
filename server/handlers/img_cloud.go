@@ -49,7 +49,7 @@ func saveObject(keyName string, r io.Reader) error {
 	// Upload input parameters
 	upParams := &s3manager.UploadInput{
 		Bucket: &bucketName,
-		Key:    &keyName,
+		Key:    aws.String("img/" + keyName),
 		Body:   r,
 	}
 
