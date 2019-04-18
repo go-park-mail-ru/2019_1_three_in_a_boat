@@ -2,8 +2,10 @@ package game
 
 import (
 	"encoding/json"
-	"go.uber.org/atomic"
 	"math"
+	"math/rand"
+
+	"go.uber.org/atomic"
 )
 
 const (
@@ -51,10 +53,10 @@ var InitialHexagons = []struct {
 	SidesMask int
 	Side      float64
 }{
-	{SkipTop | SkipBottom, 850},
-	{SkipTopRight | SkipBottomLeft, 600},
-	{SkipTopLeft | SkipBottomRight, 450},
-	{SkipTop | SkipBottom, 300},
+	{SkipTop, 850},
+	{SkipBottomLeft, 600},
+	{SkipTopRight, 450},
+	{SkipBottom, 300},
 }
 
 type Snapshot struct {
@@ -74,6 +76,17 @@ func NewSnapshot() Snapshot {
 	return snap
 }
 
+var masks = [6]int{SkipTop, SkipTopRight, SkipBottomRight, SkipBottom,
+	SkipBottomLeft, SkipTopLeft}
+
+func RandomSidesMask() int {
+	return masks[1+rand.Intn(5)]
+}
+
+func RandomAngle() float64 {
+	return rand.Float64() * math.Pi * 2
+}
+
 func (ss *Snapshot) Update(in *Input) bool {
 	ss.Angle = in.Angle()
 	// check previous snapshot doesn't end the game
@@ -87,9 +100,10 @@ func (ss *Snapshot) Update(in *Input) bool {
 
 	// update snapshot
 	for i := range ss.Hexagons {
-		if ss.Hexagons[i].Side <= ShrinkPerTick {
+		if ss.Hexagons[i].Side <= Settings.MinHexagonSize {
 			ss.Score += 10
-			ss.Hexagons[i] = *NewHexagon(InitialHexagons[0].SidesMask, InitialHexagons[0].Side)
+			ss.Hexagons[i] = *NewHexagon(RandomSidesMask(), InitialHexagons[0].Side)
+			ss.Hexagons[i].Rotate(RandomAngle())
 		} else {
 			angle := ss.Hexagons[i].angle + RotatePerTick
 			ss.Hexagons[i].Shrink(ShrinkPerTick)

@@ -10,11 +10,12 @@ var Game game
 
 var Settings = gameSettings{
 	PlayerCircleRadius:    70,
-	ShrinkPerSec:          60,
+	ShrinkPerSec:          100,
 	RotatePerSec:          math.Pi / 4,
 	TickDuration:          time.Millisecond * 50,
 	IntensityToAngleRatio: 0.1,
 	CursorRadius:          10,
+	MinHexagonSize:        40,
 }
 
 var ShrinkPerTick float64
@@ -34,6 +35,7 @@ type gameSettings struct {
 	TickDuration          time.Duration
 	IntensityToAngleRatio float64
 	CursorRadius          float64
+	MinHexagonSize        float64
 }
 
 func LoadOrStoreSinglePlayRoom(room Room) (Room, bool) {
