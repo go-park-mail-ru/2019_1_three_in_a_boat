@@ -15,7 +15,7 @@ var Settings = gameSettings{
 	TickDuration:          time.Millisecond * 50,
 	IntensityToAngleRatio: 0.1,
 	CursorRadius:          10,
-	LineWidth:             10,
+	LineWidth:             5,
 	MinHexagonSize:        40,
 }
 
