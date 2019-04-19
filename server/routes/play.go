@@ -34,10 +34,15 @@ func (h *SinglePlayHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// claims, _ := formats.AuthFromContext(r.Context())
+	claims, _ := formats.AuthFromContext(r.Context())
+
+	var uid int64 = 0
+	if claims != nil {
+		uid = claims.Pk
+	}
 
 	room, reconnect := game.LoadOrStoreSinglePlayRoom(
-		game.NewSinglePlayerRoom(r, 0, conn))
+		game.NewSinglePlayerRoom(r, uid, conn))
 
 	LogInfo(0, "WS: connected", r)
 	go room.Run(r, reconnect)

@@ -3,6 +3,7 @@ module github.com/go-park-mail-ru/2019_1_three_in_a_boat
 go 1.12
 
 require (
+	github.com/aws/aws-sdk-go v1.19.14
 	github.com/badoux/checkmail v0.0.0-20181210160741-9661bd69e9ad
 	github.com/disintegration/imaging v1.6.0
 	github.com/google/logger v1.0.1
