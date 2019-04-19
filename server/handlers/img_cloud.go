@@ -16,7 +16,7 @@ const (
 	imageFolder = "img/"
 )
 
-// The basket that we use
+// The bucket that we use
 var (
 	bucketName = "hexagon-game"
 	region     = "eu-north-1"
