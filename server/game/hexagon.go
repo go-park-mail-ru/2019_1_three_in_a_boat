@@ -113,7 +113,12 @@ func (h *Hexagon) Width() float64 {
 
 func (h *Hexagon) Crosses(circle Circle) bool {
 	for _, l := range h.Lines {
-		if l != nil && l.Crosses(circle) {
+		// lines have width, and we compensate for the with cursorRadius. This works
+		// fine, however on the edges lines then appear a little longer than they
+		// should be. E.g., it's possible to lose even though cursor didn't touch
+		// the line. Shortening the line before checking fixes that. Shortened
+		// does not affect the original line.
+		if l != nil && l.Shortened(Settings.LineWidth).Crosses(circle) {
 			return true
 		}
 	}

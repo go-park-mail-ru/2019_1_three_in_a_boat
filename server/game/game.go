@@ -15,6 +15,7 @@ var Settings = gameSettings{
 	TickDuration:          time.Millisecond * 50,
 	IntensityToAngleRatio: 0.1,
 	CursorRadius:          10,
+	LineWidth:             10,
 	MinHexagonSize:        40,
 }
 
@@ -36,6 +37,7 @@ type gameSettings struct {
 	IntensityToAngleRatio float64
 	CursorRadius          float64
 	MinHexagonSize        float64
+	LineWidth             float64
 }
 
 func LoadOrStoreSinglePlayRoom(room Room) (Room, bool) {

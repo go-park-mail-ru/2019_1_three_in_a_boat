@@ -39,7 +39,7 @@ type Line struct {
 	End   Coords
 }
 
-func (l *Line) Crosses(circle Circle) bool {
+func (l Line) Crosses(circle Circle) bool {
 	// programmersforum for the rescue bljad
 	// http://www.programmersforum.ru/showthread.php?t=117078
 	eps := 1e-10
@@ -87,4 +87,32 @@ func (l *Line) Rotate(rad float64) {
 func (l *Line) ApplyTransform(T [2][2]float64) {
 	l.Start.ApplyTransform(T)
 	l.End.ApplyTransform(T)
+}
+
+// Doesn't touch original line l, returns a line, same as L, but shorter by
+// shortenBy from BOTH sides. If shortenBy > 1/2 length of the line, returns the
+// line itself to avoid stupid bullshit
+func (l *Line) Shortened(shortenBy float64) Line {
+	if shortenBy < 0 {
+		panic("shortenBy has to be non-negative")
+	}
+	height := math.Abs(l.Start.Y - l.End.Y)
+	width := math.Abs(l.Start.X - l.End.X)
+	length := math.Sqrt(width*width + height*height)
+
+	if shortenBy*2 >= length {
+		return *l
+	}
+
+	sin := height / length
+	cos := width / length
+	newLine := Line{}
+
+	// move in the direction of the opposite end - hence the Copysign
+	newLine.Start.X = l.Start.X + shortenBy*math.Copysign(cos, l.End.X-l.Start.X)
+	newLine.Start.Y = l.Start.Y + shortenBy*math.Copysign(sin, l.End.Y-l.Start.Y)
+	newLine.End.X = l.End.X - shortenBy*math.Copysign(cos, l.End.X-l.Start.X)
+	newLine.End.Y = l.End.Y - shortenBy*math.Copysign(sin, l.End.Y-l.Start.Y)
+
+	return newLine
 }
