@@ -8,8 +8,6 @@ import (
 	. "github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/handlers"
 	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/settings"
 	"net/http"
-	"os"
-	"path"
 )
 
 // stores pointers, assumes they aren't modified anywhere else
@@ -90,9 +88,9 @@ func PutUser(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-	if u.Profile.Img.String == "" && oldImg.Valid {
+	if form.Img != nil && oldImg.Valid {
 		// we don't care if this fails and this is very unlikely to fail
-		_ = os.Remove(path.Join(settings.UploadsPath, oldImg.String))
+		_ = DeleteImage(oldImg.String)
 	}
 
 	if HandleErrForward(w, r, formats.ErrSignupAuthFailure, Authorize(w, u)) != nil {

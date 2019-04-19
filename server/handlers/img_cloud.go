@@ -89,7 +89,7 @@ func SaveImage(img image.Image, name string) error {
 }
 
 // Delete image from AWS bucket
-func DeleteImage(img image.Image, name string) error {
+func DeleteImage(name string) error {
 	input := &s3.DeleteObjectInput{
 		Bucket: aws.String(bucketName),
 		Key:    aws.String(imageFolder + name),
