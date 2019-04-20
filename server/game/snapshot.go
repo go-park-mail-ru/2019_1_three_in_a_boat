@@ -108,15 +108,15 @@ func (ss *Snapshot) Update(in *Input) bool {
 		difficultyIncrement = Settings.MaxMultiplier
 	}
 
-	var rotationAmplitude float64 = 1
-	ticksSinceRotation := ss.Ticks % int64(math.Round(SameDirectionNumTicks))
+	ticksSinceRotation := float64(ss.Ticks % int64(math.Round(SameDirectionNumTicks)))
 	if ticksSinceRotation == 0 {
 		ss.ClockWise = !ss.ClockWise
 	}
 
-	if ticksSinceRotation < 30 || SameDirectionNumTicks-float64(ticksSinceRotation) < 30 {
-		rotationAmplitude = 0.3
-	}
+	var rotationAmplitude float64
+	// to or from rotation really
+	ticksToRotation := math.Abs(ticksSinceRotation - SameDirectionNumTicks)
+	rotationAmplitude = math.Min(0.4, ticksToRotation/SameDirectionNumTicks)
 
 	// 1 = clockwise, -1 = ccw
 	var rotationDirection float64 = 1
