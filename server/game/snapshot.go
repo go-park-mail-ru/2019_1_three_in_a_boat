@@ -115,8 +115,8 @@ func (ss *Snapshot) Update(in *Input) bool {
 
 	var rotationAmplitude float64
 	// to or from rotation really
-	ticksToRotation := math.Abs(ticksSinceRotation - SameDirectionNumTicks)
-	rotationAmplitude = math.Min(0.4, ticksToRotation/SameDirectionNumTicks)
+	ticksToRotation := math.Min(ticksSinceRotation, math.Abs(ticksSinceRotation-SameDirectionNumTicks))
+	rotationAmplitude = math.Min(1, math.Max(0.5, 3*ticksToRotation/SameDirectionNumTicks))
 
 	// 1 = clockwise, -1 = ccw
 	var rotationDirection float64 = 1
@@ -133,7 +133,7 @@ func (ss *Snapshot) Update(in *Input) bool {
 		} else {
 
 			angle := ss.Hexagons[i].angle +
-				rotationAmplitude*rotationDirection*(RotatePerTick*difficultyIncrement)
+				(rotationAmplitude * rotationDirection * RotatePerTick * difficultyIncrement)
 			ss.Hexagons[i].Shrink(ShrinkPerTick * difficultyIncrement)
 			ss.Hexagons[i].Rotate(angle)
 		}

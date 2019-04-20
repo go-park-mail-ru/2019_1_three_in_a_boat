@@ -11,7 +11,7 @@ var Game game
 var Settings = gameSettings{
 	PlayerCircleRadius:    70,
 	ShrinkPerSec:          100,
-	RotatePerSec:          math.Pi / 2,
+	RotatePerSec:          math.Pi / 3,
 	TickDuration:          time.Millisecond * 40,
 	IntensityToAngleRatio: 0.1,
 	CursorRadius:          10,
