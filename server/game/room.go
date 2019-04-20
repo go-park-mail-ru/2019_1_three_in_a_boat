@@ -129,9 +129,10 @@ func (spr *SinglePlayerRoom) Tick() (isOver bool) {
 
 	spr.WriteJSON(
 		SinglePlayerSnapshotData{
-			Over:     false,
-			Score:    spr.Snapshot.Score,
-			Hexagons: spr.Snapshot.Hexagons,
+			Over:              false,
+			Score:             spr.Snapshot.Score,
+			Hexagons:          spr.Snapshot.Hexagons,
+			CursorCircleAngle: spr.Snapshot.CursorCircleAngle,
 		})
 
 	isOver = spr.Snapshot.Update(spr.LastInput)
@@ -182,7 +183,8 @@ func (spr *SinglePlayerRoom) Run(r *http.Request, reconnect bool) {
 }
 
 type SinglePlayerSnapshotData struct {
-	Over     bool      `json:"over,omitempty"` // false is omitted
-	Score    int64     `json:"score"`
-	Hexagons []Hexagon `json:"hexes"`
+	Over              bool      `json:"over,omitempty"` // false is omitted
+	Score             int64     `json:"score"`
+	Hexagons          []Hexagon `json:"hexes"`
+	CursorCircleAngle float64   `json:"cursorCircleAngle"`
 }
