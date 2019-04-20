@@ -19,11 +19,13 @@ var Settings = gameSettings{
 	MinHexagonSize:        40,
 	MultiplierPerSec:      1e-2,
 	MaxMultiplier:         2.5,
+	SameDirectionDuration: 15, // seconds
 }
 
 var ShrinkPerTick float64
 var RotatePerTick float64
 var MultiplierPerTick float64
+var SameDirectionNumTicks float64
 
 type game struct {
 	// the map stores pointers to Rooms, and despite being thread-safe
@@ -42,8 +44,9 @@ type gameSettings struct {
 	MinHexagonSize        float64
 	LineWidth             float64
 	// controls how fast does the shrinking/rotating speed increase
-	MultiplierPerSec float64
-	MaxMultiplier    float64
+	MultiplierPerSec      float64
+	MaxMultiplier         float64
+	SameDirectionDuration float64
 }
 
 func LoadOrStoreSinglePlayRoom(room Room) (Room, bool) {
@@ -57,5 +60,6 @@ func init() {
 	ShrinkPerTick = Settings.ShrinkPerSec / float64(time.Second/Settings.TickDuration)
 	RotatePerTick = Settings.RotatePerSec / float64(time.Second/Settings.TickDuration)
 	MultiplierPerTick = Settings.MultiplierPerSec / float64(time.Second/Settings.TickDuration)
+	SameDirectionNumTicks = Settings.SameDirectionDuration * float64(time.Second/Settings.TickDuration)
 
 }
