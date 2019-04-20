@@ -47,6 +47,7 @@ var InitialSnapshot = Snapshot{
 	Hexagons: nil,
 	State:    StateWaiting,
 	Score:    0,
+	Ticks:    0,
 }
 
 var InitialHexagons = []struct {
@@ -64,6 +65,7 @@ type Snapshot struct {
 	Hexagons []Hexagon
 	State    int
 	Score    int64
+	Ticks    int64
 }
 
 func NewSnapshot() Snapshot {
@@ -88,6 +90,7 @@ func RandomAngle() float64 {
 }
 
 func (ss *Snapshot) Update(in *Input) bool {
+	ss.Ticks += 1
 	ss.Angle = in.Angle()
 	// check previous snapshot doesn't end the game
 	cur := ss.GetCursor()
@@ -98,6 +101,11 @@ func (ss *Snapshot) Update(in *Input) bool {
 		}
 	}
 
+	difficultyIncrement := 1 + MultiplierPerTick*float64(ss.Ticks)
+	if difficultyIncrement > Settings.MaxMultiplier {
+		difficultyIncrement = Settings.MaxMultiplier
+	}
+
 	// update snapshot
 	for i := range ss.Hexagons {
 		if ss.Hexagons[i].Side <= Settings.MinHexagonSize {
@@ -105,8 +113,9 @@ func (ss *Snapshot) Update(in *Input) bool {
 			ss.Hexagons[i] = *NewHexagon(RandomSidesMask(), InitialHexagons[0].Side)
 			ss.Hexagons[i].Rotate(RandomAngle())
 		} else {
-			angle := ss.Hexagons[i].angle + RotatePerTick
-			ss.Hexagons[i].Shrink(ShrinkPerTick)
+
+			angle := ss.Hexagons[i].angle + (RotatePerTick * difficultyIncrement)
+			ss.Hexagons[i].Shrink(ShrinkPerTick * difficultyIncrement)
 			ss.Hexagons[i].Rotate(angle)
 		}
 	}
