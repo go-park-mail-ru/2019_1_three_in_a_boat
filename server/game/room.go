@@ -112,7 +112,7 @@ func NewSinglePlayerRoom(
 		Uid:       p1uid,
 		RoomId:    uuid.New().String(),
 		Snapshot:  NewSnapshot(),
-		LastInput: NewInput(math.Pi / 2),
+		LastInput: NewInput(-math.Pi / 2),
 		Request:   r,
 	}
 	return room
@@ -159,15 +159,13 @@ func (spr *SinglePlayerRoom) FinishGame() {
 	Game.Rooms.Delete(string(spr.RoomId))
 }
 
-func (spr *SinglePlayerRoom) ReadLoop(inputCh chan struct{}) {
+func (spr *SinglePlayerRoom) ReadLoop() {
 	for spr.ReadInput() {
 	}
 }
 
 func (spr *SinglePlayerRoom) Run(r *http.Request, reconnect bool) {
-	spr.LastInput = NewInput(math.Pi / 2)
-	inputCh := make(chan struct{})
-	go spr.ReadLoop(inputCh)
+	go spr.ReadLoop()
 	if spr.Connected() {
 		err := spr.Conn.WriteMessage(websocket.TextMessage, []byte(spr.RoomId))
 		if err != nil {

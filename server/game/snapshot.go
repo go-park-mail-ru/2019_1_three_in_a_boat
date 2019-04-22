@@ -43,7 +43,7 @@ func NewInput(angle float64) *Input {
 }
 
 var InitialSnapshot = Snapshot{
-	Angle:             math.Pi / 2,
+	Angle:             -math.Pi / 2,
 	Hexagons:          nil,
 	State:             StateWaiting,
 	Score:             0,
