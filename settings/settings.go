@@ -5,8 +5,10 @@
 package settings
 
 import (
+	"flag"
 	"github.com/google/logger"
 	"gopkg.in/square/go-jose.v2"
+	"log"
 	"os"
 	"strings"
 	"sync"
@@ -21,6 +23,8 @@ var (
 
 // If -l is not specified, logs will be stored here
 const DefaultLogPath = "logs/server.log"
+
+const AuthPort = 8000
 
 var ImageSize = [...]int{400, 400}
 
@@ -73,4 +77,31 @@ func GetAllowedOrigins() map[string]struct{} {
 	})
 
 	return allowedOrigins
+}
+
+var Verbose = flag.Bool("v", true, "print info level logs to stdout")
+var LogPath = flag.String("l", DefaultLogPath, "path to the log file")
+var SysLog = flag.Bool("sl", false, "log to syslog")
+var ServerPort = flag.Int("p", 3000, "port to listen at")
+
+func SetUp() (*os.File, *logger.Logger) {
+	// using flag.Parse in init is discouraged so using this function which must
+	// be called explicitly instead
+
+	flag.Parse()
+	logFile, err := os.OpenFile(
+		*LogPath, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0660)
+	if err != nil {
+		log.Fatalf("Failed to open log file: %v", err)
+	}
+
+	logger.SetFlags(log.Ldate | log.Ltime | log.Lshortfile)
+	l := logger.Init("Hexagon Server", *Verbose, *SysLog, logFile)
+
+	// triggering the do.Once for logging and triggering fatal errors
+	GetSigner()
+	DB()
+	GetAllowedOrigins()
+
+	return logFile, l
 }

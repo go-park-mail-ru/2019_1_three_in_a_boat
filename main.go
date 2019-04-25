@@ -1,9 +1,10 @@
 package main
 
 import (
-	"flag"
-	"log"
+	"context"
 	"os"
+	"os/signal"
+	"time"
 
 	"github.com/google/logger"
 	_ "github.com/lib/pq"
@@ -12,31 +13,35 @@ import (
 	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/settings"
 )
 
-var verbose = flag.Bool("v", true, "print info level logs to stdout")
-var logPath = flag.String("l", settings.DefaultLogPath, "path to the log file")
-var sysLog = flag.Bool("sl", false, "log to syslog")
-var port = flag.Int("p", 3000, "port to listen at")
-
 func main() {
-	flag.Parse()
-	logFile, err := os.OpenFile(
-		*logPath, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0660)
-	if err != nil {
-		log.Fatalf("Failed to open log file: %v", err)
-	}
+	file, log := settings.SetUp()
 	//noinspection GoUnhandledErrorResult
-	defer logFile.Close()
+	defer file.Close()
+	defer log.Close()
 
-	logger.SetFlags(log.Ldate | log.Ltime | log.Lshortfile)
-	l := logger.Init("Hexagon Server", *verbose, *sysLog, logFile)
-	defer l.Close()
-
-	// triggering the do.Once for logging and triggering fatal errors
-	settings.GetSigner()
-	settings.DB()
-	settings.GetAllowedOrigins()
-
-	s := server.Server(*port)
+	s := server.Server(*settings.ServerPort)
 	logger.Info("Listening at ", s.Addr)
-	logger.Fatal(s.ListenAndServe())
+	go func() {
+		if err := s.ListenAndServe(); err != nil {
+			logger.Fatal(err)
+		}
+	}()
+
+	// graceful shutdown
+	stop := make(chan os.Signal, 1)
+	signal.Notify(stop, os.Interrupt)
+
+	<-stop
+	logger.Info("Gracefully shutting down...")
+	ctx, _ := context.WithTimeout(context.Background(), 5*time.Second)
+	if err := s.Shutdown(ctx); err != nil {
+		logger.Error(
+			"Failed to shutdown gracefully: %v; shutting down forcefully...", err)
+		if err := s.Close(); err != nil {
+			logger.Fatalf(
+				"Failed to shutdown forcefully: %v; ignoring errors and shutting down", err)
+		}
+	} else {
+		logger.Info("Shutdown sequence complete")
+	}
 }
