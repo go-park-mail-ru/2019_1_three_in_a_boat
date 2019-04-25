@@ -1,12 +1,14 @@
 package routes
 
 import (
-	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/db"
-	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/formats"
-	. "github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/handlers"
-	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/settings"
 	"net/http"
 	"net/url"
+
+	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/db"
+	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/formats"
+	. "github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/handlers"
+	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/settings/server"
+	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/settings/shared"
 )
 
 // Represents the result returned by GetUsers
@@ -64,6 +66,6 @@ func validateUsersParams(url *url.URL) (
 	page int, pageSize int, order []db.SelectOrder) {
 	return makeNPage(url.Query()["page"]),
 		makePageSize(url.Query()["pageSize"],
-			settings.UsersMaxPageSize, settings.UsersDefaultPageSize),
+			server_settings.UsersMaxPageSize, server_settings.UsersDefaultPageSize),
 		makeOrderList(url.Query()["sort"], db.UserOrderMap)
 }

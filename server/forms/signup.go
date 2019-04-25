@@ -2,14 +2,16 @@ package forms
 
 import (
 	"errors"
-	"github.com/badoux/checkmail"
-	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/db"
-	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/formats"
-	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/settings"
-	"github.com/lib/pq"
-	"github.com/nbutton23/zxcvbn-go"
 	"strings"
 	"time"
+
+	"github.com/badoux/checkmail"
+	"github.com/lib/pq"
+	"github.com/nbutton23/zxcvbn-go"
+
+	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/db"
+	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/formats"
+	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/settings/server"
 )
 
 // A struct responsible for validating signup form. Only checks validity of the
@@ -95,7 +97,7 @@ func (f *SignupForm) ValidatePassword() (r FieldReport) {
 	strength := zxcvbn.PasswordStrength(f.Password, []string{f.Username, f.Email,
 		f.FirstName.String, f.LastName.String})
 
-	if strength.Score < settings.MinPasswordStrength {
+	if strength.Score < server_settings.MinPasswordStrength {
 		r.Errors = append(r.Errors, formats.ErrPasswordTooWeak[strength.Score])
 	}
 
@@ -114,7 +116,7 @@ func (f *SignupForm) ValidateEmail() (r FieldReport) {
 	}
 
 	//noinspection GoBoolExpressions
-	if !settings.EmailExistsCheck {
+	if !server_settings.EmailExistsCheck {
 		r.Ok = true
 		return
 	}

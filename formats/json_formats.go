@@ -4,9 +4,11 @@ package formats
 
 import (
 	"encoding/json"
-	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/settings"
 	"net/http"
 	"time"
+
+	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/formats/pb"
+	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/settings/shared"
 )
 
 // The struct outlines full JSON response structure. It should not be used
@@ -17,7 +19,7 @@ type JSONResponseData struct {
 	Date    string      `json:"responseTime"`
 	Data    interface{} `json:"data"`
 	Message string      `json:"message,omitempty"`
-	User    *UserClaims `json:"user"`
+	User    *pb.Claims  `json:"user"`
 }
 
 // The struct outlines basic JSON response structure. Additional metadata fields

@@ -1,9 +1,10 @@
 package routes
 
 import (
-	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/test-utils"
 	"os"
 	"testing"
+
+	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/test-utils"
 )
 
 // Launches all tests between the calls to test_utils.SetUp and

@@ -1,8 +1,9 @@
 package routes
 
 import (
-	. "github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/handlers"
 	"net/http"
+
+	. "github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/handlers"
 )
 
 // Handles Signout resource. Only accepts GET requests. Implements

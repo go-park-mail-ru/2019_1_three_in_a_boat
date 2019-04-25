@@ -2,16 +2,17 @@ package routes
 
 import (
 	"encoding/json"
-	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/db"
-	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/formats"
-	. "github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/test-utils"
-	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/settings"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"sort"
 	"strings"
 	"testing"
+
+	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/db"
+	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/formats"
+	. "github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/test-utils"
+	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/settings/server"
 )
 
 type GetUsersFullResponse struct {
@@ -50,7 +51,7 @@ func TestGetUsers(t *testing.T) {
 				return GetUsersResponse{
 					res,
 					0,
-					(len(sorted) - 1) / settings.UsersDefaultPageSize,
+					(len(sorted) - 1) / server_settings.UsersDefaultPageSize,
 				}
 			},
 			fail: false,

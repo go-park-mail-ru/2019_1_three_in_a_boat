@@ -3,13 +3,15 @@ package forms
 import (
 	"bytes"
 	"encoding/base64"
-	"github.com/disintegration/imaging"
-	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/db"
-	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/formats"
-	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/settings"
-	"github.com/google/uuid"
 	"image"
 	"strings"
+
+	"github.com/disintegration/imaging"
+	"github.com/google/uuid"
+
+	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/db"
+	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/formats"
+	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/settings/server"
 )
 
 // A struct responsible for validating profile edit form. Only checks validity
@@ -30,7 +32,6 @@ type UserEditForm struct {
 // Returns a report indicating whether the form is valid.
 func (f *UserEditForm) Validate() *Report {
 	report := NewReport()
-
 	report.Fields["username"] = f.ValidateUsername()
 	report.Fields["password"] = f.ValidatePassword()
 	report.Fields["email"] = f.ValidateEmail()
@@ -114,7 +115,7 @@ func (f *UserEditForm) ValidateImg() FieldReport {
 		return FieldReport{false, []string{formats.ErrBase64Decoding}}
 	}
 
-	f.Img = imaging.Fill(img, settings.ImageSize[0], settings.ImageSize[1],
+	f.Img = imaging.Fill(img, server_settings.ImageSize[0], server_settings.ImageSize[1],
 		imaging.Center, imaging.Lanczos)
 	f.ImgName = uuid.New().String() + ".jpg"
 

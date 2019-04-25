@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/formats"
+	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/formats"
 	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/handlers"
 	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/routes"
-	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/settings"
+	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/settings/server"
 )
 
 // CORS Middleware: adds Access-Control headers if request's Origin is allowed
@@ -15,7 +15,7 @@ import (
 func CSRF(next routes.Handler) routes.Handler {
 	return HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// noinspection GoBoolExpressions
-		if !settings.EnableCSRF {
+		if !server_settings.EnableCSRF {
 			next.ServeHTTP(w, r)
 			return
 		}

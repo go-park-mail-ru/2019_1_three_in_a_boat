@@ -6,8 +6,9 @@
 package middleware
 
 import (
-	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/routes"
 	"net/http"
+
+	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/routes"
 )
 
 // Generic handler used by HandlerFunc to create a routes.Handler-compatible

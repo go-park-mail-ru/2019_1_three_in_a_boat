@@ -5,12 +5,11 @@ import (
 	"net/http"
 	"time"
 
-	"gopkg.in/square/go-jose.v2/jwt"
-
-	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/formats"
+	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/formats"
+	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/formats/pb"
 	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/handlers"
 	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/routes"
-	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/settings"
+	server_settings "github.com/go-park-mail-ru/2019_1_three_in_a_boat/settings/server"
 )
 
 // Authentication middleware: if the resource requires authentication,
@@ -22,52 +21,47 @@ import (
 // Verifies that the claims are signed.
 func Auth(next routes.Handler) routes.Handler {
 	return HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		ctx := context.Background()
+		ctx := r.Context()
 		var rawJWT *http.Cookie
-		var parsedJWT *jwt.JSONWebToken
 		var err error
-		errMsg := ""
 
 		rawJWT, err = r.Cookie("auth")
 		if err != nil { // err = ErrNoCookie only
-			ctx = formats.NewAuthContext(context.Background(), nil)
-		} else {
-			parsedJWT, err = jwt.ParseSigned(rawJWT.Value)
-			if err != nil {
-				ctx = formats.NewAuthContext(context.Background(), nil)
-				errMsg = formats.ErrJWTDecryptionFailure
+			handleAuthError(w, r, next)
+			return
+		}
+
+		authCtx, cancel := context.WithTimeout(context.Background(), time.Second)
+		defer cancel()
+		authReply, err := server_settings.AuthClient.CheckAuthorize(
+			authCtx, &pb.CheckAuthorizeRequest{Token: rawJWT.Value})
+
+		if err != nil {
+			if authReply != nil {
+				handlers.LogError(0, authReply.Message+": "+err.Error(), r)
 			} else {
-				claims := formats.UserClaims{}
-				err = parsedJWT.Claims(&settings.GetSecretKey().PublicKey, &claims)
-				if err != nil {
-					errMsg = formats.ErrJWTDecryptionFailure
-				} else if claims.Pk == 0 {
-					errMsg = formats.ErrJWTDecryptionEmpty
-				} else if claims.Expiry.Time().Before(time.Now()) {
-					errMsg = formats.ErrJWTOutdated
-				} else {
-					ctx = formats.NewAuthContext(context.Background(), &claims)
-				}
+				handlers.LogError(0, err.Error(), r)
 			}
+			handleAuthError(w, r, next)
+			return
 		}
 
-		// err indicates any failure in the above functions, while errMsg is only
-		// written if something went unexpectedly wrong (i.e., jwt key present, but
-		// could not be read)
-		if errMsg != "" {
-			ctx = formats.NewAuthContext(context.Background(), nil)
-			//noinspection GoNilness
-			handlers.LogError(0, errMsg+": "+err.Error(), r)
-			// log the error and forward the response as unauthorized - do not return
-		}
-
-		if next.Settings()[r.Method].AuthRequired && err != nil {
-			handlers.LogError(0, err.Error(), r)
-			handlers.Handle403(w, r)
-			return // .. unless the resource requires authorization
-		}
-
+		ctx = formats.NewAuthContext(ctx, authReply.Claims)
 		r = r.WithContext(ctx)
 		next.ServeHTTP(w, r)
 	}, next.Settings())
+}
+
+// Initializes an empty context, calls next if auth is not required, handles 403 otherwise
+func handleAuthError(
+	w http.ResponseWriter,
+	r *http.Request,
+	next routes.Handler) {
+	ctx := formats.NewAuthContext(context.Background(), nil)
+	r = r.WithContext(ctx)
+	if next.Settings()[r.Method].AuthRequired {
+		handlers.Handle403(w, r)
+	} else {
+		next.ServeHTTP(w, r)
+	}
 }

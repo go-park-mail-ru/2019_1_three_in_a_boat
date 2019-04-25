@@ -2,14 +2,15 @@ package handlers
 
 import (
 	"bytes"
+	"image"
+	"image/jpeg"
+	"io"
+
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
-	"image"
-	"image/jpeg"
-	"io"
 )
 
 const (

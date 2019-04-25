@@ -2,10 +2,12 @@ package test_utils
 
 import (
 	"encoding/json"
-	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/db"
-	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/settings"
-	"github.com/google/logger"
 	"io/ioutil"
+
+	"github.com/google/logger"
+
+	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/db"
+	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/settings/shared"
 )
 
 func SetUp() {
@@ -38,11 +40,6 @@ func TearDown() {
 }
 
 func UserDataEqual(u1 db.UserData, u2 db.UserData) bool {
-	if u1.SignupDate.Sub(u2.SignupDate).Seconds() < 1 {
-		// json omits sub-second times, so this is a workaround
-		// BirthData does not store time so no need to do it there
-		u1.SignupDate = u2.SignupDate
-	}
 	return u1 == u2
 }
 

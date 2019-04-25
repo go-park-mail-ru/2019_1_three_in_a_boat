@@ -7,23 +7,23 @@ import (
 	"time"
 
 	"github.com/google/logger"
-	_ "github.com/lib/pq"
 
-	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server"
-	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/settings"
+	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/settings/server"
 )
 
 func main() {
-	file, log := settings.SetUp()
+	file, log, conn := server_settings.SetUp()
 	//noinspection GoUnhandledErrorResult
 	defer file.Close()
 	defer log.Close()
+	//noinspection GoUnhandledErrorResult
+	defer conn.Close()
 
-	s := server.Server(*settings.ServerPort)
+	s := Server(*server_settings.ServerPort)
 	logger.Info("Listening at ", s.Addr)
 	go func() {
 		if err := s.ListenAndServe(); err != nil {
-			logger.Fatal(err)
+			logger.Fatalf("Failed to listen and serve: %v", err)
 		}
 	}()
 

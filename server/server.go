@@ -1,5 +1,5 @@
 // Package defines Server() which represents a hexagon API server
-package server
+package main
 
 // The file provides constants, structs and interfaces necessary for using the
 // routes package

@@ -3,9 +3,10 @@ package settings
 import (
 	"database/sql"
 	"fmt"
-	"github.com/google/logger"
 	"os"
 	"sync"
+
+	"github.com/google/logger"
 )
 
 var setDbParamsOnce sync.Once

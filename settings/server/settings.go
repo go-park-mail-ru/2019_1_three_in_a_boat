@@ -2,48 +2,27 @@
 // package. All the constants that affect the behavior of the server itself are
 // listed in settings.go, constants that define client-related interaction
 // specifics are listed in api.go
-package settings
+package server_settings
 
 import (
 	"flag"
-	"github.com/google/logger"
-	"gopkg.in/square/go-jose.v2"
 	"log"
 	"os"
+	"strconv"
 	"strings"
 	"sync"
-)
 
-var (
-	dbUsername = "hexagon"
-	dbName     = "hexagon"
-	dbHost     = "localhost"
-	dbPassword = "ChangeBeforeDeploying"
+	"github.com/google/logger"
+	"google.golang.org/grpc"
+
+	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/formats/pb"
+	. "github.com/go-park-mail-ru/2019_1_three_in_a_boat/settings/shared"
 )
 
 // If -l is not specified, logs will be stored here
-const DefaultLogPath = "logs/server.log"
+const DefaultLogPath = "etc/logs/server.log"
 
-const AuthPort = 8000
-
-var ImageSize = [...]int{400, 400}
-
-// Path to file containing secret key. Meaningless when StoreKey is false
-const SecretPath = "secret.rsa" // relative to the binary
-
-// If true, the key will be loaded form SecretPath. If it does not exist, it
-// will be created and a newly generated key will be written to it.
-// If false, generates a new key on startup every time.
-const StoreKey = true
-
-// Signing algorithm. The documentation recommends RS256 as the default one.
-const SigningAlgorithm = jose.RS256
-
-// CSRF when debugging is annoying af, hence this setting
-const EnableCSRF = true
-
-// Simply the version returned to the client
-const Version = "0.9"
+var authConn *grpc.ClientConn
 
 // Set-like map of allowed origins. If Origin belongs to this set, it will be
 // returned to the client. Otherwise Access-Control remains unset.
@@ -82,11 +61,16 @@ func GetAllowedOrigins() map[string]struct{} {
 var Verbose = flag.Bool("v", true, "print info level logs to stdout")
 var LogPath = flag.String("l", DefaultLogPath, "path to the log file")
 var SysLog = flag.Bool("sl", false, "log to syslog")
-var ServerPort = flag.Int("p", 3000, "port to listen at")
+var ServerPort = flag.Int("p", DefaultServerPort, "external API port")
+var AuthAddress = flag.String(
+	"auth",
+	DefaultAuthAddress+":"+strconv.Itoa(DefaultAuthPort),
+	"external API port")
 
-func SetUp() (*os.File, *logger.Logger) {
+func SetUp() (*os.File, *logger.Logger, *grpc.ClientConn) {
 	// using flag.Parse in init is discouraged so using this function which must
-	// be called explicitly instead
+	// be called explicitly instead. Also logfiles need to be closed and we can't
+	// return from init.
 
 	flag.Parse()
 	logFile, err := os.OpenFile(
@@ -99,9 +83,24 @@ func SetUp() (*os.File, *logger.Logger) {
 	l := logger.Init("Hexagon Server", *Verbose, *SysLog, logFile)
 
 	// triggering the do.Once for logging and triggering fatal errors
-	GetSigner()
 	DB()
 	GetAllowedOrigins()
 
-	return logFile, l
+	return logFile, l, AuthConn()
 }
+
+var dialAuthOnce sync.Once
+
+func AuthConn() *grpc.ClientConn {
+	dialAuthOnce.Do(
+		func() {
+			var err error
+			authConn, err = grpc.Dial(*AuthAddress, grpc.WithInsecure())
+			if err != nil {
+				logger.Fatalf("Failed to dial the auth server: %v", err)
+			}
+		})
+	return authConn
+}
+
+var AuthClient = pb.NewAuthClient(AuthConn())

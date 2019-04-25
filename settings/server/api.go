@@ -1,11 +1,8 @@
-package settings
+package server_settings
 
 // The file defines constants used by various handlers and forms, that affect
 // the behavior of the API in a non-critical way (e.g. validation settings,
 // entries per page etc.)
-
-// Specifies the string returned to the client when the entry in the DB is NULL or empty
-const DefaultImgName = "default.png"
 
 // Defines how many users are returned per page by default.
 const UsersDefaultPageSize = 10
@@ -30,3 +27,9 @@ const CSRFTokenLength = 20
 
 // Lifespan of a CSRFToken - in days
 const CSRFTokenLifespan = 7
+
+// All user images will be shrinked and cropped to this size
+var ImageSize = [...]int{400, 400}
+
+// CSRF when debugging is annoying af, hence this setting. False = no checking.
+const EnableCSRF = true

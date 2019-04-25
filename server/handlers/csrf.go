@@ -3,9 +3,10 @@ package handlers
 import (
 	"crypto/rand"
 	"encoding/base64"
-	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/settings"
 	"net/http"
 	"time"
+
+	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/settings/server"
 )
 
 func SetNewCsrfToken(w http.ResponseWriter) error {
@@ -17,7 +18,7 @@ func SetNewCsrfToken(w http.ResponseWriter) error {
 	http.SetCookie(w, &http.Cookie{
 		Name:     "csrf",
 		Value:    token,
-		Expires:  time.Now().Add(time.Hour * 24 * settings.CSRFTokenLifespan),
+		Expires:  time.Now().Add(time.Hour * 24 * server_settings.CSRFTokenLifespan),
 		HttpOnly: false,
 		Path:     "/", // guarantees uniqueness.. I think
 	})
@@ -26,7 +27,7 @@ func SetNewCsrfToken(w http.ResponseWriter) error {
 }
 
 func MakeCSRFToken() (string, error) {
-	randombytes := make([]byte, settings.CSRFTokenLength)
+	randombytes := make([]byte, server_settings.CSRFTokenLength)
 	_, err := rand.Read(randombytes)
 	if err != nil {
 		return "", err

@@ -2,7 +2,8 @@ package db
 
 import (
 	"database/sql"
-	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/settings"
+
+	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/settings/shared"
 )
 
 // Struct representing an author - data, additional to Profile, supplied only

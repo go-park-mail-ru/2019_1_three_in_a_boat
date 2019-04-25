@@ -5,10 +5,10 @@ import (
 
 	"github.com/gorilla/websocket"
 
-	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/formats"
+	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/formats"
 	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/game"
 	. "github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/handlers"
-	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/settings"
+	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/settings/server"
 )
 
 // A handler that handles a ~multiple~ users resource. The handler itself is
@@ -23,7 +23,7 @@ var upgrader = websocket.Upgrader{
 	WriteBufferSize: 1024,
 	CheckOrigin: func(r *http.Request) bool {
 		origin := r.Header.Get("Origin")
-		_, allowed := settings.GetAllowedOrigins()[origin]
+		_, allowed := server_settings.GetAllowedOrigins()[origin]
 		return allowed
 	},
 }
@@ -38,7 +38,7 @@ func (h *SinglePlayHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	var uid int64 = 0
 	if claims != nil {
-		uid = claims.Pk
+		uid = claims.Uid
 	}
 
 	room, reconnect := game.LoadOrStoreSinglePlayRoom(

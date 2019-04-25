@@ -4,15 +4,13 @@ import (
 	"context"
 	"testing"
 
-	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/db"
+	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/formats/pb"
 )
 
 func TestAuthContext(t *testing.T) {
 	ctx := context.Background()
-	uc := UserClaims{
-		UserData: &db.UserData{
-			Pk: 42,
-		},
+	uc := pb.Claims{
+		Uid: 42,
 	}
 	ctx = NewAuthContext(ctx, &uc)
 
@@ -20,7 +18,7 @@ func TestAuthContext(t *testing.T) {
 
 	if !ok {
 		t.Error("failed to extract auth from context after adding it")
-	} else if uc2.Pk != 42 {
+	} else if uc2.Uid != 42 {
 		t.Error("extracted empty/corrupted userdata")
 	}
 

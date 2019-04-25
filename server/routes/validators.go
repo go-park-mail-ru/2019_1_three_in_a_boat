@@ -2,10 +2,11 @@ package routes
 
 import (
 	"errors"
-	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/db"
 	"net/url"
 	"strconv"
 	"strings"
+
+	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/db"
 )
 
 // file provides utility functions user for validating get parameters

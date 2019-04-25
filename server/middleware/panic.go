@@ -2,10 +2,11 @@ package middleware
 
 import (
 	"fmt"
-	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/formats"
+	"net/http"
+
+	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/formats"
 	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/handlers"
 	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/routes"
-	"net/http"
 )
 
 func Panic(next routes.Handler) routes.Handler {

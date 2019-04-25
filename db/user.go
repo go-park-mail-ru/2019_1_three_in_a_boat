@@ -5,8 +5,8 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/settings"
-	"time"
+
+	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/settings/shared"
 )
 
 // Class representing a user - a JOIN on Account and Profile
@@ -20,16 +20,12 @@ type User struct {
 // Helper class, representing the User in a way it is serailized. User JSON
 // interface converts User to UserData and forwards the marshal/unmarshal call.
 type UserData struct {
-	Pk         int64        `json:"uid"`
-	Username   string       `json:"username"`
-	Email      string       `json:"email"`
-	FirstName  NullString   `json:"firstName"`
-	LastName   NullString   `json:"lastName"`
-	HighScore  NullInt64    `json:"highScore"`
-	Gender     NullString   `json:"gender"`
-	Img        NullString   `json:"img"`
-	BirthDate  NullDateTime `json:"birthDate"`
-	SignupDate time.Time    `json:"signupDate"`
+	Pk        int64      `json:"uid"`
+	Username  string     `json:"username"`
+	Email     string     `json:"email"`
+	HighScore NullInt64  `json:"highScore"`
+	Gender    NullString `json:"gender"`
+	Img       NullString `json:"img"`
 }
 
 func (u User) MarshalJSON() ([]byte, error) {
@@ -39,10 +35,12 @@ func (u User) MarshalJSON() ([]byte, error) {
 		img.Valid = true
 	}
 	return json.Marshal(UserData{
-		u.Account.Pk, u.Account.Username, u.Account.Email,
-		u.Profile.FirstName, u.Profile.LastName,
-		u.Profile.HighScore, u.Profile.Gender, img,
-		NullDateTime{u.Profile.BirthDate}, u.Profile.SignupDate,
+		Pk:        u.Account.Pk,
+		Username:  u.Account.Username,
+		Email:     u.Account.Email,
+		HighScore: u.Profile.HighScore,
+		Gender:    u.Profile.Gender,
+		Img:       img,
 	})
 }
 

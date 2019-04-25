@@ -3,7 +3,7 @@ package forms
 import (
 	"testing"
 
-	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/db"
+	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/db"
 )
 
 func TestCheckLength(t *testing.T) {

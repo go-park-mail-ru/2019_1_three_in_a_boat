@@ -2,9 +2,10 @@
 package middleware
 
 import (
+	"net/http"
+
 	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/handlers"
 	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/routes"
-	"net/http"
 )
 
 // CORS-preflight-friendly Methods middleware based on routes.Route and

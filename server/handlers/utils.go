@@ -2,9 +2,10 @@ package handlers
 
 import (
 	"fmt"
-	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/formats"
 	"net/http"
 	"strconv"
+
+	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/formats"
 )
 
 // Handles a successful response: tries to marshal data, writes it to res.
@@ -81,6 +82,6 @@ func writeSuccessResponse(depth int, w http.ResponseWriter, r *http.Request,
 		LogError(1+depth, fmt.Sprintf("%s while processing %s: %s",
 			formats.ErrResponseWriterFailure, msg, err), r)
 	} else {
-		LogInfo(1, msg, r)
+		LogInfo(1+depth, msg, r)
 	}
 }
