@@ -3,7 +3,7 @@ package handlers
 import (
 	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/db"
 	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/formats"
-	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/settings"
+	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/settings"
 	"github.com/google/uuid"
 	"gopkg.in/square/go-jose.v2/jwt"
 	"net/http"

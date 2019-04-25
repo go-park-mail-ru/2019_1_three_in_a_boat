@@ -4,9 +4,6 @@ package settings
 // the behavior of the API in a non-critical way (e.g. validation settings,
 // entries per page etc.)
 
-// Specifies the directory images are saved to
-const UploadsPath = "media/images"
-
 // Specifies the string returned to the client when the entry in the DB is NULL or empty
 const DefaultImgName = "default.png"
 

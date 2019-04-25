@@ -4,7 +4,7 @@ import (
 	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/db"
 	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/formats"
 	. "github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/handlers"
-	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/settings"
+	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/settings"
 	"net/http"
 )
 
@@ -23,6 +23,7 @@ func (h *AuthorsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if HandleErrForward(w, r, formats.ErrSqlFailure, err) != nil {
 		return
 	} else {
+		//noinspection GoUnhandledErrorResult
 		defer rows.Close()
 	}
 

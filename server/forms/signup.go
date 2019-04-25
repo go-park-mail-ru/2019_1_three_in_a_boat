@@ -5,7 +5,7 @@ import (
 	"github.com/badoux/checkmail"
 	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/db"
 	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/formats"
-	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/settings"
+	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/settings"
 	"github.com/lib/pq"
 	"github.com/nbutton23/zxcvbn-go"
 	"strings"
@@ -113,6 +113,7 @@ func (f *SignupForm) ValidateEmail() (r FieldReport) {
 		return
 	}
 
+	//noinspection GoBoolExpressions
 	if !settings.EmailExistsCheck {
 		r.Ok = true
 		return

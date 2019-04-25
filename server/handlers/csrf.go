@@ -3,7 +3,7 @@ package handlers
 import (
 	"crypto/rand"
 	"encoding/base64"
-	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/settings"
+	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/settings"
 	"net/http"
 	"time"
 )

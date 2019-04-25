@@ -7,7 +7,7 @@ import (
 	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/formats"
 	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/handlers"
 	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/routes"
-	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/settings"
+	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/settings"
 )
 
 // CORS Middleware: adds Access-Control headers if request's Origin is allowed

@@ -3,7 +3,7 @@ package test_utils
 import (
 	"encoding/json"
 	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/db"
-	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/settings"
+	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/settings"
 	"github.com/google/logger"
 	"io/ioutil"
 )
@@ -20,14 +20,17 @@ func SetUp() {
 
 func TearDown() {
 	// foreign keys first, or the constraint will complain
+	//noinspection SqlWithoutWhere
 	_, err := settings.DB().Exec("DELETE FROM author;")
 	if err != nil {
 		panic(err)
 	}
+	//noinspection SqlWithoutWhere
 	_, err = settings.DB().Exec("DELETE FROM profile;")
 	if err != nil {
 		panic(err)
 	}
+	//noinspection SqlWithoutWhere
 	_, err = settings.DB().Exec("DELETE FROM account;")
 	if err != nil {
 		panic(err)

@@ -2,12 +2,14 @@ package main
 
 import (
 	"flag"
-	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server"
-	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/settings"
-	"github.com/google/logger"
-	_ "github.com/lib/pq"
 	"log"
 	"os"
+
+	"github.com/google/logger"
+	_ "github.com/lib/pq"
+
+	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server"
+	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/settings"
 )
 
 var verbose = flag.Bool("v", true, "print info level logs to stdout")
@@ -22,6 +24,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("Failed to open log file: %v", err)
 	}
+	//noinspection GoUnhandledErrorResult
 	defer logFile.Close()
 
 	logger.SetFlags(log.Ldate | log.Ltime | log.Lshortfile)

@@ -4,7 +4,7 @@ package formats
 
 import (
 	"encoding/json"
-	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/settings"
+	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/settings"
 	"net/http"
 	"time"
 )

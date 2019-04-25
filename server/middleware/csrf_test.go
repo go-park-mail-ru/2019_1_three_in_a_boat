@@ -8,10 +8,11 @@ import (
 	"testing"
 
 	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/routes"
-	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/settings"
+	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/settings"
 )
 
 func TestCSRF(t *testing.T) {
+	//noinspection GoBoolExpressions
 	if !settings.EnableCSRF {
 		fmt.Println("CSRF is not enabled: skipping csrf test")
 		return

@@ -4,11 +4,12 @@ import (
 	"crypto/rand"
 	"crypto/rsa"
 	"crypto/x509"
-	"github.com/google/logger"
-	"gopkg.in/square/go-jose.v2"
 	"io/ioutil"
 	"os"
 	"sync"
+
+	"github.com/google/logger"
+	"gopkg.in/square/go-jose.v2"
 )
 
 var jwtTokenOnce = sync.Once{}
@@ -28,6 +29,7 @@ func generateKey() {
 
 func GetSecretKey() *rsa.PrivateKey {
 	jwtTokenOnce.Do(func() {
+		//noinspection GoBoolExpressions
 		if StoreKey {
 			if keyBytes, err := ioutil.ReadFile(SecretPath); err == nil {
 				logger.Info("Reading secret key from secret.rsa")
