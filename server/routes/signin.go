@@ -1,14 +1,17 @@
 package routes
 
 import (
-	"database/sql"
+	"context"
 	"encoding/json"
-	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/db"
-	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/formats"
-	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/forms"
-	. "github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/handlers"
-	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/settings"
 	"net/http"
+	"time"
+
+	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/forms"
+	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/shared/formats"
+	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/shared/formats/pb"
+	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/shared/http-utils"
+	. "github.com/go-park-mail-ru/2019_1_three_in_a_boat/shared/http-utils/handlers"
+	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/shared/settings/shared"
 )
 
 // Handles Signin resource. Only accepts POST requests. Implements
@@ -34,43 +37,51 @@ func (h *SigninHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	u, err := db.GetUserByUsernameOrEmail(settings.DB(),
-		form.Username.String,
-		form.Email.String)
-	if err != nil {
-		if err == sql.ErrNoRows {
-			HandleInvalidData(w, r, forms.UnsuccessfulSigninReport,
-				formats.ErrInvalidCredentials)
-		} else {
-			Handle500(w, r, formats.ErrSqlFailure, err)
-		}
-		return
-	}
+	if ok, claims := authorize(
+		w, r, form.Username.String, form.Email.String, form.Password); ok {
+		Handle200(w, r, claims)
+	} // else do nothing - authorize handles errors itself
 
-	ok, err := db.AccountComparePasswordToHash(form.Password, u.Account.Password)
-	if HandleErrForward(w, r, formats.ErrPasswordHashing, err) != nil {
-		return
-	}
-
-	if !ok {
-		HandleInvalidData(w, r, forms.UnsuccessfulSigninReport, formats.ErrInvalidCredentials)
-		return
-	}
-
-	err = Authorize(w, u)
-	if HandleErrForward(w, r, formats.ErrJWTEncryptionFailure, err) != nil {
-		return
-	}
-
-	Handle200(w, r, u)
 }
 
-func (h *SigninHandler) Settings() map[string]RouteSettings {
-	return map[string]RouteSettings{
+func (h *SigninHandler) Settings() map[string]http_utils.RouteSettings {
+	return map[string]http_utils.RouteSettings{
 		"POST": {
 			AuthRequired:           false,
 			CorsAllowed:            true,
 			CsrfProtectionRequired: true,
 		},
 	}
+}
+
+func authorize(
+	w http.ResponseWriter, r *http.Request, username, email, password string) (
+	bool, *pb.Claims) {
+	authCtx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+
+	checkAuthReply, err := settings.AuthClient.Authorize(authCtx,
+		&pb.AuthorizeRequest{
+			Username: username,
+			Email:    email,
+			Password: password,
+		})
+
+	if err != nil {
+		if checkAuthReply != nil {
+			Handle500(w, r, checkAuthReply.Message, err)
+		} else {
+			Handle500(w, r, formats.ErrAuthServiceFailure, err)
+		}
+		return false, nil
+	}
+
+	if !checkAuthReply.GetOk() {
+		HandleInvalidData(w, r, forms.UnsuccessfulSigninReport, formats.ErrInvalidCredentials)
+		return false, nil
+	}
+
+	// if no errors, message is the token
+	Authorize(w, checkAuthReply.Message)
+	return true, checkAuthReply.Claims
 }

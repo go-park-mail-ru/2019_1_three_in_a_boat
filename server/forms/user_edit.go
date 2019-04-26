@@ -3,13 +3,16 @@ package forms
 import (
 	"bytes"
 	"encoding/base64"
-	"github.com/disintegration/imaging"
-	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/db"
-	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/formats"
-	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/settings"
-	"github.com/google/uuid"
 	"image"
 	"strings"
+
+	"github.com/disintegration/imaging"
+	"github.com/google/uuid"
+
+	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/shared/db"
+	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/shared/formats"
+	http_utils "github.com/go-park-mail-ru/2019_1_three_in_a_boat/shared/http-utils"
+	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/shared/settings/server"
 )
 
 // A struct responsible for validating profile edit form. Only checks validity
@@ -28,9 +31,8 @@ type UserEditForm struct {
 }
 
 // Returns a report indicating whether the form is valid.
-func (f *UserEditForm) Validate() *Report {
-	report := NewReport()
-
+func (f *UserEditForm) Validate() *http_utils.Report {
+	report := http_utils.NewReport()
 	report.Fields["username"] = f.ValidateUsername()
 	report.Fields["password"] = f.ValidatePassword()
 	report.Fields["email"] = f.ValidateEmail()
@@ -54,7 +56,7 @@ func (f *UserEditForm) Validate() *Report {
 // See CheckUserDbConstraints docs to catch this case.
 func (f *UserEditForm) EditUser(u *db.User) (*db.User, error) {
 	if !f.ok {
-		return nil, ErrFormInvalid
+		return nil, http_utils.ErrFormInvalid
 	}
 
 	var err error
@@ -93,68 +95,68 @@ func (f *UserEditForm) EditUser(u *db.User) (*db.User, error) {
 
 // Creates Img and f.ImgName based on f.ImgBase64. NULL is ignored, empty string
 // deletes the image.
-func (f *UserEditForm) ValidateImg() FieldReport {
+func (f *UserEditForm) ValidateImg() http_utils.FieldReport {
 	if !f.ImgBase64.Valid {
 		f.ImgBase64.Valid = false
-		return FieldReport{true, nil}
+		return http_utils.FieldReport{true, nil}
 	}
 
 	if f.ImgBase64.String == "" { // !Valid already checked
 		f.ImgBase64.Valid = true
-		return FieldReport{true, nil}
+		return http_utils.FieldReport{true, nil}
 	}
 
 	imgBytes, err := base64.StdEncoding.DecodeString(f.ImgBase64.String)
 	if err != nil {
-		return FieldReport{false, []string{formats.ErrBase64Decoding}}
+		return http_utils.FieldReport{false, []string{formats.ErrBase64Decoding}}
 	}
 
 	img, err := imaging.Decode(bytes.NewReader(imgBytes))
 	if err != nil {
-		return FieldReport{false, []string{formats.ErrBase64Decoding}}
+		return http_utils.FieldReport{false, []string{formats.ErrBase64Decoding}}
 	}
 
-	f.Img = imaging.Fill(img, settings.ImageSize[0], settings.ImageSize[1],
+	f.Img = imaging.Fill(img, server_settings.ImageSize[0], server_settings.ImageSize[1],
 		imaging.Center, imaging.Lanczos)
 	f.ImgName = uuid.New().String() + ".jpg"
 
-	return FieldReport{true, nil}
+	return http_utils.FieldReport{true, nil}
 }
 
 // Creates Img and f.ImgName based on f.ImgBase64. NULL is ignored, empty string
 // deletes the image.
-func (f *UserEditForm) ValidatePassword() FieldReport {
+func (f *UserEditForm) ValidatePassword() http_utils.FieldReport {
 	f.Password = strings.TrimSpace(f.Password)
 	if f.Password != "" {
 		return f.SignupForm.ValidatePassword()
 	} else {
-		return FieldReport{true, nil}
+		return http_utils.FieldReport{true, nil}
 	}
 }
 
 // Validates username the same way as signupform, except it ignores empty string
-func (f *UserEditForm) ValidateUsername() FieldReport {
+func (f *UserEditForm) ValidateUsername() http_utils.FieldReport {
 	f.Username = strings.TrimSpace(f.Username)
 	if f.Username != "" {
 		return f.SignupForm.ValidateUsername()
 	} else {
-		return FieldReport{true, []string{}}
+		return http_utils.FieldReport{true, []string{}}
 	}
 }
 
 // Validates email the same way as signupform, except it ignores empty string
-func (f *UserEditForm) ValidateEmail() FieldReport {
+func (f *UserEditForm) ValidateEmail() http_utils.FieldReport {
 	f.Email = strings.TrimSpace(f.Email)
 	if f.Email != "" {
 		return f.SignupForm.ValidateEmail()
 	} else {
-		return FieldReport{true, []string{}}
+		return http_utils.FieldReport{true, []string{}}
 	}
 }
 
 // Validates gender: checks that it's one of the [male, female, other]. Empty
 // string or null are ignored
-func (f *UserEditForm) ValidateGender() FieldReport {
+func (f *UserEditForm) ValidateGender() http_utils.FieldReport {
 	f.Gender.String = strings.TrimSpace(f.Gender.String)
 	if f.Gender.String != "" && f.Gender.Valid {
 		switch f.Gender.String {
@@ -163,12 +165,12 @@ func (f *UserEditForm) ValidateGender() FieldReport {
 		case "female":
 			fallthrough
 		case "other":
-			return FieldReport{true, []string{}}
+			return http_utils.FieldReport{true, []string{}}
 		default:
-			return FieldReport{false, []string{}} // never triggered by the API
+			return http_utils.FieldReport{false, []string{}} // never triggered by the API
 		}
 	} else {
 		f.Gender.Valid = false
-		return FieldReport{true, []string{}}
+		return http_utils.FieldReport{true, []string{}}
 	}
 }

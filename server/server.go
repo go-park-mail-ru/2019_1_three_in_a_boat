@@ -1,5 +1,5 @@
 // Package defines Server() which represents a hexagon API server
-package server
+package main
 
 // The file provides constants, structs and interfaces necessary for using the
 // routes package
@@ -12,19 +12,19 @@ import (
 
 	"github.com/google/logger"
 
-	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/middleware"
 	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/routes"
+	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/shared/http-utils"
+	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/shared/http-utils/middleware"
 )
 
 // Maps URL paths into corresponding routes.Routes
-var RoutesMap = map[string]routes.Handler{
+var RoutesMap = map[string]http_utils.Handler{
 	"/authors": &routes.AuthorsHandler{},
 	"/users":   &routes.UsersHandler{},
 	"/users/":  &routes.UserHandler{},
 	"/signin":  &routes.SigninHandler{},
 	"/":        &routes.CheckAuthHandler{},
 	"/signout": &routes.SignOutHandler{},
-	"/play":    &routes.SinglePlayHandler{},
 }
 
 var globalRouter = http.ServeMux{}
@@ -41,7 +41,7 @@ func GetRouter() http.Handler {
 					middleware.Methods(
 						middleware.CORS(
 							middleware.CSRF(
-								middleware.Auth(handler))))))
+								middleware.Auth(handler)))))) // ))0)
 		}
 	})
 

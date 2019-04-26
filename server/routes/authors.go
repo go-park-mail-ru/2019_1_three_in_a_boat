@@ -1,11 +1,13 @@
 package routes
 
 import (
-	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/db"
-	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/formats"
-	. "github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/handlers"
-	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/settings"
 	"net/http"
+
+	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/shared/db"
+	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/shared/formats"
+	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/shared/http-utils"
+	. "github.com/go-park-mail-ru/2019_1_three_in_a_boat/shared/http-utils/handlers"
+	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/shared/settings/shared"
 )
 
 // Handles Authors resource. Only accepts GET requests because creating authors
@@ -23,6 +25,7 @@ func (h *AuthorsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if HandleErrForward(w, r, formats.ErrSqlFailure, err) != nil {
 		return
 	} else {
+		//noinspection GoUnhandledErrorResult
 		defer rows.Close()
 	}
 
@@ -43,8 +46,8 @@ func (h *AuthorsHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	Handle200(w, r, authors)
 }
 
-func (h *AuthorsHandler) Settings() map[string]RouteSettings {
-	return map[string]RouteSettings{
+func (h *AuthorsHandler) Settings() map[string]http_utils.RouteSettings {
+	return map[string]http_utils.RouteSettings{
 		"GET": {
 			AuthRequired:           false,
 			CorsAllowed:            true,

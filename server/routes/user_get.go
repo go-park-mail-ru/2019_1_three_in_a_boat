@@ -2,11 +2,12 @@ package routes
 
 import (
 	"database/sql"
-	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/db"
-	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/formats"
-	. "github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/handlers"
-	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/settings"
 	"net/http"
+
+	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/shared/db"
+	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/shared/formats"
+	. "github.com/go-park-mail-ru/2019_1_three_in_a_boat/shared/http-utils/handlers"
+	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/shared/settings/shared"
 )
 
 // A handler that handles a ~single~ user resource. Simply returns the user
@@ -23,12 +24,12 @@ func GetUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	//authedAs, ok := formats.AuthFromContext(r.Context())
-	//if authedAs != nil && ok && authedAs.Pk == uid {
-	//	// if the user looking at their own profile this can save as 1 DB request
-	//	Handle200(w, r, authedAs.UserData)
-	//	return
-	//}
+	// authedAs, ok := formats.AuthFromContext(r.Context())
+	// if authedAs != nil && ok && authedAs.Pk == uid {
+	// 	// if the user looking at their own profile this can save as 1 DB request
+	// 	Handle200(w, r, authedAs.UserData)
+	// 	return
+	// }
 
 	u, err := db.GetUser(settings.DB(), uid)
 	if err != nil {

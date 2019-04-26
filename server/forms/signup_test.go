@@ -1,11 +1,10 @@
 package forms
 
 import (
-	"fmt"
 	"strings"
 	"testing"
 
-	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/db"
+	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/shared/db"
 )
 
 func TestSignupForm_ValidateEmail(t *testing.T) {
@@ -180,33 +179,35 @@ func TestSignupForm_MakeUser(t *testing.T) {
 	for _, c := range cases {
 		u, err := c.SignupForm.MakeUser()
 		if c.SignupForm.ok {
-			pwdMatch, pwdErr :=
-				db.AccountComparePasswordToHash(c.SignupForm.Password, u.Account.Password)
-			if pwdErr != nil {
-				t.Errorf("hashing error")
-			} else if err != nil {
+			if err != nil {
 				t.Errorf("epxceted a user, got an error")
-			} else if u.Account.Pk != c.User.Account.Pk ||
-				u.Account.Username != c.User.Account.Username ||
-				u.Account.Email != c.User.Account.Email ||
-				!pwdMatch ||
-				u.Profile.FirstName != c.User.Profile.FirstName ||
-				u.Profile.LastName != c.User.Profile.LastName ||
-				u.Profile.BirthDate != c.User.Profile.BirthDate ||
-				u.Profile.HighScore != c.User.Profile.HighScore ||
-				u.Profile.Gender != c.User.Profile.Gender ||
-				u.Profile.Img != c.User.Profile.Img {
-				fmt.Println(u.Account.Pk != c.User.Account.Pk,
-					u.Account.Username != c.User.Account.Username,
-					u.Account.Email != c.User.Account.Email,
-					pwdMatch,
-					u.Profile.FirstName != c.User.Profile.FirstName,
-					u.Profile.LastName != c.User.Profile.LastName,
-					u.Profile.BirthDate != c.User.Profile.BirthDate,
-					u.Profile.HighScore != c.User.Profile.HighScore,
-					u.Profile.Gender != c.User.Profile.Gender,
-					u.Profile.Img != c.User.Profile.Img)
-				t.Errorf("corrupted/empty user data received")
+			} else {
+				pwdMatch, pwdErr :=
+					db.AccountComparePasswordToHash(c.SignupForm.Password, u.Account.Password)
+				if pwdErr != nil {
+					t.Errorf("hashing error")
+				} else if u.Account.Pk != c.User.Account.Pk ||
+					u.Account.Username != c.User.Account.Username ||
+					u.Account.Email != c.User.Account.Email ||
+					!pwdMatch ||
+					u.Profile.FirstName != c.User.Profile.FirstName ||
+					u.Profile.LastName != c.User.Profile.LastName ||
+					u.Profile.BirthDate != c.User.Profile.BirthDate ||
+					u.Profile.HighScore != c.User.Profile.HighScore ||
+					u.Profile.Gender != c.User.Profile.Gender ||
+					u.Profile.Img != c.User.Profile.Img {
+					// fmt.Println(u.Account.Pk != c.User.Account.Pk,
+					// 	u.Account.Username != c.User.Account.Username,
+					// 	u.Account.Email != c.User.Account.Email,
+					// 	pwdMatch,
+					// 	u.Profile.FirstName != c.User.Profile.FirstName,
+					// 	u.Profile.LastName != c.User.Profile.LastName,
+					// 	u.Profile.BirthDate != c.User.Profile.BirthDate,
+					// 	u.Profile.HighScore != c.User.Profile.HighScore,
+					// 	u.Profile.Gender != c.User.Profile.Gender,
+					// 	u.Profile.Img != c.User.Profile.Img)
+					t.Errorf("corrupted/empty user data received")
+				}
 			}
 		}
 

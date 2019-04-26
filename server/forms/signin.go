@@ -2,8 +2,10 @@ package forms
 
 import (
 	"github.com/badoux/checkmail"
-	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/db"
-	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/formats"
+
+	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/shared/db"
+	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/shared/formats"
+	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/shared/http-utils"
 )
 
 // A form responsible for validating signin form. Only checks validity of the
@@ -21,10 +23,10 @@ type SigninForm struct {
 // only one of the form.Username and form.Email will be non-empty, so it's safe
 // to send it to db.GetUserByUsernameOrEmail. Checks only that the fields are
 // non-empty.
-func (f *SigninForm) Validate() *Report {
-	report := NewReport("name", "password")
+func (f *SigninForm) Validate() *http_utils.Report {
+	report := http_utils.NewReport("name", "password")
 	report.Ok = true
-	fReport := FieldReport{false, []string{formats.ErrFieldTooShort}}
+	fReport := http_utils.FieldReport{false, []string{formats.ErrFieldTooShort}}
 
 	if len(f.Name) == 0 {
 		report.Ok = false
@@ -59,10 +61,10 @@ func (f *SigninForm) parseName() {
 // A report that is never used, in the package and provided to the route as a
 // report that should be sent to the client. It does not indicate whether the
 // user wasn't found or the passwords didn't match.
-var UnsuccessfulSigninReport = Report{
-	false,
-	map[string]FieldReport{
-		"name":     {false, []string{formats.ErrInvalidCredentials}},
-		"password": {false, []string{formats.ErrInvalidCredentials}},
+var UnsuccessfulSigninReport = http_utils.Report{
+	Ok: false,
+	Fields: map[string]http_utils.FieldReport{
+		"name":     {Ok: false, Errors: []string{formats.ErrInvalidCredentials}},
+		"password": {Ok: false, Errors: []string{formats.ErrInvalidCredentials}},
 	},
 }

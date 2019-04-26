@@ -3,13 +3,14 @@ package routes
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/db"
-	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/formats"
-	. "github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/test-utils"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/shared/db"
+	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/shared/formats"
+	. "github.com/go-park-mail-ru/2019_1_three_in_a_boat/shared/test-utils"
 )
 
 type GetUserFullResponse struct {

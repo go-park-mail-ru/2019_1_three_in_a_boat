@@ -1,13 +1,17 @@
 package routes
 
 import (
+	"context"
 	"encoding/json"
-	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/db"
-	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/formats"
-	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/forms"
-	. "github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/handlers"
-	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/settings"
 	"net/http"
+	"time"
+
+	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/forms"
+	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/shared/db"
+	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/shared/formats"
+	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/shared/formats/pb"
+	. "github.com/go-park-mail-ru/2019_1_three_in_a_boat/shared/http-utils/handlers"
+	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/shared/settings/shared"
 )
 
 // stores pointers, assumes they aren't modified anywhere else
@@ -33,7 +37,7 @@ func PutUser(w http.ResponseWriter, r *http.Request) {
 	authedAs, ok := formats.AuthFromContext(r.Context())
 	// since AuthRequired is true, authedAs is always a valid UserClaims
 	// let's just check though LUL. Also authedAs.Pk != uid is a necessary check.
-	if authedAs == nil || !ok || authedAs.Pk != uid {
+	if authedAs == nil || !ok || authedAs.Uid != uid {
 		Handle403(w, r)
 		return
 	}
@@ -50,7 +54,7 @@ func PutUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// might not be needed, but is at least convenient
-	u, err := db.GetUser(settings.DB(), authedAs.Pk)
+	u, err := db.GetUser(settings.DB(), authedAs.Uid)
 	if HandleErrForward(w, r, formats.ErrSqlFailure, err) != nil {
 		return
 	}
@@ -93,9 +97,23 @@ func PutUser(w http.ResponseWriter, r *http.Request) {
 		_ = DeleteImage(oldImg.String)
 	}
 
-	if HandleErrForward(w, r, formats.ErrSignupAuthFailure, Authorize(w, u)) != nil {
+	token, err := tokenize(formats.ClaimsFromUser(u))
+	if HandleErrForward(w, r, formats.ErrAuthServiceFailure, err) != nil {
 		return
 	}
 
+	Authorize(w, token)
 	Handle200(w, r, u)
+}
+
+func tokenize(claims *pb.Claims) (string, error) {
+	authCtx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+
+	tokenizeReply, err := settings.AuthClient.Tokenize(authCtx, claims)
+	if err != nil {
+		return "", err
+	} else {
+		return tokenizeReply.Token, nil
+	}
 }

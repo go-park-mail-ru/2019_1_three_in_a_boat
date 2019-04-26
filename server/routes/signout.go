@@ -1,8 +1,10 @@
 package routes
 
 import (
-	. "github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/handlers"
 	"net/http"
+
+	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/shared/http-utils"
+	. "github.com/go-park-mail-ru/2019_1_three_in_a_boat/shared/http-utils/handlers"
 )
 
 // Handles Signout resource. Only accepts GET requests. Implements
@@ -18,8 +20,8 @@ func (h *SignOutHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	Handle200(w, r, nil)
 }
 
-func (h *SignOutHandler) Settings() map[string]RouteSettings {
-	return map[string]RouteSettings{
+func (h *SignOutHandler) Settings() map[string]http_utils.RouteSettings {
+	return map[string]http_utils.RouteSettings{
 		"POST": {
 			AuthRequired:           false,
 			CorsAllowed:            true,

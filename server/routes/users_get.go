@@ -1,12 +1,14 @@
 package routes
 
 import (
-	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/db"
-	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/formats"
-	. "github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/handlers"
-	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/settings"
 	"net/http"
 	"net/url"
+
+	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/shared/db"
+	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/shared/formats"
+	. "github.com/go-park-mail-ru/2019_1_three_in_a_boat/shared/http-utils/handlers"
+	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/shared/settings/server"
+	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/shared/settings/shared"
 )
 
 // Represents the result returned by GetUsers
@@ -30,6 +32,7 @@ func GetUsers(w http.ResponseWriter, r *http.Request) {
 	if HandleErrForward(w, r, formats.ErrSqlFailure, err) != nil {
 		return
 	} else {
+		//noinspection GoUnhandledErrorResult
 		defer rows.Close()
 	}
 
@@ -63,6 +66,6 @@ func validateUsersParams(url *url.URL) (
 	page int, pageSize int, order []db.SelectOrder) {
 	return makeNPage(url.Query()["page"]),
 		makePageSize(url.Query()["pageSize"],
-			settings.UsersMaxPageSize, settings.UsersDefaultPageSize),
+			server_settings.UsersMaxPageSize, server_settings.UsersDefaultPageSize),
 		makeOrderList(url.Query()["sort"], db.UserOrderMap)
 }

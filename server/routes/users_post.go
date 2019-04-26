@@ -2,11 +2,12 @@ package routes
 
 import (
 	"encoding/json"
-	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/formats"
-	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/forms"
-	. "github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/handlers"
-	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/settings"
 	"net/http"
+
+	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/forms"
+	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/shared/formats"
+	. "github.com/go-park-mail-ru/2019_1_three_in_a_boat/shared/http-utils/handlers"
+	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/shared/settings/shared"
 )
 
 // A handler that handles a ~multiple~ users resource. Only accepts POST
@@ -48,9 +49,10 @@ func PostUsers(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if HandleErrForward(w, r, formats.ErrSignupAuthFailure, Authorize(w, u)) != nil {
+	token, err := tokenize(formats.ClaimsFromUser(u))
+	if HandleErrForward(w, r, formats.ErrSignupAuthFailure, err) != nil {
 		return
 	}
-
+	Authorize(w, token)
 	Handle201(w, r, u)
 }
