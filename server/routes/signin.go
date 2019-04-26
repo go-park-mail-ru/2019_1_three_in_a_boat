@@ -6,11 +6,12 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/formats"
-	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/formats/pb"
 	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/forms"
-	. "github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/handlers"
-	server_settings "github.com/go-park-mail-ru/2019_1_three_in_a_boat/settings/server"
+	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/shared/formats"
+	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/shared/formats/pb"
+	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/shared/http-utils"
+	. "github.com/go-park-mail-ru/2019_1_three_in_a_boat/shared/http-utils/handlers"
+	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/shared/settings/shared"
 )
 
 // Handles Signin resource. Only accepts POST requests. Implements
@@ -43,8 +44,8 @@ func (h *SigninHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func (h *SigninHandler) Settings() map[string]RouteSettings {
-	return map[string]RouteSettings{
+func (h *SigninHandler) Settings() map[string]http_utils.RouteSettings {
+	return map[string]http_utils.RouteSettings{
 		"POST": {
 			AuthRequired:           false,
 			CorsAllowed:            true,
@@ -59,7 +60,7 @@ func authorize(
 	authCtx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 
-	checkAuthReply, err := server_settings.AuthClient.Authorize(authCtx,
+	checkAuthReply, err := settings.AuthClient.Authorize(authCtx,
 		&pb.AuthorizeRequest{
 			Username: username,
 			Email:    email,

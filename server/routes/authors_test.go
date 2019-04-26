@@ -7,9 +7,9 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/db"
-	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/formats"
-	. "github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/test-utils"
+	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/shared/db"
+	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/shared/formats"
+	. "github.com/go-park-mail-ru/2019_1_three_in_a_boat/shared/test-utils"
 )
 
 // Tests are dependent on DB because I'm a stupid singleton-using idiot.

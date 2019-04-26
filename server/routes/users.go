@@ -2,6 +2,8 @@ package routes
 
 import (
 	"net/http"
+
+	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/shared/http-utils"
 )
 
 // A handler that handles a ~multiple~ users resource. The handler itself is
@@ -19,8 +21,8 @@ func (h *UsersHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (h *UsersHandler) Settings() map[string]RouteSettings {
-	return map[string]RouteSettings{
+func (h *UsersHandler) Settings() map[string]http_utils.RouteSettings {
+	return map[string]http_utils.RouteSettings{
 		"POST": {
 			AuthRequired:           false,
 			CorsAllowed:            true,

@@ -1,6 +1,10 @@
 package routes
 
-import "net/http"
+import (
+	"net/http"
+
+	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/shared/http-utils"
+)
 
 // A handler that handles a ~single~ user resource. The handler itself is simply
 // a struct that forwards the requests, depending on the method to one of
@@ -16,8 +20,8 @@ func (h *UserHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func (h *UserHandler) Settings() map[string]RouteSettings {
-	return map[string]RouteSettings{
+func (h *UserHandler) Settings() map[string]http_utils.RouteSettings {
+	return map[string]http_utils.RouteSettings{
 		"PUT": {
 			AuthRequired:           true,
 			CorsAllowed:            true,

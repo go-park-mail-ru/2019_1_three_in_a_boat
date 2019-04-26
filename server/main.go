@@ -2,13 +2,14 @@ package main
 
 import (
 	"context"
+	"net/http"
 	"os"
 	"os/signal"
 	"time"
 
 	"github.com/google/logger"
 
-	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/settings/server"
+	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/shared/settings/server"
 )
 
 func main() {
@@ -23,7 +24,9 @@ func main() {
 	logger.Info("Listening at ", s.Addr)
 	go func() {
 		if err := s.ListenAndServe(); err != nil {
-			logger.Fatalf("Failed to listen and serve: %v", err)
+			if err != http.ErrServerClosed {
+				logger.Fatalf("Failed to listen and serve: %v", err)
+			}
 		}
 	}()
 

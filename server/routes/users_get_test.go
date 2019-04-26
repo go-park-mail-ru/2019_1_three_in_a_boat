@@ -9,10 +9,10 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/db"
-	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/formats"
-	. "github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/test-utils"
-	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/settings/server"
+	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/shared/db"
+	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/shared/formats"
+	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/shared/settings/server"
+	. "github.com/go-park-mail-ru/2019_1_three_in_a_boat/shared/test-utils"
 )
 
 type GetUsersFullResponse struct {

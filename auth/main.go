@@ -11,8 +11,8 @@ import (
 	"github.com/google/logger"
 	"google.golang.org/grpc"
 
-	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/formats/pb"
-	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/settings/auth"
+	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/shared/formats/pb"
+	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/shared/settings/auth"
 )
 
 func gracefulShutdown(s *grpc.Server, ctx context.Context) error {
