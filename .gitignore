@@ -1,0 +1,5 @@
+.idea
+logs/*.log
+secret.rsa
+media/images/(!default.png)
+*.pb.go
