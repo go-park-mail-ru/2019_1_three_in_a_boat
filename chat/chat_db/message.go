@@ -33,6 +33,14 @@ func GetLastNMessages(_db db.Queryable, limit int, offset int) (*sql.Rows, error
             FROM message m ORDER BY m."created" DESC ` + limitStr + offsetStr)
 }
 
+func GetNMessagesSince(_db db.Queryable, limit int, firstMsgId int) (*sql.Rows, error) {
+	limitStr := db.MakeLimitString(limit)
+
+	return _db.Query(
+		`SELECT m."id", m."uid", m."message", m."created"
+            FROM message m WHERE id < $1 ORDER BY m."id" DESC `+limitStr, firstMsgId)
+}
+
 func MessageFromRow(row db.Scanner) (*Message, error) {
 	m := &Message{}
 	err := row.Scan(&m.Pk, &m.Uid, &m.Text, &m.Timestamp)

@@ -19,7 +19,8 @@ import (
 
 // Maps URL paths into corresponding routes.Routes
 var RoutesMap = map[string]http_utils.Handler{
-	"/chat": &ChatHandler{},
+	"/chat":          &ChatHandler{},
+	"/chat/paginate": &ChatPaginationHandler{},
 }
 
 var globalRouter = http.ServeMux{}

@@ -12,7 +12,7 @@ import (
 var (
 	dbUsername = "hexagon"
 	dbName     = "hexagon"
-	dbHost     = "localhost:5432"
+	dbHost     = "localhost"
 	dbPassword = "ChangeBeforeDeploying"
 )
 
