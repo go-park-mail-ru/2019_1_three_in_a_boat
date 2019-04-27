@@ -6,6 +6,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"strconv"
 	"strings"
 )
 
@@ -48,6 +49,18 @@ func MakeLimitString(limit int) string {
 	} else {
 		return fmt.Sprintf("LIMIT %d ", limit)
 	}
+}
+
+func MakeIdsString(ids []int64) string {
+	builder := strings.Builder{}
+	for i, id := range ids {
+		builder.WriteString(`a."uid"=` + strconv.Itoa(int(id)))
+		if i != len(ids)-1 {
+			builder.WriteString(" OR ")
+		}
+	}
+
+	return builder.String()
 }
 
 // Makes a valid SQL OFFSET statement based on provided limit.

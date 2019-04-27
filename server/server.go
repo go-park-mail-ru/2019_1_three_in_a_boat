@@ -19,12 +19,13 @@ import (
 
 // Maps URL paths into corresponding routes.Routes
 var RoutesMap = map[string]http_utils.Handler{
-	"/authors": &routes.AuthorsHandler{},
-	"/users":   &routes.UsersHandler{},
-	"/users/":  &routes.UserHandler{},
-	"/signin":  &routes.SigninHandler{},
-	"/":        &routes.CheckAuthHandler{},
-	"/signout": &routes.SignOutHandler{},
+	"/authors":    &routes.AuthorsHandler{},
+	"/users":      &routes.UsersHandler{},
+	"/users/":     &routes.UserHandler{},
+	"/signin":     &routes.SigninHandler{},
+	"/":           &routes.CheckAuthHandler{},
+	"/signout":    &routes.SignOutHandler{},
+	"/users/chat": &routes.UsersBatchHandler{},
 }
 
 var globalRouter = http.ServeMux{}

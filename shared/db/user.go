@@ -144,6 +144,19 @@ func GetUserMany(_db Queryable, order []SelectOrder,
 
 }
 
+func GetBatchByIds(_db Queryable, ids []int64) (*sql.Rows, error) {
+	if len(ids) == 0 {
+		return nil, errors.New("get batch called with empty list")
+	}
+	idsStr := MakeIdsString(ids)
+	return _db.Query(`SELECT a."uid", a."username", a."email", a."password", 
+                           p."first_name", p."last_name", p."high_score",
+                    p."gender", p."img", p."birth_date", p."signup_date"
+                    FROM account a JOIN profile p ON a.uid = p.uid WHERE ` +
+		idsStr)
+
+}
+
 // Convenience function provided for getting a user out of sql.Rows.Scan()
 // returned by GetUserMany. For single users, use GetUser or
 // GetUserByNameOrEmail User does not implement Scanner interface because there
@@ -161,6 +174,21 @@ func UserFromRow(row Scanner) (*User, int, error) {
 	} else {
 		u.Profile.Pk = u.Account.Pk
 		return nil, 0, err
+	}
+}
+
+func UserFromBatchRow(row Scanner) (*User, error) {
+	u := &User{&Account{}, &Profile{}}
+	err := row.Scan(&u.Account.Pk, &u.Account.Username, &u.Account.Email,
+		&u.Account.Password, &u.Profile.FirstName, &u.Profile.LastName,
+		&u.Profile.HighScore, &u.Profile.Gender, &u.Profile.Img,
+		&u.Profile.BirthDate, &u.Profile.SignupDate)
+
+	if err == nil {
+		return u, nil
+	} else {
+		u.Profile.Pk = u.Account.Pk
+		return nil, err
 	}
 }
 
