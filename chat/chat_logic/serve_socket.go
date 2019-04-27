@@ -4,6 +4,7 @@ import (
 	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/chat/chat_db"
 	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/shared/formats"
 	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/shared/http-utils/handlers"
+	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/shared/settings/chat"
 	"github.com/google/uuid"
 	"github.com/gorilla/websocket"
 	"net/http"
@@ -68,7 +69,7 @@ func (cs *ChatSocket) Read() bool {
 		}
 		m.Timestamp = time.Now()
 
-		err := m.Save(chat_db.DB())
+		err := m.Save(chat_settings.DB())
 		if err != nil {
 			handlers.WSLogError(cs.Request, formats.ErrSqlFailure, cs.Id, err)
 			return cs.WriteJSON(ServiceMessage{formats.ErrSqlFailure, "error"})

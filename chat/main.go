@@ -2,25 +2,24 @@ package main
 
 import (
 	"context"
+	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/shared/settings/chat"
 	"net/http"
 	"os"
 	"os/signal"
 	"time"
 
 	"github.com/google/logger"
-
-	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/shared/settings/game"
 )
 
 func main() {
-	file, log, conn := game_settings.SetUp()
+	file, log, conn := chat_settings.SetUp()
 	//noinspection GoUnhandledErrorResult
 	defer file.Close()
 	defer log.Close()
 	//noinspection GoUnhandledErrorResult
 	defer conn.Close()
 
-	s := Server(*game_settings.GamePort)
+	s := Server(*chat_settings.ChatPort)
 	logger.Info("Listening at ", s.Addr)
 	go func() {
 		if err := s.ListenAndServe(); err != nil {
