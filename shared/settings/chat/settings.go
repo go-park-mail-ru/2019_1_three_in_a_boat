@@ -32,7 +32,7 @@ func SetUp() (*os.File, *logger.Logger, *grpc.ClientConn) {
 	logFile, l := shared.SetUpLog(*LogPath, *Verbose, *SysLog)
 
 	// triggering the do.Once for logging and triggering fatal errors
-	shared.DB()
+	DB()
 	shared.GetAllowedOrigins()
 	conn := shared.AuthConn(*AuthAddress)
 	shared.AuthClient = pb.NewAuthClient(conn)
