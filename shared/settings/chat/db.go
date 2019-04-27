@@ -26,8 +26,8 @@ func SetDbParams(pwd, username, host, name string) {
 	setDbParamsOnce.Do(func() {
 		if pwd != "" {
 			dbPassword = pwd
-		} else if os.Getenv("PGPASSWORD") != "" {
-			dbPassword = os.Getenv("PGPASSWORD")
+		} else if os.Getenv("CHAT_PGPASSWORD") != "" {
+			dbPassword = os.Getenv("CHAT_PGPASSWORD")
 		} else {
 			logger.Warningln("Using debug password")
 		}
