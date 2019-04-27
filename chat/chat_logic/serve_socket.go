@@ -22,7 +22,7 @@ type ChatSocket struct {
 
 type ServiceMessage struct {
 	Code string `json:"message"`
-	Type string `json:"string"`
+	Type string `json:"type"`
 }
 
 func NewChatSocket(conn *websocket.Conn, r *http.Request) *ChatSocket {
