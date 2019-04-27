@@ -132,8 +132,8 @@ func GetUserMany(_db Queryable, order []SelectOrder,
 		return nil, err
 	}
 
-	limitStr := makeLimitString(limit)
-	offsetStr := makeOffsetString(offset)
+	limitStr := MakeLimitString(limit)
+	offsetStr := MakeOffsetString(offset)
 
 	return _db.Query(`SELECT a."uid", a."username", a."email", a."password", 
                            p."first_name", p."last_name", p."high_score",

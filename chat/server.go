@@ -19,7 +19,7 @@ import (
 
 // Maps URL paths into corresponding routes.Routes
 var RoutesMap = map[string]http_utils.Handler{
-	"/play": &SinglePlayHandler{},
+	"/chat": &ChatHandler{},
 }
 
 var globalRouter = http.ServeMux{}

@@ -3,3 +3,7 @@ logs/*.log
 secret.rsa
 media/images/(!default.png)
 *.pb.go
+run-auth
+run-game
+run-server
+run-chat

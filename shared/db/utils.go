@@ -42,7 +42,7 @@ func makeOrderString(orderMap map[string]string, order []SelectOrder) (string, e
 
 // Makes a valid SQL LIMIT statement based on provided limit.
 // If limit is negative, returns an empty string
-func makeLimitString(limit int) string {
+func MakeLimitString(limit int) string {
 	if limit < 0 {
 		return ""
 	} else {
@@ -52,7 +52,7 @@ func makeLimitString(limit int) string {
 
 // Makes a valid SQL OFFSET statement based on provided limit.
 // If limit is negative or zero, returns an empty string
-func makeOffsetString(offset int) string {
+func MakeOffsetString(offset int) string {
 	if offset <= 0 {
 		return ""
 	} else {

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/chat/chat_logic"
 	"net/http"
 
 	"github.com/gorilla/websocket"
@@ -18,6 +19,7 @@ var upgrader = websocket.Upgrader{
 	ReadBufferSize:  1024,
 	WriteBufferSize: 1024,
 	CheckOrigin: func(r *http.Request) bool {
+		return true // PepegaChamp
 		origin := r.Header.Get("Origin")
 		_, allowed := settings.GetAllowedOrigins()[origin]
 		return allowed
@@ -30,12 +32,8 @@ func (h *ChatHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	claims, _ := formats.AuthFromContext(r.Context())
-
-	var uid int64 = 0
-	if claims != nil {
-		uid = claims.Uid
-	}
+	chat := chat_logic.NewChatSocket(conn, r)
+	chat.Run()
 }
 
 func (h *ChatHandler) Settings() map[string]http_utils.RouteSettings {

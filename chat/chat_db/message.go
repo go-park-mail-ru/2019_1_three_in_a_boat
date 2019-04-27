@@ -1,4 +1,4 @@
-package messages
+package chat_db
 
 import (
 	"database/sql"
@@ -17,7 +17,7 @@ type Message struct {
 func (m *Message) Save(_db db.Queryable) error {
 	if m.Pk == 0 {
 		return _db.QueryRow(
-			`INSERT INTO message (uid, text) VALUES ($1, $2)`,
+			`INSERT INTO message (uid, message) VALUES ($1, $2) RETURNING ID`,
 			m.Uid, m.Text).Scan(&m.Pk)
 	} else {
 		return errors.New("editing not implemented")
@@ -29,8 +29,8 @@ func GetLastNMessages(_db db.Queryable, limit int, offset int) (*sql.Rows, error
 	offsetStr := db.MakeOffsetString(offset)
 
 	return _db.Query(
-		`SELECT m."id", m."uid", m."text", m."timestamp",
-            FROM message m ORDER BY m."timestamp" DESC ` + limitStr + offsetStr)
+		`SELECT m."id", m."uid", m."message", m."created"
+            FROM message m ORDER BY m."created" DESC ` + limitStr + offsetStr)
 }
 
 func MessageFromRow(row db.Scanner) (*Message, error) {
