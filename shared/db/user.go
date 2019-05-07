@@ -132,8 +132,8 @@ func GetUserMany(_db Queryable, order []SelectOrder,
 		return nil, err
 	}
 
-	limitStr := makeLimitString(limit)
-	offsetStr := makeOffsetString(offset)
+	limitStr := MakeLimitString(limit)
+	offsetStr := MakeOffsetString(offset)
 
 	return _db.Query(`SELECT a."uid", a."username", a."email", a."password", 
                            p."first_name", p."last_name", p."high_score",
@@ -141,6 +141,19 @@ func GetUserMany(_db Queryable, order []SelectOrder,
                     count(*) OVER() AS n_users
                     FROM account a JOIN profile p ON a.uid = p.uid ` +
 		orderStr + limitStr + offsetStr)
+
+}
+
+func GetBatchByIds(_db Queryable, ids []int64) (*sql.Rows, error) {
+	if len(ids) == 0 {
+		return nil, errors.New("get batch called with empty list")
+	}
+	idsStr := MakeIdsString(ids)
+	return _db.Query(`SELECT a."uid", a."username", a."email", a."password", 
+                           p."first_name", p."last_name", p."high_score",
+                    p."gender", p."img", p."birth_date", p."signup_date"
+                    FROM account a JOIN profile p ON a.uid = p.uid WHERE ` +
+		idsStr)
 
 }
 
@@ -161,6 +174,21 @@ func UserFromRow(row Scanner) (*User, int, error) {
 	} else {
 		u.Profile.Pk = u.Account.Pk
 		return nil, 0, err
+	}
+}
+
+func UserFromBatchRow(row Scanner) (*User, error) {
+	u := &User{&Account{}, &Profile{}}
+	err := row.Scan(&u.Account.Pk, &u.Account.Username, &u.Account.Email,
+		&u.Account.Password, &u.Profile.FirstName, &u.Profile.LastName,
+		&u.Profile.HighScore, &u.Profile.Gender, &u.Profile.Img,
+		&u.Profile.BirthDate, &u.Profile.SignupDate)
+
+	if err == nil {
+		return u, nil
+	} else {
+		u.Profile.Pk = u.Account.Pk
+		return nil, err
 	}
 }
 

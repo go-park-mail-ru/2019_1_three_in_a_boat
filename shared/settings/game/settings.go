@@ -25,6 +25,7 @@ var AuthAddress = flag.String(
 var GamePort = flag.Int("p", shared.DefaultGamePort, "game port")
 
 func SetUp() (*os.File, *logger.Logger, *grpc.ClientConn) {
+	flag.Parse()
 	// using flag.Parse in init is discouraged so using this function which must
 	// be called explicitly instead. Also logfiles need to be closed and we can't
 	// return from init.

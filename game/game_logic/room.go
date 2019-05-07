@@ -3,7 +3,9 @@ package game_logic
 import (
 	"math"
 	"net/http"
+	"sync/atomic"
 	"time"
+	"unsafe"
 
 	"github.com/google/uuid"
 	"github.com/gorilla/websocket"
@@ -30,8 +32,31 @@ func (r *MultiPlayerRoom) IsSinglePlayer() bool {
 	return r.Player2 == nil
 }
 
+type atomicConn struct {
+	p unsafe.Pointer
+}
+
+//noinspection GoExportedFuncWithUnexportedType
+func NewAtomicConn(conn *websocket.Conn) atomicConn {
+	ac := atomicConn{}
+	ac.Load(conn)
+	return ac
+}
+
+func (ac *atomicConn) Get() *websocket.Conn {
+	return (*websocket.Conn)(atomic.LoadPointer(&ac.p))
+}
+
+func (ac *atomicConn) Reset() {
+	atomic.StorePointer(&ac.p, nil)
+}
+
+func (ac *atomicConn) Load(conn *websocket.Conn) {
+	atomic.StorePointer(&ac.p, unsafe.Pointer(conn))
+}
+
 type SinglePlayerRoom struct {
-	Conn      *websocket.Conn
+	Conn      atomicConn
 	Uid       int64
 	RoomId    RoomId
 	Snapshot  Snapshot
@@ -45,21 +70,18 @@ func (spr *SinglePlayerRoom) Id() RoomId {
 }
 
 func (spr *SinglePlayerRoom) Disconnect() {
-	spr.Conn = nil
+	spr.Conn.Reset()
 	if spr.Snapshot.State == StateRunning {
 		spr.Snapshot.State = StateDisconnect
 	}
 }
 
-func (spr *SinglePlayerRoom) Connected() bool {
-	return spr.Conn != nil
-}
-
 func (spr *SinglePlayerRoom) Reconnect(conn *websocket.Conn) {
-	if spr.Connected() {
+	prev := spr.Conn.Get()
+	if prev != nil {
 		panic("an attempt to reconnect a connected game")
 	}
-	spr.Conn = conn
+	spr.Conn.Load(conn)
 	spr.Snapshot.State = StateRunning
 }
 
@@ -67,8 +89,9 @@ func (spr *SinglePlayerRoom) Reconnect(conn *websocket.Conn) {
 // assumption is, JSON always marshals. The logs will show if it's a disconnect
 // or a JSON marshaling error.
 func (spr *SinglePlayerRoom) WriteJSON(v interface{}) bool {
-	if spr.Connected() {
-		err := spr.Conn.WriteJSON(v)
+	conn := spr.Conn.Get()
+	if conn != nil {
+		err := conn.WriteJSON(v)
 		if handlers.WSHandleErrForward(
 			spr.Request, formats.ErrWebSocketFailure, spr.RoomId, err) != nil {
 			spr.Disconnect()
@@ -83,32 +106,28 @@ func (spr *SinglePlayerRoom) WriteJSON(v interface{}) bool {
 
 // Same as WriteJSON - invalid JSON = disconnect.
 func (spr *SinglePlayerRoom) ReadJSON(v interface{}) bool {
-	if spr.Connected() {
-		err := spr.Conn.ReadJSON(v)
+	conn := spr.Conn.Get()
+	if conn != nil {
+		err := conn.ReadJSON(v)
 		if handlers.WSHandleErrForward(
 			spr.Request, formats.ErrWebSocketFailure, spr.RoomId, err) != nil {
 			spr.Disconnect()
 			return false
-		} else {
-			return true
 		}
-	}
-
-	return false
-}
-
-func (spr *SinglePlayerRoom) ReadInput() bool {
-	if spr.ReadJSON(&spr.LastInput) {
 		return true
 	}
 
 	return false
 }
 
+func (spr *SinglePlayerRoom) ReadInput() bool {
+	return spr.ReadJSON(&spr.LastInput)
+}
+
 func NewSinglePlayerRoom(
 	r *http.Request, p1uid int64, conn *websocket.Conn) *SinglePlayerRoom {
 	room := &SinglePlayerRoom{
-		Conn:      conn,
+		Conn:      NewAtomicConn(conn),
 		Uid:       p1uid,
 		RoomId:    uuid.New().String(),
 		Snapshot:  NewSnapshot(),
@@ -147,8 +166,9 @@ func (spr *SinglePlayerRoom) Tick() (isOver bool) {
 func (spr *SinglePlayerRoom) FinishGame() {
 	spr.WriteJSON(
 		SinglePlayerSnapshotData{Over: true, Score: spr.Snapshot.Score})
-	if spr.Conn != nil {
-		_ = spr.Conn.Close()
+	conn := spr.Conn.Get()
+	if conn != nil {
+		_ = conn.Close()
 	}
 	spr.Disconnect()
 	handlers.WSLogInfo(spr.Request, "Closing socket", spr.RoomId)
@@ -166,8 +186,9 @@ func (spr *SinglePlayerRoom) ReadLoop() {
 
 func (spr *SinglePlayerRoom) Run(r *http.Request, reconnect bool) {
 	go spr.ReadLoop()
-	if spr.Connected() {
-		err := spr.Conn.WriteMessage(websocket.TextMessage, []byte(spr.RoomId))
+	conn := spr.Conn.Get()
+	if conn != nil {
+		err := conn.WriteMessage(websocket.TextMessage, []byte(spr.RoomId))
 		if err != nil {
 			handlers.LogError(0, "WS: unexpected disconnect", r)
 		}
