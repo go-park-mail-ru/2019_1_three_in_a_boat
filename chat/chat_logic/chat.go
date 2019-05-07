@@ -3,7 +3,7 @@ package chat_logic
 import (
 	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/chat/chat_db"
 	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/shared/formats"
-	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/shared/settings/chat"
+	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/shared/settings/shared"
 	"github.com/google/logger"
 	"sync"
 )
@@ -23,7 +23,7 @@ func WriteToAll(message chat_db.Message) {
 }
 
 func GetLastMessages() []*chat_db.Message {
-	rows, err := chat_db.GetLastNMessages(chat_settings.DB(), 20, 0)
+	rows, err := chat_db.GetLastNMessages(settings.DB(), 20, 0)
 	if err != nil {
 		logger.Error(formats.ErrSqlFailure, ": ", err)
 		return nil

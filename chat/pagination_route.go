@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/chat/chat_db"
-	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/shared/settings/chat"
+	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/shared/settings/shared"
 	"net/http"
 	"strconv"
 
@@ -29,7 +29,7 @@ func (h *ChatPaginationHandler) ServeHTTP(w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	rows, err := chat_db.GetNMessagesSince(chat_settings.DB(), 20, msgIdInt)
+	rows, err := chat_db.GetNMessagesSince(settings.DB(), 20, msgIdInt)
 	if HandleErrForward(w, r, formats.ErrSqlFailure, err) != nil {
 		return
 	}

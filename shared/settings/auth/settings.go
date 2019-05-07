@@ -34,6 +34,7 @@ var SysLog = flag.Bool("sl", false, "log to syslog")
 var AuthPort = flag.Int("p", shared.DefaultAuthPort, "auth service port (must be shared across all services)")
 
 func SetUp() (*os.File, *logger.Logger) {
+	flag.Parse()
 	// using flag.Parse in init is discouraged so using this function which must
 	// be called explicitly instead
 

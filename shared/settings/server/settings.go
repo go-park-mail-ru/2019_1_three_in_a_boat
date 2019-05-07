@@ -29,6 +29,7 @@ var AuthAddress = flag.String(
 	"auth service address (with port)")
 
 func SetUp() (*os.File, *logger.Logger, *grpc.ClientConn) {
+	flag.Parse()
 	logFile, l := shared.SetUpLog(*LogPath, *Verbose, *SysLog)
 
 	// triggering the do.Once for logging and triggering fatal errors

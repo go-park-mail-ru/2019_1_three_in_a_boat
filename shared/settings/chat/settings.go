@@ -25,6 +25,7 @@ var AuthAddress = flag.String(
 var ChatPort = flag.Int("p", shared.DefaultChatPort, "chat port")
 
 func SetUp() (*os.File, *logger.Logger, *grpc.ClientConn) {
+	flag.Parse()
 	// using flag.Parse in init is discouraged so using this function which must
 	// be called explicitly instead. Also logfiles need to be closed and we can't
 	// return from init.
@@ -32,7 +33,7 @@ func SetUp() (*os.File, *logger.Logger, *grpc.ClientConn) {
 	logFile, l := shared.SetUpLog(*LogPath, *Verbose, *SysLog)
 
 	// triggering the do.Once for logging and triggering fatal errors
-	DB()
+	shared.DB()
 	shared.GetAllowedOrigins()
 	conn := shared.AuthConn(*AuthAddress)
 	shared.AuthClient = pb.NewAuthClient(conn)

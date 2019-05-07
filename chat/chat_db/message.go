@@ -8,10 +8,10 @@ import (
 )
 
 type Message struct {
-	Pk        int64     `json:"mid,omitempty"`
-	Uid       int64     `json:"uid,omitempty"`
-	Text      string    `json:"text"`
-	Timestamp time.Time `json:"timestamp"`
+	Pk        int64        `json:"mid"`
+	Uid       db.NullInt64 `json:"uid,omitempty"`
+	Text      string       `json:"text"`
+	Timestamp time.Time    `json:"timestamp"`
 }
 
 func (m *Message) Save(_db db.Queryable) error {
