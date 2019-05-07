@@ -111,9 +111,14 @@ func (mpr *MultiPlayerRoom) connWriteText(
 // assumption is, JSON always marshals. The logs will show if it's a disconnect
 // or a JSON marshaling error.
 func (mpr *MultiPlayerRoom) WriteJSON(
+	v1 interface{}, v2 interface{}) (ok1 bool, ok2 bool) {
+	return mpr.connWriteJSON(v1, mpr.Conn1, mpr.Request1),
+		mpr.connWriteJSON(v2, mpr.Conn2, mpr.Request2)
+}
+
+func (mpr *MultiPlayerRoom) WriteSameJSON(
 	v interface{}) (ok1 bool, ok2 bool) {
-	return mpr.connWriteJSON(v, mpr.Conn1, mpr.Request1),
-		mpr.connWriteJSON(v, mpr.Conn2, mpr.Request2)
+	return mpr.WriteJSON(v, v)
 }
 
 // Same as WriteJSON - invalid JSON = disconnect.
@@ -148,11 +153,22 @@ func (mpr *MultiPlayerRoom) Tick() {
 		MultiPlayerSnapshotData{
 			Over1:             false,
 			Over2:             false,
+			OtherAngle:        mpr.LastInput2.Angle(),
 			Score1:            mpr.Score1,
 			Score2:            mpr.Score2,
 			Hexagons:          mpr.Snapshot.Hexagons,
 			CursorCircleAngle: mpr.Snapshot.CursorCircleAngle,
-		})
+		},
+		MultiPlayerSnapshotData{
+			Over1:             false,
+			Over2:             false,
+			OtherAngle:        mpr.LastInput1.Angle(),
+			Score1:            mpr.Score1,
+			Score2:            mpr.Score2,
+			Hexagons:          mpr.Snapshot.Hexagons,
+			CursorCircleAngle: mpr.Snapshot.CursorCircleAngle,
+		},
+	)
 
 	isOver := mpr.Snapshot.IsMultiplayerGameOver(mpr.LastInput1, mpr.LastInput2)
 
@@ -171,7 +187,7 @@ func (mpr *MultiPlayerRoom) Tick() {
 }
 
 func (mpr *MultiPlayerRoom) FinishGame() {
-	mpr.WriteJSON(
+	mpr.WriteSameJSON(
 		MultiPlayerSnapshotData{
 			Over1:  false,
 			Over2:  false,
@@ -204,8 +220,8 @@ func (mpr *MultiPlayerRoom) ReadLoop() {
 }
 
 func (mpr *MultiPlayerRoom) Run() {
-	ok1 := mpr.connWriteText([]byte(mpr.RoomId), mpr.Conn1, mpr.Request1)
-	ok2 := mpr.connWriteText([]byte(mpr.RoomId), mpr.Conn2, mpr.Request2)
+	ok1 := mpr.connWriteText([]byte(string(mpr.RoomId)+" 1"), mpr.Conn1, mpr.Request1)
+	ok2 := mpr.connWriteText([]byte(string(mpr.RoomId)+" 2"), mpr.Conn2, mpr.Request2)
 
 	if !ok1 && !ok2 {
 		return
@@ -225,6 +241,7 @@ func (mpr *MultiPlayerRoom) Run() {
 type MultiPlayerSnapshotData struct {
 	Over1             bool      `json:"over1,omitempty"`
 	Over2             bool      `json:"over2,omitempty"`
+	OtherAngle        float64   `json:"otherAngle"`
 	Score1            int64     `json:"score1"`
 	Score2            int64     `json:"score2"`
 	Hexagons          []Hexagon `json:"hexes"`
