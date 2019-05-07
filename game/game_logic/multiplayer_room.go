@@ -151,8 +151,8 @@ func (mpr *MultiPlayerRoom) ReadInput() (ok1 bool, ok2 bool) {
 func (mpr *MultiPlayerRoom) Tick() {
 	mpr.WriteJSON(
 		MultiPlayerSnapshotData{
-			Over1:             false,
-			Over2:             false,
+			Over1:             mpr.Snapshot.State == StateOverPlayer1,
+			Over2:             mpr.Snapshot.State == StateOverPlayer2,
 			OtherAngle:        mpr.LastInput2.Angle(),
 			Score1:            mpr.Score1,
 			Score2:            mpr.Score2,
@@ -160,8 +160,8 @@ func (mpr *MultiPlayerRoom) Tick() {
 			CursorCircleAngle: mpr.Snapshot.CursorCircleAngle,
 		},
 		MultiPlayerSnapshotData{
-			Over1:             false,
-			Over2:             false,
+			Over1:             mpr.Snapshot.State == StateOverPlayer1,
+			Over2:             mpr.Snapshot.State == StateOverPlayer2,
 			OtherAngle:        mpr.LastInput1.Angle(),
 			Score1:            mpr.Score1,
 			Score2:            mpr.Score2,
@@ -189,8 +189,8 @@ func (mpr *MultiPlayerRoom) Tick() {
 func (mpr *MultiPlayerRoom) FinishGame() {
 	mpr.WriteSameJSON(
 		MultiPlayerSnapshotData{
-			Over1:  false,
-			Over2:  false,
+			Over1:  true,
+			Over2:  true,
 			Score1: mpr.Score1,
 			Score2: mpr.Score2,
 		})
