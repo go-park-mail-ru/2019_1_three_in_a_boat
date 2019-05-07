@@ -1,0 +1,82 @@
+version: '3.2'
+
+services:
+
+  db:
+    image: postgres:10.7-alpine
+    volumes:
+      - ./postgres-data:/var/lib/postgresql/10/main
+    networks:
+      - hexagon
+
+  auth:
+    build:
+      context: ../..
+      dockerfile: Dockerfile.auth
+    image: hexagon-auth
+    command: run-auth -p 3001 -v -l /app/server.log
+    networks:
+      - hexagon
+    depends_on:
+      - db
+    deploy:
+      restart_policy:
+        condition: on-failure
+    env_file:
+      - postgres.env
+
+  chat:
+    build:
+      context: ../..
+      dockerfile: Dockerfile.chat
+    image: hexagon-chat
+    command: run-chat -p 3003 -v -l /app/chat.log -auth auth:3003
+    networks:
+      - hexagon
+    depends_on:
+      - auth
+      - db
+    deploy:
+      restart_policy:
+        condition: on-failure
+    env_file:
+      - postgres.env
+
+  game:
+    build:
+      context: ../..
+      dockerfile: Dockerfile.game
+    image: hexagon-game
+    command: run-game -p 3002 -v -l /app/game.log -auth auth:3002
+    networks:
+      - hexagon
+    depends_on:
+      - auth
+      - db
+    deploy:
+      restart_policy:
+        condition: on-failure
+    env_file:
+      - postgres.env
+
+  server:
+    build:
+      context: ../..
+      dockerfile: Dockerfile.server
+    image: hexagon-server
+    command: run-server -p 3000 -v -l /app/server.log -auth auth:3000
+    networks:
+      - hexagon
+    depends_on:
+      - auth
+      - db
+    deploy:
+      restart_policy:
+        condition: on-failure
+    env_file:
+      - postgres.env
+
+
+networks:
+  hexagon:
+
