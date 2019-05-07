@@ -17,6 +17,7 @@ require (
 	github.com/hashicorp/golang-lru v0.5.1 // indirect
 	github.com/lib/pq v1.0.0
 	github.com/nbutton23/zxcvbn-go v0.0.0-20180912185939-ae427f1e4c1d
+	github.com/sheerun/queue v1.0.0
 	github.com/stretchr/objx v0.1.1 // indirect
 	github.com/stretchr/testify v1.3.0 // indirect
 	go.uber.org/atomic v1.3.2

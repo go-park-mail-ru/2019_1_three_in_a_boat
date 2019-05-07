@@ -2,11 +2,17 @@ package game_logic
 
 import (
 	"math"
+	"net/http"
 	"sync"
 	"time"
+
+	"github.com/gorilla/websocket"
 )
 
-var Game game
+var Game = game{
+	Rooms:        sync.Map{},
+	WaitingRooms: nil,
+}
 
 var Settings = gameSettings{
 	PlayerCircleRadius:    70,
@@ -31,7 +37,9 @@ type game struct {
 	// the map stores pointers to Rooms, and despite being thread-safe
 	// one room must not be modified concurrently, in the app a single room
 	// is handled by a single goroutine
-	Rooms sync.Map
+	Rooms        sync.Map
+	WaitingRooms []*MultiPlayerRoom
+	mu           sync.Mutex
 }
 
 type gameSettings struct {
@@ -49,11 +57,26 @@ type gameSettings struct {
 	SameDirectionDuration float64
 }
 
-func LoadOrStoreSinglePlayRoom(room Room) (Room, bool) {
+func LoadOrStoreRoom(room Room) (Room, bool) {
 	actual, ok := Game.Rooms.LoadOrStore(string(room.Id()), room)
 	r := actual.(Room)
 	return r, ok
+}
 
+// TODO: send a test message to make sure the socket hasn't disconnected
+func GetOrCreateMPRoom(
+	r *http.Request, uid int64, conn *websocket.Conn) (*MultiPlayerRoom, bool) {
+	Game.mu.Lock()
+	defer Game.mu.Unlock()
+	l := len(Game.WaitingRooms)
+	if l != 0 {
+		first := Game.WaitingRooms[0]
+		Game.WaitingRooms = Game.WaitingRooms[1:]
+		return first, true
+	} else {
+		Game.WaitingRooms = append(Game.WaitingRooms, NewMultiPlayerRoom(r, uid, conn))
+		return Game.WaitingRooms[0], false
+	}
 }
 
 func init() {
