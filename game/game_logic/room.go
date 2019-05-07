@@ -113,20 +113,15 @@ func (spr *SinglePlayerRoom) ReadJSON(v interface{}) bool {
 			spr.Request, formats.ErrWebSocketFailure, spr.RoomId, err) != nil {
 			spr.Disconnect()
 			return false
-		} else {
-			return true
 		}
+		return true
 	}
 
 	return false
 }
 
 func (spr *SinglePlayerRoom) ReadInput() bool {
-	if spr.ReadJSON(&spr.LastInput) {
-		return true
-	}
-
-	return false
+	return spr.ReadJSON(&spr.LastInput)
 }
 
 func NewSinglePlayerRoom(
