@@ -1,6 +1,7 @@
 package game_logic
 
 import (
+	"encoding/json"
 	"math"
 	"net/http"
 	"time"
@@ -39,7 +40,7 @@ func NewMultiPlayerRoom(
 		Uid1:       uid,
 		Uid2:       0,
 		LastInput1: NewInput(-math.Pi / 2),
-		LastInput2: NewInput(-math.Pi / 2),
+		LastInput2: NewInput(math.Pi / 2),
 		Request1:   r,
 		Request2:   nil,
 		RoomId:     uuid.New().String(),
@@ -59,7 +60,7 @@ func (mpr *MultiPlayerRoom) Id() RoomId {
 	return mpr.RoomId
 }
 
-func (mpr *MultiPlayerRoom) Disconnect(_conn atomicConn) {
+func (mpr *MultiPlayerRoom) Disconnect(_conn *atomicConn) {
 	conn := _conn.Get()
 	if conn != nil {
 		_ = conn.Close()
@@ -68,15 +69,15 @@ func (mpr *MultiPlayerRoom) Disconnect(_conn atomicConn) {
 }
 
 func (mpr *MultiPlayerRoom) Disconnect1() {
-	mpr.Disconnect(mpr.Conn1)
+	mpr.Disconnect(&mpr.Conn1)
 }
 
 func (mpr *MultiPlayerRoom) Disconnect2() {
-	mpr.Disconnect(mpr.Conn2)
+	mpr.Disconnect(&mpr.Conn2)
 }
 
 func (mpr *MultiPlayerRoom) connWriteJSON(
-	v interface{}, _conn atomicConn, r *http.Request) bool {
+	v interface{}, _conn *atomicConn, r *http.Request) bool {
 	conn := _conn.Get()
 	if conn != nil {
 		err := conn.WriteJSON(v)
@@ -92,7 +93,7 @@ func (mpr *MultiPlayerRoom) connWriteJSON(
 }
 
 func (mpr *MultiPlayerRoom) connWriteText(
-	message []byte, _conn atomicConn, r *http.Request) bool {
+	message []byte, _conn *atomicConn, r *http.Request) bool {
 	conn := _conn.Get()
 	if conn != nil {
 		err := conn.WriteMessage(websocket.TextMessage, message)
@@ -112,8 +113,8 @@ func (mpr *MultiPlayerRoom) connWriteText(
 // or a JSON marshaling error.
 func (mpr *MultiPlayerRoom) WriteJSON(
 	v1 interface{}, v2 interface{}) (ok1 bool, ok2 bool) {
-	return mpr.connWriteJSON(v1, mpr.Conn1, mpr.Request1),
-		mpr.connWriteJSON(v2, mpr.Conn2, mpr.Request2)
+	return mpr.connWriteJSON(v1, &mpr.Conn1, mpr.Request1),
+		mpr.connWriteJSON(v2, &mpr.Conn2, mpr.Request2)
 }
 
 func (mpr *MultiPlayerRoom) WriteSameJSON(
@@ -123,10 +124,12 @@ func (mpr *MultiPlayerRoom) WriteSameJSON(
 
 // Same as WriteJSON - invalid JSON = disconnect.
 func (mpr *MultiPlayerRoom) connReadJSON(
-	v interface{}, _conn atomicConn, r *http.Request) bool {
+	v interface{}, _conn *atomicConn, r *http.Request) bool {
 	conn := _conn.Get()
 	if conn != nil {
 		err := conn.ReadJSON(v)
+		b := v.(*Input).Angle()
+		json.Marshal(b)
 		if handlers.WSHandleErrForward(
 			r, formats.ErrWebSocketFailure, mpr.RoomId, err) != nil {
 			mpr.Disconnect(_conn)
@@ -140,8 +143,8 @@ func (mpr *MultiPlayerRoom) connReadJSON(
 
 func (mpr *MultiPlayerRoom) ReadJSON(
 	v1 interface{}, v2 interface{}) (ok1 bool, ok2 bool) {
-	return mpr.connReadJSON(v1, mpr.Conn1, mpr.Request1),
-		mpr.connReadJSON(v2, mpr.Conn2, mpr.Request2)
+	return mpr.connReadJSON(v1, &mpr.Conn1, mpr.Request1),
+		mpr.connReadJSON(v2, &mpr.Conn2, mpr.Request2)
 }
 
 func (mpr *MultiPlayerRoom) ReadInput() (ok1 bool, ok2 bool) {
@@ -210,18 +213,21 @@ func (mpr *MultiPlayerRoom) FinishGame() {
 	// Game.Rooms.Delete(string(mpr.RoomId)) // these are only stored in the queue
 }
 
-func (mpr *MultiPlayerRoom) ReadLoop() {
-	for {
-		ok1, ok2 := mpr.ReadInput()
-		if !ok1 && !ok2 {
-			break
-		}
+func (mpr *MultiPlayerRoom) ReadLoop1() {
+	for mpr.connReadJSON(mpr.LastInput1, &mpr.Conn1, mpr.Request1) {
+		mpr.Conn2 = mpr.Conn2
+	}
+}
+
+func (mpr *MultiPlayerRoom) ReadLoop2() {
+	for mpr.connReadJSON(mpr.LastInput2, &mpr.Conn2, mpr.Request2) {
+		mpr.Conn1 = mpr.Conn1
 	}
 }
 
 func (mpr *MultiPlayerRoom) Run() {
-	ok1 := mpr.connWriteText([]byte(string(mpr.RoomId)+" 1"), mpr.Conn1, mpr.Request1)
-	ok2 := mpr.connWriteText([]byte(string(mpr.RoomId)+" 2"), mpr.Conn2, mpr.Request2)
+	ok1 := mpr.connWriteText([]byte(string(mpr.RoomId)+" 1"), &mpr.Conn1, mpr.Request1)
+	ok2 := mpr.connWriteText([]byte(string(mpr.RoomId)+" 2"), &mpr.Conn2, mpr.Request2)
 
 	if !ok1 && !ok2 {
 		return
@@ -230,7 +236,8 @@ func (mpr *MultiPlayerRoom) Run() {
 	time.Sleep(time.Second * 3)
 
 	mpr.Snapshot.State = StateRunning
-	go mpr.ReadLoop()
+	go mpr.ReadLoop1()
+	go mpr.ReadLoop2()
 	tick := time.Tick(Settings.TickDuration)
 	for mpr.Snapshot.State != StateOverBoth {
 		<-tick
