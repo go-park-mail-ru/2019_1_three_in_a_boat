@@ -156,7 +156,7 @@ func (mpr *MultiPlayerRoom) Tick() {
 		MultiPlayerSnapshotData{
 			Over1:             mpr.Snapshot.State == StateOverPlayer1,
 			Over2:             mpr.Snapshot.State == StateOverPlayer2,
-			OtherAngle:        mpr.LastInput2.Angle(),
+			OtherAngle:        -1 * mpr.LastInput2.Angle(),
 			Score1:            mpr.Score1,
 			Score2:            mpr.Score2,
 			Hexagons:          mpr.Snapshot.Hexagons,
@@ -165,7 +165,7 @@ func (mpr *MultiPlayerRoom) Tick() {
 		MultiPlayerSnapshotData{
 			Over1:             mpr.Snapshot.State == StateOverPlayer1,
 			Over2:             mpr.Snapshot.State == StateOverPlayer2,
-			OtherAngle:        mpr.LastInput1.Angle(),
+			OtherAngle:        -1 * mpr.LastInput1.Angle(),
 			Score1:            mpr.Score1,
 			Score2:            mpr.Score2,
 			Hexagons:          mpr.Snapshot.Hexagons,
