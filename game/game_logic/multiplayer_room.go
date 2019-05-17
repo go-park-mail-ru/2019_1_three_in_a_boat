@@ -128,8 +128,6 @@ func (mpr *MultiPlayerRoom) connReadJSON(
 	conn := _conn.Get()
 	if conn != nil {
 		err := conn.ReadJSON(v)
-		b := v.(*Input).Angle()
-		json.Marshal(b)
 		if handlers.WSHandleErrForward(
 			r, formats.ErrWebSocketFailure, mpr.RoomId, err) != nil {
 			mpr.Disconnect(_conn)
