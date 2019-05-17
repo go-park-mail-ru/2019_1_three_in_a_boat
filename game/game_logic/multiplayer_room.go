@@ -3,6 +3,7 @@ package game_logic
 import (
 	"math"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/google/uuid"
@@ -223,8 +224,24 @@ func (mpr *MultiPlayerRoom) ReadLoop2() {
 }
 
 func (mpr *MultiPlayerRoom) Run() {
-	ok1 := mpr.connWriteText([]byte(string(mpr.RoomId)+" 1"), &mpr.Conn1, mpr.Request1)
-	ok2 := mpr.connWriteText([]byte(string(mpr.RoomId)+" 2"), &mpr.Conn2, mpr.Request2)
+	var uid1 int64 = 0
+	var uid2 int64 = 0
+	claims, ok := formats.AuthFromContext(mpr.Request1.Context())
+	if ok && claims != nil {
+		uid1 = claims.Uid
+	}
+	claims, ok = formats.AuthFromContext(mpr.Request2.Context())
+	if ok && claims != nil {
+		uid2 = claims.Uid
+	}
+	ok1 := mpr.connWriteText(
+		[]byte(string(mpr.RoomId)+" 1"+strconv.Itoa(int(uid2))),
+		&mpr.Conn1,
+		mpr.Request1)
+	ok2 := mpr.connWriteText(
+		[]byte(string(mpr.RoomId)+" 2"+strconv.Itoa(int(uid1))),
+		&mpr.Conn2,
+		mpr.Request2)
 
 	if !ok1 && !ok2 {
 		return
