@@ -235,11 +235,11 @@ func (mpr *MultiPlayerRoom) Run() {
 		uid2 = claims.Uid
 	}
 	ok1 := mpr.connWriteText(
-		[]byte(string(mpr.RoomId)+" 1"+strconv.Itoa(int(uid2))),
+		[]byte(string(mpr.RoomId)+" 1 "+strconv.Itoa(int(uid2))),
 		&mpr.Conn1,
 		mpr.Request1)
 	ok2 := mpr.connWriteText(
-		[]byte(string(mpr.RoomId)+" 2"+strconv.Itoa(int(uid1))),
+		[]byte(string(mpr.RoomId)+" 2 "+strconv.Itoa(int(uid1))),
 		&mpr.Conn2,
 		mpr.Request2)
 
