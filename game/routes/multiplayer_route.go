@@ -3,6 +3,9 @@ package routes
 import (
 	"fmt"
 	"net/http"
+	"time"
+
+	"github.com/gorilla/websocket"
 
 	. "github.com/go-park-mail-ru/2019_1_three_in_a_boat/shared/http-utils/handlers"
 
@@ -29,6 +32,15 @@ func (h *MultiPlayHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	room, ready := game_logic.GetOrCreateMPRoom(r, uid, conn)
+	conn.SetCloseHandler(func(code int, text string) error {
+		_ = conn.WriteControl(
+			websocket.CloseMessage,
+			websocket.FormatCloseMessage(code, text),
+			time.Now().Add(time.Second))
+		game_logic.DisconnectMPRoom(room)
+		return nil
+	})
+
 	if ready {
 		room.ConnectSecondPlayer(r, uid, conn)
 		room.Run()

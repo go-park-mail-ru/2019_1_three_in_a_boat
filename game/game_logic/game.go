@@ -63,7 +63,20 @@ func LoadOrStoreRoom(room Room) (Room, bool) {
 	return r, ok
 }
 
-// TODO: send a test message to make sure the socket hasn't disconnected
+func DisconnectMPRoom(room *MultiPlayerRoom) {
+	Game.mu.Lock()
+	defer Game.mu.Unlock()
+	for i, r := range Game.WaitingRooms {
+		if r.RoomId == room.Id() {
+			if i != len(Game.WaitingRooms)-1 {
+				Game.WaitingRooms = append(Game.WaitingRooms[:i], Game.WaitingRooms[i+1:]...)
+			} else {
+				Game.WaitingRooms = Game.WaitingRooms[:i]
+			}
+		}
+	}
+
+}
 func GetOrCreateMPRoom(
 	r *http.Request, uid int64, conn *websocket.Conn) (*MultiPlayerRoom, bool) {
 	Game.mu.Lock()
