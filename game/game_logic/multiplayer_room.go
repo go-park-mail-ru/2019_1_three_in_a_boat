@@ -223,6 +223,20 @@ func (mpr *MultiPlayerRoom) ReadLoop2() {
 	}
 }
 
+func (mpr *MultiPlayerRoom) Wait() {
+	conn := mpr.Conn1.Get()
+	conn.SetCloseHandler(func(code int, text string) error {
+		_ = conn.WriteControl(
+			websocket.CloseMessage,
+			websocket.FormatCloseMessage(code, text),
+			time.Now().Add(time.Second))
+		handlers.WSLogInfo(mpr.Request1, "Responding to closed socket: "+text, mpr.Id())
+		DisconnectMPRoom(mpr)
+		return nil
+	})
+	go mpr.ReadLoop1()
+}
+
 func (mpr *MultiPlayerRoom) Run() {
 	var uid1 int64 = 0
 	var uid2 int64 = 0
@@ -250,7 +264,6 @@ func (mpr *MultiPlayerRoom) Run() {
 	time.Sleep(time.Second * 3)
 
 	mpr.Snapshot.State = StateRunning
-	go mpr.ReadLoop1()
 	go mpr.ReadLoop2()
 	tick := time.Tick(Settings.TickDuration)
 	for mpr.Snapshot.State != StateOverBoth {
