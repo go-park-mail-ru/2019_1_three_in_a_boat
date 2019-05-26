@@ -24,7 +24,7 @@ services:
       restart_policy:
         condition: on-failure
     env_file:
-      - postgres.env
+      - stack.env
     ports:
       - "3001:3001"
 
@@ -43,7 +43,7 @@ services:
       restart_policy:
         condition: on-failure
     env_file:
-      - postgres.env
+      - stack.env
     ports:
       - "3003:3003"
 
@@ -62,7 +62,7 @@ services:
       restart_policy:
         condition: on-failure
     env_file:
-      - postgres.env
+      - stack.env
     ports:
       - "3002:3002"
 
@@ -81,7 +81,7 @@ services:
       restart_policy:
         condition: on-failure
     env_file:
-      - postgres.env
+      - stack.env
     ports:
       - "4000:3000"
 
