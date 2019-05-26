@@ -13,7 +13,7 @@ services:
   auth:
     build:
       context: ../..
-      dockerfile: Dockerfile.auth
+      dockerfile: etc/docker/Dockerfile.auth
     image: hexagon-auth
     command: run-auth -p 3001 -v -l /app/server.log
     networks:
@@ -31,7 +31,7 @@ services:
   chat:
     build:
       context: ../..
-      dockerfile: Dockerfile.chat
+      dockerfile: etc/docker/Dockerfile.chat
     image: hexagon-chat
     command: run-chat -p 3003 -v -l /app/chat.log -auth auth:3001
     networks:
@@ -50,7 +50,7 @@ services:
   game:
     build:
       context: ../..
-      dockerfile: Dockerfile.game
+      dockerfile: etc/docker/Dockerfile.game
     image: hexagon-game
     command: run-game -p 3002 -v -l /app/game.log -auth auth:3001
     networks:
@@ -69,7 +69,7 @@ services:
   server:
     build:
       context: ../..
-      dockerfile: Dockerfile.server
+      dockerfile: etc/docker/Dockerfile.server
     image: hexagon-server
     command: run-server -p 3000 -v -l /app/server.log -auth auth:3001
     networks:
