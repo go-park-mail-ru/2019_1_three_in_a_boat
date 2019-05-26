@@ -37,6 +37,7 @@ func (h *MultiPlayHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			websocket.CloseMessage,
 			websocket.FormatCloseMessage(code, text),
 			time.Now().Add(time.Second))
+		WSLogInfo(r, "Responding to closed socket: "+text, room.Id())
 		game_logic.DisconnectMPRoom(room)
 		return nil
 	})
