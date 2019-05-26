@@ -1,0 +1,12 @@
+FROM golang:1.12.4-alpine3.9
+
+# install git, protoc, protoc-gen-go
+RUN apk add --no-cache git protobuf
+RUN go get -u github.com/golang/protobuf/protoc-gen-go
+
+# build the service
+WORKDIR /app
+ADD . /app
+RUN /usr/bin/protoc -I /app/shared/formats/proto /app/shared/formats/proto/auth.proto --go_out=plugins=grpc:/app/shared/formats/pb
+RUN go build -o /usr/bin/run-chat /app/chat
+RUN rm -rf /app/*

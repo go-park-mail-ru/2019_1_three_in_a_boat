@@ -1,0 +1,94 @@
+version: '3.2'
+
+services:
+
+  db:
+    image: postgres:10.7-alpine
+    volumes:
+      - hexagon-data:/var/lib/postgresql/data
+      - ../migrations/bundle.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - hexagon
+
+  auth:
+    build:
+      context: ../..
+      dockerfile: Dockerfile.auth
+    image: hexagon-auth
+    command: run-auth -p 3001 -v -l /app/server.log
+    networks:
+      - hexagon
+    depends_on:
+      - db
+    deploy:
+      restart_policy:
+        condition: on-failure
+    env_file:
+      - postgres.env
+    ports:
+      - "3001:3001"
+
+  chat:
+    build:
+      context: ../..
+      dockerfile: Dockerfile.chat
+    image: hexagon-chat
+    command: run-chat -p 3003 -v -l /app/chat.log -auth auth:3001
+    networks:
+      - hexagon
+    depends_on:
+      - auth
+      - db
+    deploy:
+      restart_policy:
+        condition: on-failure
+    env_file:
+      - postgres.env
+    ports:
+      - "3003:3003"
+
+  game:
+    build:
+      context: ../..
+      dockerfile: Dockerfile.game
+    image: hexagon-game
+    command: run-game -p 3002 -v -l /app/game.log -auth auth:3001
+    networks:
+      - hexagon
+    depends_on:
+      - auth
+      - db
+    deploy:
+      restart_policy:
+        condition: on-failure
+    env_file:
+      - postgres.env
+    ports:
+      - "3002:3002"
+
+  server:
+    build:
+      context: ../..
+      dockerfile: Dockerfile.server
+    image: hexagon-server
+    command: run-server -p 3000 -v -l /app/server.log -auth auth:3001
+    networks:
+      - hexagon
+    depends_on:
+      - auth
+      - db
+    deploy:
+      restart_policy:
+        condition: on-failure
+    env_file:
+      - postgres.env
+    ports:
+      - "3000:3000"
+
+
+networks:
+  hexagon:
+
+volumes:
+  hexagon-data:
+
