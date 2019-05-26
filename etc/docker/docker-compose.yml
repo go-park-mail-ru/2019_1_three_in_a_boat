@@ -83,7 +83,7 @@ services:
     env_file:
       - postgres.env
     ports:
-      - "3000:3000"
+      - "4000:3000"
 
 
 networks:
