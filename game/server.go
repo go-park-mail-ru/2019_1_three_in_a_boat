@@ -6,6 +6,7 @@ package main
 // any logic in it so I think it's fine.
 
 import (
+	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/game/routes"
 	"net/http"
 	"strconv"
 	"sync"
@@ -19,7 +20,8 @@ import (
 
 // Maps URL paths into corresponding routes.Routes
 var RoutesMap = map[string]http_utils.Handler{
-	"/play": &SinglePlayHandler{},
+	"/play":       &routes.SinglePlayHandler{},
+	"/play/multi": &routes.MultiPlayHandler{},
 }
 
 var globalRouter = http.ServeMux{}

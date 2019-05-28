@@ -27,8 +27,8 @@ const (
 )
 
 const (
-	ErrDateOutOfRange          = "E_DATE_OUT_OF_RANGE"
 	ErrBase64Decoding          = "E_INVALID_BASE64"
+	ErrDateOutOfRange          = "E_DATE_OUT_OF_RANGE"
 	ErrEmailDoesNotExist       = "E_EMAIL_DOES_NOT_EXIST"
 	ErrEmailDomainDoesNotExist = "E_EMAIL_DOMAIN_DOES_NOT_EXIST"
 	ErrFieldTooLong            = "E_TOO_LONG"
@@ -36,6 +36,7 @@ const (
 	ErrInvalidCredentials      = "E_INVALID_CREDENTIALS"
 	ErrInvalidDate             = "E_INVALID_DATE_FORMAT"
 	ErrInvalidEmail            = "E_INVALID_EMAIL"
+	ErrInvalidGetParams        = "E_BAD_GET_PARAMS"
 	ErrInvalidJSON             = "E_INVALID_JSON"
 	ErrPasswordTooWeak0        = "E_WEAK_PASSWORD_0"
 	ErrPasswordTooWeak1        = "E_WEAK_PASSWORD_1"

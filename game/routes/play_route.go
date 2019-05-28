@@ -1,6 +1,7 @@
-package main
+package routes
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/gorilla/websocket"
@@ -12,11 +13,6 @@ import (
 	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/shared/settings/shared"
 )
 
-// A handler that handles a ~multiple~ users resource. The handler itself is
-// simply a struct that forwards the requests, depending on the method to one of
-// GetUsers or PostUsers. Accepts PUT and POST requests. Implements
-// route.Handler. For details on what do both resources do, see
-// users_(method).go.
 type SinglePlayHandler struct{}
 
 var upgrader = websocket.Upgrader{
@@ -31,7 +27,9 @@ var upgrader = websocket.Upgrader{
 
 func (h *SinglePlayHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	conn, err := upgrader.Upgrade(w, r, nil)
-	if HandleErrForward(w, r, formats.ErrWebSocketFailure, err) != nil {
+	if err != nil {
+		LogError(1, fmt.Sprintf(
+			"Connection %s: (%s)", formats.ErrWebSocketFailure, err.Error()), r)
 		return
 	}
 
@@ -42,11 +40,11 @@ func (h *SinglePlayHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		uid = claims.Uid
 	}
 
-	room, reconnect := game_logic.LoadOrStoreSinglePlayRoom(
+	room, _ := game_logic.LoadOrStoreRoom(
 		game_logic.NewSinglePlayerRoom(r, uid, conn))
 
 	LogInfo(0, "WS: connected", r)
-	go room.Run(r, reconnect)
+	room.Run()
 }
 
 func (h *SinglePlayHandler) Settings() map[string]http_utils.RouteSettings {

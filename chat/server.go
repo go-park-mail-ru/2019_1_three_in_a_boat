@@ -2,7 +2,8 @@
 package main
 
 // The file provides constants, structs and interfaces necessary for using the
-// routes package
+// routes package. It contains a little bit of copypasta but there isn't really
+// any logic in it so I think it's fine.
 
 import (
 	"net/http"
@@ -12,20 +13,14 @@ import (
 
 	"github.com/google/logger"
 
-	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/server/routes"
 	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/shared/http-utils"
 	"github.com/go-park-mail-ru/2019_1_three_in_a_boat/shared/http-utils/middleware"
 )
 
 // Maps URL paths into corresponding routes.Routes
 var RoutesMap = map[string]http_utils.Handler{
-	"/authors":    &routes.AuthorsHandler{},
-	"/users":      &routes.UsersHandler{},
-	"/users/":     &routes.UserHandler{},
-	"/signin":     &routes.SigninHandler{},
-	"/":           &routes.CheckAuthHandler{},
-	"/signout":    &routes.SignOutHandler{},
-	"/users/chat": &routes.UsersBatchHandler{},
+	"/chat":          &ChatHandler{},
+	"/chat/paginate": &ChatPaginationHandler{},
 }
 
 var globalRouter = http.ServeMux{}

@@ -6,6 +6,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"strconv"
 	"strings"
 )
 
@@ -42,7 +43,7 @@ func makeOrderString(orderMap map[string]string, order []SelectOrder) (string, e
 
 // Makes a valid SQL LIMIT statement based on provided limit.
 // If limit is negative, returns an empty string
-func makeLimitString(limit int) string {
+func MakeLimitString(limit int) string {
 	if limit < 0 {
 		return ""
 	} else {
@@ -50,9 +51,21 @@ func makeLimitString(limit int) string {
 	}
 }
 
+func MakeIdsString(ids []int64) string {
+	builder := strings.Builder{}
+	for i, id := range ids {
+		builder.WriteString(`a."uid"=` + strconv.Itoa(int(id)))
+		if i != len(ids)-1 {
+			builder.WriteString(" OR ")
+		}
+	}
+
+	return builder.String()
+}
+
 // Makes a valid SQL OFFSET statement based on provided limit.
 // If limit is negative or zero, returns an empty string
-func makeOffsetString(offset int) string {
+func MakeOffsetString(offset int) string {
 	if offset <= 0 {
 		return ""
 	} else {

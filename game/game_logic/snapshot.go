@@ -11,8 +11,9 @@ import (
 const (
 	StateWaiting = iota
 	StateRunning
-	StateOver
-	StateDisconnect
+	StateOverBoth
+	StateOverPlayer1
+	StateOverPlayer2
 )
 
 type Input struct {
@@ -43,7 +44,6 @@ func NewInput(angle float64) *Input {
 }
 
 var InitialSnapshot = Snapshot{
-	Angle:             -math.Pi / 2,
 	Hexagons:          nil,
 	State:             StateWaiting,
 	Score:             0,
@@ -63,7 +63,6 @@ var InitialHexagons = []struct {
 }
 
 type Snapshot struct {
-	Angle             float64
 	Hexagons          []Hexagon
 	State             int
 	Score             int64
@@ -93,17 +92,78 @@ func RandomAngle() float64 {
 	return rand.Float64() * math.Pi * 2
 }
 
-func (ss *Snapshot) Update(in *Input) bool {
-	ss.Ticks += 1
-	ss.Angle = in.Angle()
-	// check previous snapshot doesn't end the game
-	cur := ss.GetCursor()
+func (ss *Snapshot) IsGameOver(in *Input) bool {
+	if ss.crosses(in) {
+		ss.State = StateOverBoth
+		return true
+	}
+
+	return false
+}
+
+func (ss *Snapshot) crosses(in *Input) bool {
+	cur := ss.GetCursor(in.Angle())
 	for _, h := range ss.Hexagons {
 		if h.Crosses(cur) {
-			ss.State = StateOver
 			return true
 		}
 	}
+	return false
+}
+
+func (ss *Snapshot) IsMultiplayerGameOver(in1 *Input, in2 *Input) bool {
+	switch ss.State {
+	case StateOverPlayer1:
+		over2 := ss.crosses(in2)
+		if over2 {
+			ss.State = StateOverBoth
+			return true
+		}
+		return false
+
+	case StateOverPlayer2:
+		over1 := ss.crosses(in1)
+		if over1 {
+			ss.State = StateOverBoth
+			return true
+		}
+		return false
+
+	case StateRunning:
+		over2 := ss.crosses(in2)
+		over1 := ss.crosses(in1)
+		if over1 {
+			if over2 {
+				ss.State = StateOverBoth
+				return true
+			} else {
+				ss.State = StateOverPlayer1
+				return false
+			}
+		}
+
+		if over2 {
+			if over1 {
+				ss.State = StateOverBoth
+				return true
+			} else {
+				ss.State = StateOverPlayer2
+				return false
+			}
+		}
+		return false
+
+	case StateOverBoth:
+		return true
+	case StateWaiting:
+		return false
+	default:
+		panic("unknown state")
+	}
+}
+
+func (ss *Snapshot) Update() int64 {
+	ss.Ticks += 1
 
 	difficultyIncrement := 1 + MultiplierPerTick*float64(ss.Ticks)
 	if difficultyIncrement > Settings.MaxMultiplier {
@@ -117,8 +177,10 @@ func (ss *Snapshot) Update(in *Input) bool {
 
 	var rotationAmplitude float64
 	// to or from rotation really
-	ticksToRotation := math.Min(ticksSinceRotation, math.Abs(ticksSinceRotation-SameDirectionNumTicks))
-	rotationAmplitude = math.Min(1, math.Max(0.5, 3*ticksToRotation/SameDirectionNumTicks))
+	ticksToRotation := math.Min(ticksSinceRotation,
+		math.Abs(ticksSinceRotation-SameDirectionNumTicks))
+	rotationAmplitude = math.Min(1,
+		math.Max(0.5, 3*ticksToRotation/SameDirectionNumTicks))
 
 	// 1 = clockwise, -1 = ccw
 	var rotationDirection float64 = 1
@@ -126,7 +188,8 @@ func (ss *Snapshot) Update(in *Input) bool {
 		rotationDirection = -1
 	}
 
-	angleIncrement := rotationAmplitude * rotationDirection * RotatePerTick * difficultyIncrement
+	angleIncrement :=
+		rotationAmplitude * rotationDirection * RotatePerTick * difficultyIncrement
 	// update snapshot
 	for i := range ss.Hexagons {
 		if ss.Hexagons[i].Side <= Settings.MinHexagonSize {
@@ -141,14 +204,14 @@ func (ss *Snapshot) Update(in *Input) bool {
 	}
 	ss.CursorCircleAngle += angleIncrement
 
-	return false
+	return ss.Score
 }
 
-func (ss *Snapshot) GetCursor() Circle {
+func (ss *Snapshot) GetCursor(angle float64) Circle {
 	return Circle{
 		Coords{
-			X: Settings.PlayerCircleRadius * math.Cos(ss.Angle+ss.CursorCircleAngle),
-			Y: Settings.PlayerCircleRadius * math.Sin(ss.Angle+ss.CursorCircleAngle),
+			X: Settings.PlayerCircleRadius * math.Cos(angle+ss.CursorCircleAngle),
+			Y: Settings.PlayerCircleRadius * math.Sin(angle+ss.CursorCircleAngle),
 		},
 		Settings.CursorRadius,
 	}

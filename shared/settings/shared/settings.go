@@ -35,8 +35,8 @@ const DefaultServerPort = 3000
 
 const DefaultAuthAddress = "localhost"
 const DefaultAuthPort = 3001
-
 const DefaultGamePort = 3002
+const DefaultChatPort = 3003
 
 // Lifespan of a JWE Auth token - in days
 const JWETokenLifespan = 30
