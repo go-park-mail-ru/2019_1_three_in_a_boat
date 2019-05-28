@@ -6,5 +6,16 @@ before_install:
   -in travis_rsa.enc -out travis_rsa -d
 - chmod 700 travis_rsa
 
+# and for my next trick ill turn the virtual machine into a useless ssh bot
 script:
-  - ssh -o "StrictHostKeyChecking no" -i travis_rsa root@ih1465635.vds.myihor.ru 'mkdir /testing-travis'
+  - scp -r -o "StrictHostKeyChecking no" -i travis_rsa . root@ih1465635.vds.myihor.ru:/hexagon-build
+  - ssh -o "StrictHostKeyChecking no" -i travis_rsa root@ih1465635.vds.myihor.ru 'cd /hexagon-build/etc/docker && \
+    docker build -t hexagon-auth:latest -f Dockerfile.auth ../.. &&
+    docker build -t hexagon-game:latest -f Dockerfile.game ../.. &&
+    docker build -t hexagon-server:latest -f Dockerfile.server ../.. &&
+    docker build -t hexagon-chat:latest -f Dockerfile.chat ../.. &&
+    docker service update hexagon_auth &&
+    docker service update hexagon_game &&
+    docker service update hexagon_chat &&
+    docker service update hexagon_server
+    '
