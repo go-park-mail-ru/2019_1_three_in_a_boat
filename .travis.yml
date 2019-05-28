@@ -1,6 +1,3 @@
-services:
-- docker
-
 before_install:
 - openssl aes-256-cbc -K $encrypted_339d0c5b3f15_key -iv $encrypted_339d0c5b3f15_iv
   -in travis_rsa.enc -out travis_rsa -d
@@ -9,13 +6,13 @@ before_install:
 # and for my next trick ill turn the virtual machine into a useless ssh bot
 script:
   - scp -r -o "StrictHostKeyChecking no" -i travis_rsa . root@ih1465635.vds.myihor.ru:/hexagon-build
-  - ssh -o "StrictHostKeyChecking no" -i travis_rsa root@ih1465635.vds.myihor.ru 'cd /hexagon-build/etc/docker && \
+  - ssh -o "StrictHostKeyChecking no" -i travis_rsa root@ih1465635.vds.myihor.ru 'cd /hexagon-build/etc/docker &&
     docker build -t hexagon-auth:latest -f Dockerfile.auth ../.. &&
     docker build -t hexagon-game:latest -f Dockerfile.game ../.. &&
-    docker build -t hexagon-server:latest -f Dockerfile.server ../.. &&
     docker build -t hexagon-chat:latest -f Dockerfile.chat ../.. &&
-    docker service update hexagon_auth &&
-    docker service update hexagon_game &&
-    docker service update hexagon_chat &&
-    docker service update hexagon_server
-    '
+    docker build -t hexagon-server:latest -f Dockerfile.server ../.. &&
+    docker service update --image hexagon-auth:latest hexagon_auth &&
+    docker service update --image hexagon-game:latest hexagon_game &&
+    docker service update --image hexagon-chat:latest hexagon_chat &&
+    docker service update --image hexagon-auth:server hexagon_server &&
+    rm -rf /hexagon-build'
