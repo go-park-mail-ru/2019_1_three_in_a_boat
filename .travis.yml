@@ -1,0 +1,8 @@
+language: go
+services:
+  - docker
+go:
+  - '1.12'
+before_install:
+  - openssl aes-256-cbc -K $encrypted_339d0c5b3f15_key -iv $encrypted_339d0c5b3f15_iv
+    -in travis_rsa.enc -out ~\/.ssh/travis_rsa -d
