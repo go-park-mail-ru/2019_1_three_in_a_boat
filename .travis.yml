@@ -14,5 +14,5 @@ script:
     docker service update --image hexagon-auth:latest hexagon_auth &&
     docker service update --image hexagon-game:latest hexagon_game &&
     docker service update --image hexagon-chat:latest hexagon_chat &&
-    docker service update --image hexagon-auth:server hexagon_server &&
+    docker service update --image hexagon-server:latest hexagon_server &&
     rm -rf /hexagon-build'
