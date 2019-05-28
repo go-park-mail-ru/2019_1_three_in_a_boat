@@ -4,6 +4,7 @@ services:
 before_install:
 - openssl aes-256-cbc -K $encrypted_339d0c5b3f15_key -iv $encrypted_339d0c5b3f15_iv
   -in travis_rsa.enc -out travis_rsa -d
+- chmod 700 travis_rsa
 
 script:
   - ssh -o "StrictHostKeyChecking no" -i travis_rsa root@ih1465635.vds.myihor.ru 'mkdir /testing-travis'
