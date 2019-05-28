@@ -6,4 +6,4 @@ before_install:
   -in travis_rsa.enc -out travis_rsa -d
 
 script:
-  - ssh -o "StrictHostKeyChecking no" -i travis_rca root@ih1465635.vds.myihor.ru 'mkdir /testing-travis'
+  - ssh -o "StrictHostKeyChecking no" -i travis_rsa root@ih1465635.vds.myihor.ru 'mkdir /testing-travis'
