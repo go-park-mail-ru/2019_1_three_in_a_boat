@@ -19,8 +19,7 @@ script:
     docker service update --image hexagon-auth:latest hexagon_auth &&
     docker service update --image hexagon-game:latest hexagon_game &&
     docker service update --image hexagon-chat:latest hexagon_chat &&
-    docker service update --image hexagon-server:latest hexagon_server &&
-    '
+    docker service update --image hexagon-server:latest hexagon_server'
 
 after_success:
   - ssh -o "StrictHostKeyChecking no" -i travis_rsa root@ih1465635.vds.myihor.ru '
