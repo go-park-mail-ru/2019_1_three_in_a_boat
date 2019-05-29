@@ -20,6 +20,10 @@ script:
     docker service update --image hexagon-game:latest hexagon_game &&
     docker service update --image hexagon-chat:latest hexagon_chat &&
     docker service update --image hexagon-server:latest hexagon_server &&
+    '
+
+after_success:
+  - ssh -o "StrictHostKeyChecking no" -i travis_rsa root@ih1465635.vds.myihor.ru '
     rm -rf /hexagon-build &&
     docker rm $(docker ps -a -q) &&
     docker rmi $(docker images | grep "^<none>" | awk "{print $3}")'
